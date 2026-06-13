@@ -1,0 +1,22 @@
+{
+  "name": "nexuslocale",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "build":      "pnpm -r build",
+    "typecheck":  "pnpm -r typecheck",
+    "lint":       "pnpm -r lint",
+    "db:migrate": "pnpm --filter @nexuslocale/db migrate",
+    "deploy":     "dotenv -e .env -- tsx scripts/deploy.mts"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2",
+    "tsx":        "^4.15.7",
+    "vercel":     "^44.2.7"
+  }
+}

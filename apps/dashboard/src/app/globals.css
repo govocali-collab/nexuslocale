@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { @apply bg-[#EEEDF8] text-[#1C1560]; }
+  * { @apply border-[#D9D7F0]; }
+}
+
+@layer components {
+  .card  { @apply bg-white border border-[#D9D7F0] rounded-lg shadow-sm; }
+  .label { @apply text-xs font-medium text-[#7A77A8] uppercase tracking-wide; }
+  .mono  { @apply font-mono text-sm; }
+}

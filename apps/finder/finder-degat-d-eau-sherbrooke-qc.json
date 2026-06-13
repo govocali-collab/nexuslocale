@@ -1,0 +1,389 @@
+{
+  "niche": "dégât d'eau",
+  "city": "Sherbrooke QC",
+  "country": "CA",
+  "lang": "fr",
+  "keywords": [
+    {
+      "keyword": "dégât d'eau",
+      "search_volume": 880,
+      "cpc": 22.6,
+      "competition": "MEDIUM",
+      "keyword_difficulty": null,
+      "score": 397.76
+    },
+    {
+      "keyword": "dégât d eau",
+      "search_volume": 880,
+      "cpc": 22.6,
+      "competition": "MEDIUM",
+      "keyword_difficulty": null,
+      "score": 397.76
+    },
+    {
+      "keyword": "degat des eaux",
+      "search_volume": 90,
+      "cpc": 25.34,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 45.611999999999995
+    },
+    {
+      "keyword": "degats des eaux",
+      "search_volume": 90,
+      "cpc": 25.34,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 45.611999999999995
+    },
+    {
+      "keyword": "dégât des eaux",
+      "search_volume": 90,
+      "cpc": 25.34,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 45.611999999999995
+    },
+    {
+      "keyword": "degat eau",
+      "search_volume": 90,
+      "cpc": 25.34,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 45.611999999999995
+    },
+    {
+      "keyword": "degat d eau quoi faire",
+      "search_volume": 70,
+      "cpc": 23.46,
+      "competition": "MEDIUM",
+      "keyword_difficulty": null,
+      "score": 32.844
+    },
+    {
+      "keyword": "dégâts d eau en copropriété",
+      "search_volume": 10,
+      "cpc": 41.37,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 8.274
+    },
+    {
+      "keyword": "dégâts des eaux plafond",
+      "search_volume": 10,
+      "cpc": 25.73,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 5.146
+    },
+    {
+      "keyword": "degat eau plafond",
+      "search_volume": 10,
+      "cpc": 25.73,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 5.146
+    },
+    {
+      "keyword": "assurance degat d eau",
+      "search_volume": 20,
+      "cpc": 4.04,
+      "competition": "MEDIUM",
+      "keyword_difficulty": null,
+      "score": 1.6159999999999999
+    },
+    {
+      "keyword": "degat d eau condo qui doit payer",
+      "search_volume": 40,
+      "cpc": 1.74,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 1.392
+    },
+    {
+      "keyword": "assurance degat des eaux locataire ou proprietaire",
+      "search_volume": 10,
+      "cpc": 3.99,
+      "competition": "HIGH",
+      "keyword_difficulty": null,
+      "score": 0.7980000000000002
+    },
+    {
+      "keyword": "assurance habitation degat des eaux",
+      "search_volume": 10,
+      "cpc": 0.44,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 0.08800000000000001
+    },
+    {
+      "keyword": "assurance habitation dégat des eaux",
+      "search_volume": 10,
+      "cpc": 0.44,
+      "competition": "LOW",
+      "keyword_difficulty": null,
+      "score": 0.08800000000000001
+    }
+  ],
+  "clusters": [
+    {
+      "label": "degat eau",
+      "keywords": [
+        {
+          "keyword": "dégât d'eau",
+          "search_volume": 880,
+          "cpc": 22.6,
+          "competition": "MEDIUM",
+          "keyword_difficulty": null,
+          "score": 397.76
+        },
+        {
+          "keyword": "dégât d eau",
+          "search_volume": 880,
+          "cpc": 22.6,
+          "competition": "MEDIUM",
+          "keyword_difficulty": null,
+          "score": 397.76
+        },
+        {
+          "keyword": "degat des eaux",
+          "search_volume": 90,
+          "cpc": 25.34,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 45.611999999999995
+        },
+        {
+          "keyword": "dégât des eaux",
+          "search_volume": 90,
+          "cpc": 25.34,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 45.611999999999995
+        },
+        {
+          "keyword": "degat eau",
+          "search_volume": 90,
+          "cpc": 25.34,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 45.611999999999995
+        },
+        {
+          "keyword": "degat d eau quoi faire",
+          "search_volume": 70,
+          "cpc": 23.46,
+          "competition": "MEDIUM",
+          "keyword_difficulty": null,
+          "score": 32.844
+        },
+        {
+          "keyword": "dégâts d eau en copropriété",
+          "search_volume": 10,
+          "cpc": 41.37,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 8.274
+        },
+        {
+          "keyword": "degat eau plafond",
+          "search_volume": 10,
+          "cpc": 25.73,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 5.146
+        },
+        {
+          "keyword": "assurance degat d eau",
+          "search_volume": 20,
+          "cpc": 4.04,
+          "competition": "MEDIUM",
+          "keyword_difficulty": null,
+          "score": 1.6159999999999999
+        },
+        {
+          "keyword": "degat d eau condo qui doit payer",
+          "search_volume": 40,
+          "cpc": 1.74,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 1.392
+        },
+        {
+          "keyword": "assurance degat des eaux locataire ou proprietaire",
+          "search_volume": 10,
+          "cpc": 3.99,
+          "competition": "HIGH",
+          "keyword_difficulty": null,
+          "score": 0.7980000000000002
+        },
+        {
+          "keyword": "assurance habitation degat des eaux",
+          "search_volume": 10,
+          "cpc": 0.44,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 0.08800000000000001
+        },
+        {
+          "keyword": "assurance habitation dégat des eaux",
+          "search_volume": 10,
+          "cpc": 0.44,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 0.08800000000000001
+        }
+      ],
+      "total_volume": 2210,
+      "avg_cpc": 17.11,
+      "avg_score": 75.58
+    },
+    {
+      "label": "degats eaux",
+      "keywords": [
+        {
+          "keyword": "degats des eaux",
+          "search_volume": 90,
+          "cpc": 25.34,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 45.611999999999995
+        },
+        {
+          "keyword": "dégâts des eaux plafond",
+          "search_volume": 10,
+          "cpc": 25.73,
+          "competition": "LOW",
+          "keyword_difficulty": null,
+          "score": 5.146
+        }
+      ],
+      "total_volume": 100,
+      "avg_cpc": 25.54,
+      "avg_score": 25.38
+    }
+  ],
+  "candidates": [
+    {
+      "domain": "degatdeausherbrooke.ca",
+      "tld": ".ca",
+      "type": "exact",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "degatdeausherbrooke.com",
+      "tld": ".com",
+      "type": "exact",
+      "available": true,
+      "price_usd": 10.98
+    },
+    {
+      "domain": "degat-d-eau-sherbrooke.ca",
+      "tld": ".ca",
+      "type": "exact",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "degat-d-eau-sherbrooke.com",
+      "tld": ".com",
+      "type": "exact",
+      "available": true,
+      "price_usd": 10.98
+    },
+    {
+      "domain": "degatsherbrooke.ca",
+      "tld": ".ca",
+      "type": "exact",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "degatsherbrooke.com",
+      "tld": ".com",
+      "type": "exact",
+      "available": true,
+      "price_usd": 10.98
+    },
+    {
+      "domain": "urgencedegatdeausherbrooke.ca",
+      "tld": ".ca",
+      "type": "partial",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "urgencedegatdeausherbrooke.com",
+      "tld": ".com",
+      "type": "partial",
+      "available": true,
+      "price_usd": 10.98
+    },
+    {
+      "domain": "urgence-degat-d-eau-sherbrooke.ca",
+      "tld": ".ca",
+      "type": "partial",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "urgence-degat-d-eau-sherbrooke.com",
+      "tld": ".com",
+      "type": "partial",
+      "available": true,
+      "price_usd": 10.98
+    },
+    {
+      "domain": "degatdeauprosherbrooke.ca",
+      "tld": ".ca",
+      "type": "partial",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "degatdeauprosherbrooke.com",
+      "tld": ".com",
+      "type": "partial",
+      "available": true,
+      "price_usd": 10.98
+    },
+    {
+      "domain": "degatdeauexpertsherbrooke.ca",
+      "tld": ".ca",
+      "type": "partial",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "degatdeauexpertsherbrooke.com",
+      "tld": ".com",
+      "type": "partial",
+      "available": true,
+      "price_usd": 10.98
+    },
+    {
+      "domain": "restaurationdegatdeausherbrooke.ca",
+      "tld": ".ca",
+      "type": "partial",
+      "available": true,
+      "price_usd": 12.98
+    },
+    {
+      "domain": "restaurationdegatdeausherbrooke.com",
+      "tld": ".com",
+      "type": "partial",
+      "available": true,
+      "price_usd": 10.98
+    }
+  ],
+  "niche_score": 123.53,
+  "best_domain": {
+    "domain": "degatdeausherbrooke.ca",
+    "tld": ".ca",
+    "type": "exact",
+    "available": true,
+    "price_usd": 12.98
+  },
+  "scanned_at": "2026-06-13T11:28:08.408Z"
+}

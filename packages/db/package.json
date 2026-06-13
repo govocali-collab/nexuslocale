@@ -1,0 +1,26 @@
+{
+  "name": "@nexuslocale/db",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Client Supabase typé + helpers CRUD + migrations SQL",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript":  "^5.4.5"
+  }
+}

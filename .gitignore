@@ -1,0 +1,44 @@
+# ─── Secrets — NE JAMAIS COMMITER ────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+
+# Clés de service Google (GSC, service accounts)
+*service-account*.json
+*service_account*.json
+*gsc*.json
+*google*.json
+credentials.json
+serviceAccountKey.json
+
+# ─── Dépendances ──────────────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ─── Build outputs ────────────────────────────────────────────────────────────
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/.next/
+.turbo/
+*.tsbuildinfo
+
+# ─── Vercel ───────────────────────────────────────────────────────────────────
+.vercel/
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+**/.DS_Store
+
+# ─── IDE ──────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+
+# ─── pnpm ─────────────────────────────────────────────────────────────────────
+.pnpm-store/

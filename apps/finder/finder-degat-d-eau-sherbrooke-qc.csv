@@ -1,0 +1,36 @@
+# Mots-clés
+keyword,search_volume,cpc,keyword_difficulty,score
+"dégât d'eau",880,22.6,,397.76
+"dégât d eau",880,22.6,,397.76
+"degat des eaux",90,25.34,,45.61
+"degats des eaux",90,25.34,,45.61
+"dégât des eaux",90,25.34,,45.61
+"degat eau",90,25.34,,45.61
+"degat d eau quoi faire",70,23.46,,32.84
+"dégâts d eau en copropriété",10,41.37,,8.27
+"dégâts des eaux plafond",10,25.73,,5.15
+"degat eau plafond",10,25.73,,5.15
+"assurance degat d eau",20,4.04,,1.62
+"degat d eau condo qui doit payer",40,1.74,,1.39
+"assurance degat des eaux locataire ou proprietaire",10,3.99,,0.80
+"assurance habitation degat des eaux",10,0.44,,0.09
+"assurance habitation dégat des eaux",10,0.44,,0.09
+
+# Domaines
+domain,available,price_usd,type
+degatdeausherbrooke.ca,true,12.98,exact
+degatdeausherbrooke.com,true,10.98,exact
+degat-d-eau-sherbrooke.ca,true,12.98,exact
+degat-d-eau-sherbrooke.com,true,10.98,exact
+degatsherbrooke.ca,true,12.98,exact
+degatsherbrooke.com,true,10.98,exact
+urgencedegatdeausherbrooke.ca,true,12.98,partial
+urgencedegatdeausherbrooke.com,true,10.98,partial
+urgence-degat-d-eau-sherbrooke.ca,true,12.98,partial
+urgence-degat-d-eau-sherbrooke.com,true,10.98,partial
+degatdeauprosherbrooke.ca,true,12.98,partial
+degatdeauprosherbrooke.com,true,10.98,partial
+degatdeauexpertsherbrooke.ca,true,12.98,partial
+degatdeauexpertsherbrooke.com,true,10.98,partial
+restaurationdegatdeausherbrooke.ca,true,12.98,partial
+restaurationdegatdeausherbrooke.com,true,10.98,partial

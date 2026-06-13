@@ -1,0 +1,271 @@
+import type { GeneratedContent, ProspectFull } from './types.js';
+
+// Config fictif réaliste pour Le Groupe Ultra (excavation, Granby)
+// Représente ce que l'API Anthropic produirait — utilisé avec --simulate.
+const MOCK_ULTRA: GeneratedContent = {
+  branding: {
+    tagline:         'Travaux d\'excavation et terrassement — fiables, région de Granby',
+    primary_color:   '#1a3a5c',
+    secondary_color: '#e87c22',
+  },
+  pages: {
+    home: {
+      hero_title:    'Excavation et terrassement à Granby et région',
+      hero_subtitle: 'Fondations, drain français, travaux commerciaux — faits pour durer',
+      intro:         'Le Groupe Ultra réalise des travaux d\'excavation résidentielle et commerciale dans la région de Granby. Notre connaissance des sols de la MRC de La Haute-Yamaska nous permet d\'adapter chaque chantier aux conditions réelles du terrain.',
+      sections: [
+        { type: 'services_grid',  heading: 'Nos services' },
+        {
+          type:    'content',
+          heading: 'Expertise locale, équipement adapté',
+          body:    'Un excavateur qui connaît les argiles de la Yamaska, les règlements municipaux de Granby et la profondeur de gel hivernale peut éviter bien des reprises de chantier. C\'est cette connaissance de terrain qui distingue un entrepreneur local d\'une compagnie de passage.',
+        },
+        { type: 'faq',           heading: 'Questions fréquentes' },
+        { type: 'service_areas', heading: 'Zones desservies' },
+        {
+          type:     'cta',
+          heading:  'Demandez un estimé sans engagement',
+          subtitle: 'Réponse sous 24h les jours ouvrables',
+        },
+      ],
+    },
+
+    services: [
+      {
+        slug:             'excavation-fondation',
+        nav_label:        'Fondation',
+        h1:               'Excavation de fondation à Granby et région',
+        meta_title:       'Excavation de fondation Granby | Groupe Ultra',
+        meta_description: 'Excavation de fondation résidentielle et commerciale à Granby. Connaissance des sols locaux, drainage inclus dans l\'évaluation. Estimé gratuit.',
+        sections: [
+          {
+            heading: 'Sols argileux et profondeur de gel',
+            body:    'La région de Granby présente fréquemment des couches d\'argile qui se comportent différemment selon la saison. Une excavation bien planifiée tient compte du type de sol rencontré et de la profondeur de gel locale — qui peut atteindre 1,5 m certains hivers — pour dimensionner correctement la fouille.',
+          },
+          {
+            heading: 'De la fouille au remblayage',
+            body:    'Nous procédons au marquage des services souterrains (Info-Excavation obligatoire), puis à l\'excavation à la pelle mécanique. Le remblayage utilise un granulat approprié, compacté par couches pour éviter les affaissements. Un rapport de compactage peut être fourni pour les projets commerciaux.',
+          },
+        ],
+        local_data: {
+          neighborhoods:   ['Vieux-Granby', 'Secteur Yamaska', 'Secteur Nord', 'Quartier des Cantons'],
+          price_context:   'Le coût varie selon la superficie, la profondeur requise et le type de sol. Chaque estimé est gratuit et basé sur une visite du terrain.',
+          faqs: [
+            {
+              q: 'Faut-il un permis de la Ville de Granby pour excaver?',
+              a: 'Oui, un permis de construction ou d\'excavation est requis pour la plupart des projets. Nous pouvons vous guider dans les démarches auprès de la Ville.',
+            },
+            {
+              q: 'Combien de jours dure une excavation de fondation résidentielle?',
+              a: 'Pour une maison standard, l\'excavation proprement dite prend généralement 1 à 3 jours selon la superficie et le type de sol rencontré.',
+            },
+          ],
+          local_landmarks: ['Accès via route 112', 'MRC de La Haute-Yamaska'],
+        },
+      },
+      {
+        slug:             'terrassement-nivellement',
+        nav_label:        'Terrassement',
+        h1:               'Terrassement et nivellement à Granby',
+        meta_title:       'Terrassement Granby | Le Groupe Ultra',
+        meta_description: 'Terrassement, nivellement de terrain et gestion du drainage à Granby et environs. Planification du ruissellement incluse. Estimé gratuit.',
+        sections: [
+          {
+            heading: 'Drainage de surface et prévention des dommages',
+            body:    'Un terrassement bien planifié dirige les eaux de ruissellement loin des fondations et des zones habitées. Nous analysons la topographie de votre terrain avant toute intervention pour établir les pentes et fossés nécessaires.',
+          },
+          {
+            heading: 'Préparation de site et décapage',
+            body:    'Avant le terrassement final, nous procédons au débroussaillage, au déboisage si nécessaire et au décapage de la terre végétale. Celle-ci peut être mise en réserve pour la réutiliser en finition paysagère.',
+          },
+        ],
+        local_data: {
+          neighborhoods:   ['Parc industriel de Granby', 'Secteur Roxton', 'Zone développement Nord'],
+          price_context:   'Le prix dépend de la superficie, du volume de déblais à évacuer et de la complexité du drainage à aménager.',
+          faqs: [
+            {
+              q: 'Peut-on conserver la terre végétale décapée?',
+              a: 'Oui, si la qualité le permet, nous pouvons la mettre en réserve sur le chantier pour la réutiliser lors de la finition.',
+            },
+          ],
+          local_landmarks: ['Secteur riverain Yamaska', 'Route 139 Granby'],
+        },
+      },
+      {
+        slug:             'drain-francais',
+        nav_label:        'Drain français',
+        h1:               'Installation de drain français à Granby',
+        meta_title:       'Drain français Granby | Le Groupe Ultra',
+        meta_description: 'Installation et remplacement de drain français à Granby. Infiltrations au sous-sol? Diagnostic gratuit, travaux rapides. Appelez-nous.',
+        sections: [
+          {
+            heading: 'Signes qu\'un drain français est en fin de vie',
+            body:    'Les drains en fibrociment posés avant les années 1990 arrivent souvent en fin de vie dans la région de Granby. Infiltrations répétées au sous-sol, humidité persistante ou moisissures malgré un bon drainage de surface sont des signaux à ne pas ignorer.',
+          },
+          {
+            heading: 'Notre méthode d\'installation',
+            body:    'Nous excavons le pourtour de la fondation, installons un drain perforé enrobé de géotextile sur un lit de pierre concassée 14-20 mm, refaisons l\'imperméabilisation si nécessaire, puis remblayons avec des matériaux granulaires appropriés.',
+          },
+        ],
+        local_data: {
+          neighborhoods:   ['Vieux-Granby', 'Secteur Saint-Alphonse', 'Secteur Yamaska Sud'],
+          price_context:   'Le coût varie selon le périmètre de la fondation, l\'accessibilité du terrain et l\'état de l\'imperméabilisation existante.',
+          competitor_context: 'Plusieurs entrepreneurs généraux interviennent en drainage dans la région, mais peu sont spécialisés en excavation résidentielle. La spécialisation permet une meilleure lecture des sols locaux.',
+          faqs: [
+            {
+              q: 'Les travaux de drain français peuvent-ils se faire en hiver?',
+              a: 'Partiellement. Le gel complique l\'excavation et le remblayage. Nous planifions généralement ces travaux au printemps ou en été pour de meilleurs résultats.',
+            },
+          ],
+        },
+      },
+      {
+        slug:             'excavation-commerciale',
+        nav_label:        'Commercial',
+        h1:               'Excavation commerciale et industrielle à Granby',
+        meta_title:       'Excavation commerciale Granby | Groupe Ultra',
+        meta_description: 'Excavation pour bâtiments commerciaux et industriels à Granby et MRC Haute-Yamaska. Équipement lourd, respect des délais. Estimé gratuit.',
+        sections: [
+          {
+            heading: 'Projets de grande envergure',
+            body:    'Les chantiers commerciaux et industriels demandent un équipement plus lourd, une planification rigoureuse et le respect strict des délais. Nous coordonnons les étapes d\'excavation en fonction du calendrier général du projet pour minimiser les interruptions.',
+          },
+          {
+            heading: 'Coordination avec les autres corps de métier',
+            body:    'Une excavation commerciale implique souvent la présence simultanée de plombiers, électriciens et ingénieurs. Nous travaillons en coordination avec les équipes sur place pour que chaque phase se déroule dans l\'ordre et dans les délais prévus.',
+          },
+        ],
+        local_data: {
+          neighborhoods:   ['Parc industriel de Granby', 'Zone commerciale rue Principale', 'Secteur Bromont-Granby'],
+          price_context:   'Les projets commerciaux sont évalués au cas par cas selon la superficie, la profondeur, le type de sol et la complexité logistique.',
+          faqs: [
+            {
+              q: 'Intervenez-vous pour des projets municipaux?',
+              a: 'Nous nous concentrons sur les projets privés résidentiels et commerciaux. Pour les appels d\'offres municipaux, vérifiez nos qualifications en nous contactant directement.',
+            },
+          ],
+          local_landmarks: ['Parc industriel de Granby', 'Route 112 commerciale'],
+        },
+      },
+    ],
+
+    service_areas: [
+      {
+        city:          'Granby',
+        nav_label:     'Granby',
+        neighborhoods: ['Vieux-Granby', 'Secteur Yamaska', 'Secteur Nord', 'Quartier des Cantons', 'Secteur Saint-Alphonse'],
+        local_context: 'Granby est le centre urbain de la MRC de La Haute-Yamaska, avec une croissance résidentielle soutenue dans ses secteurs nord et est. Les sols y sont souvent argileux, ce qui influence la conception des drainages et la planification des fondations. Nos équipes connaissent les règlements municipaux et les exigences de la Ville pour les travaux d\'excavation.',
+        faqs: [
+          {
+            q: 'Intervenez-vous dans les nouveaux développements domiciliaires de Granby?',
+            a: 'Oui, nous travaillons avec des entrepreneurs généraux et des particuliers dans les nouveaux secteurs résidentiels. Contactez-nous en début de projet pour planifier l\'excavation selon votre calendrier.',
+          },
+        ],
+        local_landmarks: ['Lac Boivin', 'Zoo de Granby', 'Parc de la Yamaska', 'Centre-ville de Granby'],
+      },
+      {
+        city:          'Bromont',
+        nav_label:     'Bromont',
+        neighborhoods: ['Mont Bromont', 'Vieux-Bromont', 'Secteur Lac Bromont', 'Bromont Technopôle'],
+        local_context: 'Bromont connaît une forte croissance résidentielle, notamment autour du secteur ski et des développements en altitude. Les terrains en pente y sont fréquents et requièrent une expertise particulière en terrassement, en gestion des talus et en drainage de surface pour prévenir l\'érosion.',
+        faqs: [
+          {
+            q: 'Les terrains en pente à Bromont sont-ils plus complexes à excaver?',
+            a: 'Oui, les pentes imposent une gestion des talus plus rigoureuse et parfois un blindage temporaire. Nous évaluons chaque terrain avant de débuter.',
+          },
+        ],
+        local_landmarks: ['Station de ski Bromont', 'Lac Bromont', 'Route des Cantons-de-l\'Est'],
+      },
+      {
+        city:          'Waterloo',
+        nav_label:     'Waterloo',
+        neighborhoods: ['Centre-ville Waterloo', 'Secteur Lac Waterloo', 'Zone industrielle'],
+        local_context: 'Waterloo est une ville à tissu résidentiel vieillissant où les drains français en fin de vie sont un problème courant. La présence de cours d\'eau impose des marges de recul réglementaires pour les travaux en bordure des zones riveraines.',
+        faqs: [
+          {
+            q: 'Y a-t-il des restrictions pour excaver près des cours d\'eau à Waterloo?',
+            a: 'Oui, la Loi sur la qualité de l\'environnement et les règlements municipaux imposent des marges de recul. Nous respectons ces exigences dans tous nos chantiers.',
+          },
+        ],
+        local_landmarks: ['Rivière Yamaska Nord', 'Lac Waterloo', 'Gare de Waterloo (patrimoniale)'],
+      },
+      {
+        city:          'Cowansville',
+        nav_label:     'Cowansville',
+        neighborhoods: ['Centre Cowansville', 'Secteur Dunham Road', 'Zone industrielle'],
+        local_context: 'Cowansville présente des sols variés — du loam sableux aux zones rocheuses près de la Yamaska Sud — ce qui demande une évaluation préalable du terrain pour adapter l\'équipement et la méthode d\'excavation. Nous y intervenons pour des projets résidentiels et commerciaux.',
+        faqs: [
+          {
+            q: 'Venez-vous à Cowansville pour de petits travaux résidentiels?',
+            a: 'Oui, nous évaluons tous les projets sans minimum imposé. Contactez-nous pour discuter de la portée et des délais.',
+          },
+        ],
+        local_landmarks: ['Rivière Yamaska Sud', 'Centre-ville historique', 'Route 139'],
+      },
+    ],
+
+    contact: {
+      intro: 'Décrivez votre projet et nous vous répondrons sous 24h les jours ouvrables. Pour un chantier urgent, appelez-nous directement.',
+      form_fields: [
+        { name: 'name',    label: 'Nom complet',          type: 'text',     required: true },
+        { name: 'phone',   label: 'Téléphone',            type: 'tel',      required: true },
+        { name: 'email',   label: 'Courriel',             type: 'email',    required: false },
+        { name: 'city',    label: 'Ville / Municipalité', type: 'text',     required: true },
+        {
+          name:    'service',
+          label:   'Type de travaux',
+          type:    'select',
+          required: true,
+          options: [
+            'Excavation de fondation',
+            'Terrassement / Nivellement',
+            'Drain français',
+            'Excavation commerciale',
+            'Autre',
+          ],
+        },
+        { name: 'message', label: 'Description du projet', type: 'textarea', required: false },
+      ],
+    },
+  },
+
+  local_data: {
+    neighborhoods:      ['Vieux-Granby', 'Secteur Yamaska', 'Secteur Nord', 'Quartier des Cantons'],
+    price_context:      'Les prix varient selon la nature du sol, l\'accessibilité du chantier et le volume des travaux. Chaque estimé est gratuit et sans engagement.',
+    competitor_context: 'La région de Granby compte plusieurs entrepreneurs généraux, mais peu d\'excavateurs spécialisés couvrant toute la MRC de La Haute-Yamaska.',
+    faqs: [
+      {
+        q: 'Devez-vous appeler Info-Excavation avant de commencer?',
+        a: 'Oui, c\'est obligatoire au Québec. Info-Excavation localise les services souterrains avant tout début de travaux. Nous gérons cet appel pour vous.',
+      },
+      {
+        q: 'Travaillez-vous en hiver?',
+        a: 'Certains travaux sont réalisables en hiver selon les conditions. Le gel influence les délais et la planification — nous l\'évaluons au cas par cas.',
+      },
+      {
+        q: 'Êtes-vous licenciés RBQ?',
+        a: 'Oui, nous détenons les licences de la Régie du bâtiment du Québec requises pour nos travaux d\'excavation et de terrassement.',
+      },
+    ],
+    local_landmarks: ['Lac Boivin', 'Zoo de Granby', 'Parc de la Yamaska', 'Rivière Yamaska'],
+  },
+};
+
+// Prospect fictif calqué sur les données réelles du scan Granby
+export const MOCK_PROSPECT: ProspectFull = {
+  business_name:  'Le Groupe Ultra',
+  niche:          'excavation',
+  city:           'Granby',
+  phone:          '(450) 378-9600',
+  rating:         4.3,
+  review_count:   33,
+  web_presence:   'has_site',
+  pain_score:     20,
+  prospect_score: 13.2,
+  status:         'new',
+  address:        'Granby, QC, Canada',
+};
+
+export function generateMockContent(_prospect: ProspectFull): GeneratedContent {
+  return MOCK_ULTRA;
+}

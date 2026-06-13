@@ -1,0 +1,26 @@
+{
+  "name": "@nexuslocale/prospector",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Scanne Google Places, score les prospects, écrit dans Supabase",
+  "bin": {
+    "prospector": "./src/index.ts"
+  },
+  "scripts": {
+    "scan":      "tsx src/index.ts scan",
+    "build":     "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nexuslocale/db":     "workspace:*",
+    "@supabase/supabase-js": "^2.43.0",
+    "commander":           "^12.1.0",
+    "cli-table3":          "^0.6.5"
+  },
+  "devDependencies": {
+    "@types/node":       "^20.14.0",
+    "tsx":               "^4.15.7",
+    "typescript":        "^5.4.5"
+  }
+}

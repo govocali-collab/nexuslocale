@@ -1,0 +1,22 @@
+{
+  "name": "@nexuslocale/indexer-cli",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "CLI + cron pour l'indexation GSC et le rank tracking SERP",
+  "scripts": {
+    "cli":       "tsx src/index.ts",
+    "cron":      "tsx src/cron.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nexuslocale/db":      "workspace:*",
+    "@nexuslocale/indexer": "workspace:*",
+    "commander":            "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx":         "^4.15.7",
+    "typescript":  "^5.4.5"
+  }
+}

@@ -1,0 +1,112 @@
+[
+  {
+    "place_id": "ChIJsim_tremblay",
+    "business_name": "Excavation Tremblay & Fils",
+    "phone": "450-372-1847",
+    "address": "145 rue Principale, Granby, QC J2G 2V4",
+    "rating": 4.8,
+    "review_count": 47,
+    "website": null,
+    "maps_url": "https://maps.google.com/?cid=sim_tremblay",
+    "web_presence": "none"
+  },
+  {
+    "place_id": "ChIJsim_grondin",
+    "business_name": "Multi-Services Grondin",
+    "phone": "450-375-0293",
+    "address": "78 chemin Denison Est, Granby, QC J2G 8J8",
+    "rating": 4.1,
+    "review_count": 89,
+    "website": null,
+    "maps_url": "https://maps.google.com/?cid=sim_grondin",
+    "web_presence": "none"
+  },
+  {
+    "place_id": "ChIJsim_bolduc",
+    "business_name": "Terrassement Bolduc",
+    "phone": "450-372-5512",
+    "address": "312 boul. Cégep, Granby, QC J2J 1X4",
+    "rating": 4.6,
+    "review_count": 23,
+    "website": "https://www.facebook.com/terrassementbolduc",
+    "maps_url": "https://maps.google.com/?cid=sim_bolduc",
+    "web_presence": "social_only"
+  },
+  {
+    "place_id": "ChIJsim_lapointe",
+    "business_name": "Excavation Lapointe",
+    "phone": "450-777-0014",
+    "address": "890 rue Drummond, Granby, QC J2H 2P3",
+    "rating": 4.3,
+    "review_count": 61,
+    "website": "http://excavationlapointe.com",
+    "maps_url": "https://maps.google.com/?cid=sim_lapointe",
+    "web_presence": "has_site"
+  },
+  {
+    "place_id": "ChIJsim_menard",
+    "business_name": "Terrassement Ménard",
+    "phone": "450-372-8800",
+    "address": "23 av. du Parc, Granby, QC J2G 4B5",
+    "rating": 4.4,
+    "review_count": 18,
+    "website": "https://www.instagram.com/terrassementmenard",
+    "maps_url": "https://maps.google.com/?cid=sim_menard",
+    "web_presence": "social_only"
+  },
+  {
+    "place_id": "ChIJsim_roy",
+    "business_name": "Excavation Roy",
+    "phone": "450-375-3300",
+    "address": "556 rue Court, Granby, QC J2G 4G9",
+    "rating": 4.7,
+    "review_count": 34,
+    "website": "http://excavationroy.ca",
+    "maps_url": "https://maps.google.com/?cid=sim_roy",
+    "web_presence": "has_site"
+  },
+  {
+    "place_id": "ChIJsim_cloutier",
+    "business_name": "Services d'excavation Cloutier",
+    "phone": "450-372-9910",
+    "address": "1204 rue Principale, Granby, QC J2J 1V5",
+    "rating": 4.5,
+    "review_count": 29,
+    "website": "https://excavationcloutier.wixsite.com/services",
+    "maps_url": "https://maps.google.com/?cid=sim_cloutier",
+    "web_presence": "has_site"
+  },
+  {
+    "place_id": "ChIJsim_lachance",
+    "business_name": "Équipements Lachance",
+    "phone": "450-378-2241",
+    "address": "44 rue Denison Ouest, Granby, QC J2G 3E7",
+    "rating": 4.2,
+    "review_count": 15,
+    "website": null,
+    "maps_url": "https://maps.google.com/?cid=sim_lachance",
+    "web_presence": "none"
+  },
+  {
+    "place_id": "ChIJsim_gagnon",
+    "business_name": "Excavation Gagnon & Associés",
+    "phone": "450-375-6661",
+    "address": "789 rue Yamaska, Granby, QC J2H 1Z2",
+    "rating": 3.9,
+    "review_count": 44,
+    "website": "http://www.excavationgagnon.com",
+    "maps_url": "https://maps.google.com/?cid=sim_gagnon",
+    "web_presence": "has_site"
+  },
+  {
+    "place_id": "ChIJsim_bergeron",
+    "business_name": "Excavation Bergeron",
+    "phone": "450-372-0054",
+    "address": "200 rue Principale, Granby, QC J2G 2V1",
+    "rating": 4.9,
+    "review_count": 12,
+    "website": "https://excavationbergeron.ca",
+    "maps_url": "https://maps.google.com/?cid=sim_bergeron",
+    "web_presence": "has_site"
+  }
+]

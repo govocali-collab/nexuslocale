@@ -1,0 +1,20 @@
+{
+  "name": "@nexuslocale/tracker",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Call tracking Twilio — reçoit appels/SMS, log leads dans Supabase",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nexuslocale/db":      "workspace:*",
+    "@supabase/supabase-js": "^2.43.0",
+    "twilio":               "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript":  "^5.4.5"
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "domain": "excavationgranby.ca",
+  "mode": "demo",
+  "type": "rent",
+
+  "business": {
+    "name": "Excavation Tremblay",
+    "phone": "450-372-0000",
+    "email": "info@excavationgranby.ca",
+    "address": "Granby, QC, Canada",
+    "hours": "Lun-Ven : 7h-17h | Sam : 8h-12h | Dim : Fermé",
+    "service_areas": ["Granby", "Bromont", "Waterloo", "Cowansville", "Farnham"]
+  },
+
+  "branding": {
+    "primary_color": "#1a3a5c",
+    "secondary_color": "#e87c22",
+    "tagline": "Expertise locale, travail soigné — depuis la région de Granby"
+  },
+
+  "niche": "excavation",
+  "city": "Granby",
+
+  "pages": {
+    "home": {
+      "hero_title": "Excavation professionnelle à Granby et région",
+      "hero_subtitle": "Fondations, terrassement, drain français — des travaux faits pour durer",
+      "intro": "Spécialisés en travaux d'excavation résidentielle et commerciale dans la région de Granby, nous réalisons chaque projet avec le matériel adapté et le souci du détail qu'exige la nature de terrain de la Montérégie-Est.",
+      "sections": [
+        { "type": "services_grid", "heading": "Nos services" },
+        { "type": "content", "heading": "Pourquoi choisir un excavateur local", "body": "Un entrepreneur local connaît les sols argileux de la région, les règlements municipaux de Granby et les conditions hivernales qui affectent la profondeur de gel. Ce savoir-faire terrain évite les mauvaises surprises en cours de chantier." },
+        { "type": "faq", "heading": "Questions fréquentes" },
+        { "type": "service_areas", "heading": "Zones desservies" },
+        { "type": "cta", "heading": "Demandez un estimé gratuit", "subtitle": "Réponse sous 24h les jours ouvrables" }
+      ]
+    },
+
+    "services": [
+      {
+        "slug": "excavation-fondation",
+        "nav_label": "Fondation",
+        "h1": "Excavation de fondation à Granby et région",
+        "meta_title": "Excavation de fondation à Granby | Tremblay",
+        "meta_description": "Excavation de fondation résidentielle et commerciale à Granby. Sol bien préparé, drainage inclus dans l'évaluation. Estimé gratuit.",
+        "sections": [
+          {
+            "heading": "Préparation du sol et profondeur de gel",
+            "body": "Dans la région de Granby, la profondeur de gel peut atteindre 1,5 m certains hivers. Une excavation bien planifiée tient compte du type de sol (argileux, rocheux ou mixte) pour déterminer la profondeur et le périmètre exacts de la fouille."
+          },
+          {
+            "heading": "Étapes d'une excavation de fondation",
+            "body": "Nous commençons par un levé de terrain, suivi du marquage des utilités souterraines (Info-Excavation obligatoire). L'excavation proprement dite est réalisée à la pelle mécanique, avec mise en talus ou blindage selon la profondeur et la stabilité du terrain."
+          },
+          {
+            "heading": "Remblayage et compactage",
+            "body": "Le remblayage utilise un matériau granulaire approprié (pierre concassée ou gravier MG-20) compacté par couches pour éviter les affaissements futurs. Un rapport de compactage peut être fourni sur demande pour les projets commerciaux."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": ["Vieux-Granby", "Secteur Yamaska", "Secteur Nord", "Quartier des Cantons"],
+          "price_context": "Le coût d'une excavation de fondation résidentielle varie selon la superficie, la profondeur requise et le type de sol rencontré. Comptez sur un estimé détaillé après visite du terrain.",
+          "faqs": [
+            {
+              "q": "Faut-il une permission de la Ville de Granby pour excaver?",
+              "a": "Oui, un permis de construction ou d'excavation est généralement requis. Nous pouvons vous guider dans les démarches auprès de la Ville de Granby."
+            },
+            {
+              "q": "Combien de temps dure une excavation de fondation standard?",
+              "a": "Pour une maison résidentielle standard, l'excavation elle-même prend généralement 1 à 3 jours selon la superficie et le type de sol."
+            }
+          ],
+          "local_landmarks": ["Près du secteur Yamaska", "Accès facile depuis la route 112", "Intervenant connu de la MRC de La Haute-Yamaska"]
+        }
+      },
+      {
+        "slug": "terrassement",
+        "nav_label": "Terrassement",
+        "h1": "Terrassement et nivellement à Granby",
+        "meta_title": "Terrassement à Granby | Excavation Tremblay",
+        "meta_description": "Services de terrassement, nivellement de terrain et aménagement extérieur à Granby. Planification du drainage incluse. Estimé gratuit.",
+        "sections": [
+          {
+            "heading": "Nivellement et gestion du drainage de surface",
+            "body": "Un terrassement bien exécuté oriente les eaux de ruissellement loin des fondations et des zones habitées. Nous analysons la topographie de votre terrain pour planifier les pentes et les fossés de rétention nécessaires."
+          },
+          {
+            "heading": "Débroussaillage et préparation de site",
+            "body": "Avant tout terrassement, nous procédons au débroussaillage, au déboisage si nécessaire et au décapage de la couche de terre végétale. Cette étape préliminaire conditionne la qualité du terrassement final."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": ["Parc industriel de Granby", "Secteur Roxton", "Secteur Bromont-Granby"],
+          "price_context": "Le prix du terrassement dépend de la superficie, du volume de déblais à évacuer et de la complexité du drainage à mettre en place.",
+          "faqs": [
+            {
+              "q": "Peut-on conserver la terre végétale décapée?",
+              "a": "Oui, si la qualité le permet, nous pouvons mettre la terre végétale en réserve sur le chantier pour la réutiliser en finition."
+            }
+          ],
+          "local_landmarks": ["Secteur riverain de la rivière Yamaska", "Accès via route 139"]
+        }
+      },
+      {
+        "slug": "drain-francais",
+        "nav_label": "Drain français",
+        "h1": "Installation de drain français à Granby",
+        "meta_title": "Drain français Granby | Excavation Tremblay",
+        "meta_description": "Installation et remplacement de drain français à Granby et région. Problèmes d'infiltration d'eau? Estimé gratuit, réponse rapide.",
+        "sections": [
+          {
+            "heading": "Quand faut-il remplacer son drain français?",
+            "body": "Dans la région de Granby, les drains français en fibrociment installés avant les années 1990 sont souvent en fin de vie. Les signes d'alerte incluent des infiltrations répétées au sous-sol, un plancher de cave humide ou des moisissures récurrentes malgré une bonne membrane d'étanchéité."
+          },
+          {
+            "heading": "Notre processus d'installation",
+            "body": "Nous excavons le pourtour de la fondation, installons un nouveau drain perforé enrobé de géotextile sur un lit de pierre concassée, refaisons l'imperméabilisation de la fondation si nécessaire, puis remblayons avec les matériaux granulaires appropriés."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": ["Vieux-Granby", "Secteur Yamaska", "Secteur Saint-Alphonse"],
+          "price_context": "Le coût varie selon le périmètre de la fondation, l'accessibilité du terrain et l'état de l'imperméabilisation existante. Un diagnostic visuel préalable est recommandé.",
+          "faqs": [
+            {
+              "q": "Les travaux de drain français sont-ils admissibles à RénoVert ou à un programme provincial?",
+              "a": "Les programmes varient selon les années. Nous vous recommandons de vérifier les programmes disponibles auprès de la Ville de Granby ou d'Hydro-Québec au moment de votre projet."
+            },
+            {
+              "q": "Combien de jours durent les travaux?",
+              "a": "Pour une maison résidentielle standard, les travaux complets (excavation, drain, remblayage) s'étendent généralement sur 2 à 4 jours."
+            }
+          ],
+          "competitor_context": "La région de Granby compte quelques entrepreneurs en drainage, mais peu spécialisés exclusivement en excavation résidentielle. Notre connaissance du type de sol local est un avantage direct pour éviter les reprises."
+        }
+      },
+      {
+        "slug": "demolition-dalle",
+        "nav_label": "Démolition dalle",
+        "h1": "Démolition de dalle et béton à Granby",
+        "meta_title": "Démolition dalle béton Granby | Excavation Tremblay",
+        "meta_description": "Démolition de dalles de béton, entrées de garage et allées à Granby. Travail propre, évacuation des débris incluse. Estimé gratuit.",
+        "sections": [
+          {
+            "heading": "Démolition au marteau hydraulique",
+            "body": "Nous utilisons des bris hydrauliques montés sur pelle mécanique pour les dalles épaisses ou armées. Cette méthode est plus rapide et génère moins de poussière que la démolition manuelle."
+          },
+          {
+            "heading": "Évacuation et valorisation des débris",
+            "body": "Les débris de béton sont chargés directement en benne et acheminés vers un centre de valorisation des matériaux de construction. Le béton concassé peut être réutilisé comme remblai dans certains cas."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": ["Zone industrielle de Granby", "Secteur commercial rue Principale", "Secteur résidentiel Nord"],
+          "price_context": "Le prix dépend de l'épaisseur de la dalle, de la surface totale, de la présence de treillis métallique et de l'accessibilité pour la machinerie.",
+          "local_landmarks": ["Accès possible par chemin Denison", "Proximité du parc industriel Granby"],
+          "faqs": [
+            {
+              "q": "Peut-on démolir une dalle en hiver?",
+              "a": "Oui, la démolition au marteau hydraulique est possible en toute saison. Le gel rend parfois le béton plus fragile, ce qui peut faciliter le travail."
+            }
+          ]
+        }
+      }
+    ],
+
+    "service_areas": [
+      {
+        "city": "Granby",
+        "nav_label": "Granby",
+        "neighborhoods": ["Vieux-Granby", "Secteur Yamaska", "Secteur Nord", "Quartier des Cantons", "Secteur Saint-Alphonse"],
+        "local_context": "Granby est le centre urbain de la MRC de La Haute-Yamaska. Les travaux d'excavation y sont fréquents en raison de la croissance résidentielle soutenue dans les secteurs nord et est de la ville. Les sols y sont souvent argileux, ce qui influence la conception des drainages et des fondations.",
+        "faqs": [
+          {
+            "q": "Intervenez-vous dans les quartiers en copropriété divise à Granby?",
+            "a": "Oui, à condition que les accès pour la machinerie soient suffisants. Nous évaluons la faisabilité lors de notre visite initiale."
+          }
+        ],
+        "local_landmarks": ["Lac Boivin", "Zoo de Granby", "Parc de la Yamaska", "Centre-ville de Granby"]
+      },
+      {
+        "city": "Bromont",
+        "nav_label": "Bromont",
+        "neighborhoods": ["Mont Bromont", "Vieux-Bromont", "Secteur Lac Bromont", "Bromont Technopôle"],
+        "local_context": "Bromont est une ville en forte croissance résidentielle, notamment autour du secteur ski et des nouveaux développements domiciliaires. Le terrain y est souvent en pente, ce qui requiert une expertise particulière en terrassement et en gestion du drainage de surface pour éviter l'érosion.",
+        "faqs": [
+          {
+            "q": "Les terrains en pente à Bromont sont-ils plus complexes à excaver?",
+            "a": "Oui, les terrains en pente nécessitent un blindage ou une gestion des talus plus rigoureuse. Nous adaptons notre approche en fonction de l'inclinaison et du type de sol."
+          }
+        ],
+        "local_landmarks": ["Station de ski Bromont", "Lac Bromont", "Route des Cantons de l'Est", "Parc d'artisans"]
+      },
+      {
+        "city": "Waterloo",
+        "nav_label": "Waterloo",
+        "neighborhoods": ["Centre-ville Waterloo", "Secteur Lac Waterloo", "Zone industrielle Waterloo"],
+        "local_context": "Waterloo est une ville de taille modeste mais avec un tissu résidentiel vieillissant où les problèmes de drains français en fin de vie sont fréquents. La proximité des cours d'eau impose une attention particulière aux travaux de drainage pour respecter les zones de protection riveraine.",
+        "faqs": [
+          {
+            "q": "Y a-t-il des restrictions pour excaver près des cours d'eau à Waterloo?",
+            "a": "Oui, la Loi sur la qualité de l'environnement et les règlements municipaux imposent des marges de recul en bordure des cours d'eau. Nous nous assurons de respecter ces exigences."
+          }
+        ],
+        "local_landmarks": ["Rivière Yamaska Nord", "Lac Waterloo", "Gare de Waterloo (patrimoniale)"]
+      },
+      {
+        "city": "Cowansville",
+        "nav_label": "Cowansville",
+        "neighborhoods": ["Centre Cowansville", "Secteur Dunham Road", "Secteur Industriel"],
+        "local_context": "Cowansville, chef-lieu de la MRC de Brome-Missisquoi, présente des sols variés allant du loam sableux aux zones rocheuses près de la rivière Yamaska Sud. Cette variabilité géologique demande une évaluation préalable pour adapter l'équipement d'excavation.",
+        "faqs": [
+          {
+            "q": "Intervenez-vous à Cowansville pour des projets commerciaux?",
+            "a": "Oui, nous réalisons des projets résidentiels et commerciaux à Cowansville. Les délais et la portée sont définis lors de l'estimé gratuit."
+          }
+        ],
+        "local_landmarks": ["Rivière Yamaska Sud", "Centre-ville historique de Cowansville", "Route 139"]
+      },
+      {
+        "city": "Farnham",
+        "nav_label": "Farnham",
+        "neighborhoods": ["Centre-ville Farnham", "Secteur Notre-Dame", "Zone agricole Est"],
+        "local_context": "Farnham est une ville agricole et résidentielle où les travaux d'excavation concernent souvent des maisons de plain-pied avec des problèmes de drainage de cour arrière ou des projets d'agrandissement de fondation. Les terrains y sont généralement plats et les accès pour la machinerie facilités.",
+        "faqs": [
+          {
+            "q": "Pouvez-vous excaver sur un terrain agricole à Farnham?",
+            "a": "Oui, sous réserve des autorisations requises auprès de la Commission de protection du territoire agricole (CPTAQ) pour les travaux qui affectent une zone agricole."
+          }
+        ],
+        "local_landmarks": ["Rivière Yamaska", "Parc régional de la Yamaska", "Route 235"]
+      }
+    ],
+
+    "contact": {
+      "intro": "Décrivez votre projet et nous vous répondrons sous 24h les jours ouvrables. Pour un projet urgent, appelez-nous directement.",
+      "form_fields": [
+        { "name": "name",    "label": "Nom complet",       "type": "text",     "required": true },
+        { "name": "phone",   "label": "Téléphone",         "type": "tel",      "required": true },
+        { "name": "email",   "label": "Courriel",          "type": "email",    "required": false },
+        { "name": "city",    "label": "Ville / Municipalité", "type": "text",  "required": true },
+        { "name": "service", "label": "Type de travaux",   "type": "select",   "required": true,
+          "options": ["Excavation de fondation", "Terrassement / Nivellement", "Drain français", "Démolition de dalle", "Autre"] },
+        { "name": "message", "label": "Description du projet", "type": "textarea", "required": false }
+      ]
+    }
+  },
+
+  "local_data": {
+    "neighborhoods": ["Vieux-Granby", "Secteur Yamaska", "Secteur Nord", "Quartier des Cantons"],
+    "price_context": "Les prix varient selon la nature du sol, l'accessibilité du chantier et le volume des travaux. Chaque estimé est gratuit et sans engagement.",
+    "faqs": [
+      {
+        "q": "Faut-il appeler Info-Excavation avant de commencer des travaux?",
+        "a": "Oui, c'est obligatoire au Québec. Info-Excavation localise les services souterrains (gaz, électricité, télécommunications) avant le début des travaux. Nous gérons cet appel pour vous."
+      },
+      {
+        "q": "Travaillez-vous en hiver?",
+        "a": "Oui, certains travaux sont réalisables en hiver selon les conditions. La neige et le gel peuvent toutefois influencer les délais et la planification."
+      },
+      {
+        "q": "Êtes-vous assurés et certifiés RBQ?",
+        "a": "Oui, nous détenons une licence de la Régie du bâtiment du Québec (RBQ) et les assurances responsabilité civile requises."
+      }
+    ],
+    "local_landmarks": ["Lac Boivin", "Zoo de Granby", "Parc de la Yamaska", "Rivière Yamaska"],
+    "competitor_context": "La région de Granby compte plusieurs entrepreneurs généraux, mais peu d'excavateurs spécialisés couvrant l'ensemble de la MRC de La Haute-Yamaska."
+  }
+}

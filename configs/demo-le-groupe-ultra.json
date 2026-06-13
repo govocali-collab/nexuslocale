@@ -1,0 +1,492 @@
+{
+  "domain": "demo-le-groupe-ultra.nexuslocale.com",
+  "mode": "demo",
+  "type": "demo",
+  "business": {
+    "name": "Le Groupe Ultra",
+    "phone": "(450) 378-9600",
+    "address": "Granby, QC, Canada",
+    "hours": "Lun–Ven : 7h–17h | Sam : 8h–12h | Dim : Fermé",
+    "service_areas": [
+      "Granby",
+      "Bromont",
+      "Waterloo",
+      "Saint-Hyacinthe",
+      "Cowansville"
+    ]
+  },
+  "branding": {
+    "primary_color": "#2B3A2B",
+    "secondary_color": "#D4891A",
+    "tagline": "Excavation et terrassement fiables pour la région de Granby"
+  },
+  "niche": "excavation",
+  "city": "Granby",
+  "pages": {
+    "home": {
+      "hero_title": "Excavation professionnelle à Granby et région",
+      "hero_subtitle": "Travaux d'excavation, terrassement et drainage réalisés avec soin pour les projets résidentiels et commerciaux de la région de Granby.",
+      "intro": "Le Groupe Ultra offre des services d'excavation complets dans la région de Granby et les municipalités environnantes. Notre équipe intervient sur des projets variés, des fondations résidentielles aux travaux d'infrastructure commerciale. Nous connaissons bien les particularités du sol et du terrain de la MRC de La Haute-Yamaska.",
+      "sections": [
+        {
+          "type": "services_grid",
+          "heading": "Nos services"
+        },
+        {
+          "type": "content",
+          "heading": "Excavation adaptée aux réalités de la région de Granby",
+          "body": "La région de Granby présente des sols variés, notamment des zones argileuses et des terrains rocheux qui exigent une expertise locale. Le Groupe Ultra intervient autant dans les secteurs établis de Granby que dans les nouveaux développements des municipalités voisines. Nous adaptons nos méthodes aux contraintes de chaque terrain pour garantir un travail durable."
+        },
+        {
+          "type": "faq",
+          "heading": "Questions fréquentes"
+        },
+        {
+          "type": "service_areas",
+          "heading": "Zones desservies"
+        },
+        {
+          "type": "cta",
+          "heading": "Demandez une soumission pour votre projet",
+          "subtitle": "Contactez Le Groupe Ultra au (450) 378-9600 pour discuter de votre projet d'excavation à Granby et dans la région."
+        }
+      ]
+    },
+    "services": [
+      {
+        "slug": "excavation-fondation",
+        "nav_label": "Excavation de fondation",
+        "h1": "Excavation de fondation à Granby et région — Le Groupe Ultra",
+        "meta_title": "Excavation de fondation à Granby | Le Groupe Ultra",
+        "meta_description": "Excavation de fondation résidentielle et commerciale à Granby. Le Groupe Ultra réalise vos travaux avec précision et respect des normes en vigueur.",
+        "sections": [
+          {
+            "heading": "Des fondations bien assises dès le départ",
+            "body": "L'excavation de fondation est une étape déterminante dans tout projet de construction. Le Groupe Ultra procède à un relevé soigneux du terrain avant d'entamer les travaux, afin d'assurer une profondeur adéquate selon les normes du Code du bâtiment du Québec. Nous travaillons en coordination avec les entrepreneurs généraux et les ingénieurs pour respecter les plans à la lettre."
+          },
+          {
+            "heading": "Expertise locale pour les sols de la région",
+            "body": "Les terrains de Granby et des municipalités avoisinantes présentent des conditions variées : zones argileuses dans certains secteurs, roc affleurant dans d'autres. Notre équipe adapte ses techniques en conséquence, que ce soit pour une résidence unifamiliale dans le secteur Bromont-sur-le-Lac ou un immeuble commercial près de la route 112. Chaque projet est traité avec rigueur pour éviter les problèmes de tassement ou d'infiltration."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Secteur Saint-Alphonse-de-Granby",
+            "Quartier Val-des-Cerfs",
+            "Secteur industriel de la route 112"
+          ],
+          "price_context": "Le coût d'une excavation de fondation varie selon la superficie, la profondeur requise et la nature du sol. Une soumission détaillée est nécessaire pour obtenir un prix juste et adapté à votre projet.",
+          "faqs": [
+            {
+              "q": "Combien de temps prend une excavation de fondation typique?",
+              "a": "La durée varie selon la taille du projet et les conditions du sol. Un projet résidentiel standard peut prendre de un à plusieurs jours. Nous vous fournissons un calendrier précis lors de la soumission."
+            },
+            {
+              "q": "Faut-il obtenir un permis avant les travaux d'excavation?",
+              "a": "Oui, la plupart des travaux de fondation nécessitent un permis de construction délivré par la Ville de Granby ou la municipalité concernée. Nous pouvons vous conseiller sur les démarches à effectuer."
+            }
+          ],
+          "local_landmarks": [
+            "Route 112",
+            "Centre-ville de Granby",
+            "Parc industriel de Granby"
+          ]
+        }
+      },
+      {
+        "slug": "terrassement",
+        "nav_label": "Terrassement",
+        "h1": "Terrassement résidentiel et commercial à Granby — Le Groupe Ultra",
+        "meta_title": "Terrassement à Granby | Le Groupe Ultra",
+        "meta_description": "Travaux de terrassement à Granby et environs. Nivellement, remblayage et mise en forme du terrain par Le Groupe Ultra, excavation depuis Granby.",
+        "sections": [
+          {
+            "heading": "Préparer votre terrain pour les travaux à venir",
+            "body": "Un terrassement bien réalisé est la base d'un projet réussi, qu'il s'agisse de la construction d'une nouvelle résidence, d'un agrandissement ou d'un aménagement paysager. Le Groupe Ultra effectue le nivellement, le débroussaillage, le remblayage et la mise en forme du terrain selon vos besoins. Nous utilisons des équipements adaptés à la taille de chaque chantier."
+          },
+          {
+            "heading": "Terrassement adapté à la topographie locale",
+            "body": "La région de Granby, avec ses reliefs variés entre la plaine et les contreforts des Cantons-de-l'Est, demande une bonne lecture du terrain. Le Groupe Ultra tient compte de la pente naturelle, des zones de drainage et des accès au chantier pour optimiser chaque intervention. Que votre terrain soit en pente ou plat, notre équipe sait comment le préparer efficacement."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Secteur nord de Granby",
+            "Secteur de Roxton Pond",
+            "Développements résidentiels de Bromont"
+          ],
+          "price_context": "Le tarif de terrassement dépend de la superficie à travailler, du volume de sol à déplacer et de l'accessibilité du terrain. Une visite sur place permet d'établir une soumission précise.",
+          "faqs": [
+            {
+              "q": "Peut-on faire du terrassement en automne dans la région de Granby?",
+              "a": "Oui, les travaux de terrassement sont possibles en automne tant que le sol n'est pas gelé. Il est toutefois préférable de planifier les travaux avant les premières gelées pour faciliter la compaction et l'ensemencement."
+            },
+            {
+              "q": "Qu'arrive-t-il avec la terre excavée?",
+              "a": "Selon le projet, la terre peut être réutilisée sur place pour le remblayage ou le modelage du terrain, ou évacuée vers un site autorisé. Nous vous conseillons sur la meilleure option selon la qualité du sol."
+            }
+          ],
+          "local_landmarks": [
+            "Lac Boivin",
+            "Mont Shefford",
+            "Route 139"
+          ]
+        }
+      },
+      {
+        "slug": "drainage-gestion-eau",
+        "nav_label": "Drainage et gestion de l'eau",
+        "h1": "Drainage et gestion des eaux à Granby — Le Groupe Ultra",
+        "meta_title": "Drainage à Granby | Le Groupe Ultra",
+        "meta_description": "Solutions de drainage et gestion des eaux à Granby et région. Le Groupe Ultra installe drains français et systèmes de gestion des eaux de surface.",
+        "sections": [
+          {
+            "heading": "Protéger votre propriété contre les infiltrations",
+            "body": "Les problèmes de drainage sont fréquents dans la région, notamment dans les secteurs à sol argileux où l'eau s'accumule facilement en saison de dégel. Le Groupe Ultra installe des drains français, des fossés de drainage et des systèmes de gestion des eaux de surface adaptés à votre terrain. Un bon drainage protège votre fondation et prolonge la durée de vie de votre propriété."
+          },
+          {
+            "heading": "Inspection et correction des problèmes existants",
+            "body": "Nous intervenons aussi pour corriger des problèmes de drainage déjà présents, comme les zones marécageuses en cour, les infiltrations en sous-sol ou les fossés obstrués. Notre équipe évalue la situation sur place et propose des solutions durables qui respectent les exigences de la municipalité et de l'environnement. Nous travaillons à Granby et dans les municipalités voisines de la MRC de La Haute-Yamaska."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Secteur Saint-Alphonse-de-Granby",
+            "Secteur Yamaska-Est",
+            "Quartiers riverains du lac Boivin"
+          ],
+          "price_context": "Le coût d'un système de drainage varie selon l'étendue des travaux, le type d'installation et la profondeur requise. Une évaluation sur place est recommandée avant toute soumission.",
+          "faqs": [
+            {
+              "q": "Comment savoir si j'ai besoin d'un drain français?",
+              "a": "Si vous observez de l'humidité persistante en sous-sol, des traces d'efflorescence sur vos murs de fondation ou une accumulation d'eau en cour après les pluies, il peut être utile de faire évaluer votre drainage par un professionnel."
+            },
+            {
+              "q": "Le drain français perturbe-t-il beaucoup le terrain?",
+              "a": "L'installation d'un drain français nécessite une excavation autour du périmètre de la fondation ou dans les zones ciblées. Une fois les travaux terminés, le terrain est remis en état selon les conditions convenues."
+            }
+          ],
+          "local_landmarks": [
+            "Lac Boivin",
+            "Rivière Yamaska",
+            "Secteur des Cantons de Granby"
+          ]
+        }
+      },
+      {
+        "slug": "demolition-deblaiement",
+        "nav_label": "Démolition et déblaiement",
+        "h1": "Démolition et déblaiement à Granby — Le Groupe Ultra",
+        "meta_title": "Démolition et déblaiement à Granby | Le Groupe Ultra",
+        "meta_description": "Services de démolition et déblaiement à Granby et environs. Le Groupe Ultra prend en charge la démolition de structures et le nettoyage de terrain.",
+        "sections": [
+          {
+            "heading": "Démolition sécuritaire et efficace",
+            "body": "Que ce soit pour démolir une vieille remise, un garage ou une structure en béton, Le Groupe Ultra dispose des équipements nécessaires pour effectuer des travaux de démolition en toute sécurité. Nous respectons les réglementations municipales de Granby et des villes environnantes en matière de gestion des débris et de protection des bâtiments adjacents."
+          },
+          {
+            "heading": "Déblaiement et préparation du site",
+            "body": "Après une démolition ou avant de démarrer un nouveau projet, le déblaiement du terrain est une étape essentielle. Notre équipe évacue les matériaux, nettoie le site et prépare le terrain pour la prochaine phase des travaux. Nous assurons une gestion responsable des déchets de construction conformément aux exigences environnementales en vigueur au Québec."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Centre-ville de Granby",
+            "Secteur industriel",
+            "Secteurs en redéveloppement de la rue Principale"
+          ],
+          "price_context": "Le prix d'une démolition dépend de la taille et du type de structure, des matériaux à évacuer et de l'accessibilité du site. Contactez-nous pour une évaluation sur place.",
+          "faqs": [
+            {
+              "q": "Faut-il un permis pour démolir un bâtiment à Granby?",
+              "a": "Oui, la Ville de Granby exige généralement un permis de démolition avant de procéder à l'abattage d'un bâtiment. Nous pouvons vous orienter dans les démarches auprès du service de l'urbanisme."
+            },
+            {
+              "q": "Gérez-vous l'évacuation des débris?",
+              "a": "Oui, nous prenons en charge l'évacuation et la disposition des débris vers des sites autorisés. Certains matériaux récupérables peuvent être valorisés ou recyclés selon leur état."
+            }
+          ],
+          "local_landmarks": [
+            "Rue Principale de Granby",
+            "Parc industriel de Granby",
+            "Route 112"
+          ]
+        }
+      },
+      {
+        "slug": "pose-infrastructure-souterraine",
+        "nav_label": "Infrastructures souterraines",
+        "h1": "Pose d'infrastructures souterraines à Granby — Le Groupe Ultra",
+        "meta_title": "Infrastructures souterraines à Granby | Le Groupe Ultra",
+        "meta_description": "Pose d'aqueduc, égouts et conduites souterraines à Granby et région. Le Groupe Ultra, entrepreneur en excavation expérimenté en Haute-Yamaska.",
+        "sections": [
+          {
+            "heading": "Conduites, aqueduc et égouts sanitaires",
+            "body": "Le Groupe Ultra réalise la pose et le remplacement de conduites d'aqueduc, d'égouts sanitaires et pluviaux, ainsi que d'autres infrastructures souterraines pour des projets résidentiels et commerciaux. Nos travaux sont réalisés en conformité avec les plans d'ingénierie et les exigences des municipalités de la région."
+          },
+          {
+            "heading": "Interventions en milieu résidentiel et municipal",
+            "body": "Que ce soit pour raccorder un nouveau bâtiment aux services municipaux, remplacer une conduite défectueuse ou réaliser des travaux pour une municipalité, notre équipe possède l'expérience requise. Nous intervenons dans Granby et les municipalités voisines, avec un souci constant de minimiser les perturbations pour les résidents et les commerces avoisinants."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Secteurs desservis par le réseau municipal de Granby",
+            "Waterloo",
+            "Saint-Césaire"
+          ],
+          "price_context": "La pose d'infrastructures souterraines est un travail spécialisé dont le coût dépend du type de conduite, de la profondeur d'enfouissement et de la longueur du tracé. Une soumission sur devis est nécessaire.",
+          "faqs": [
+            {
+              "q": "Pouvez-vous remplacer une vieille conduite d'égout pour une résidence existante?",
+              "a": "Oui, nous effectuons le remplacement de conduites d'égout pour des propriétés résidentielles, en coordination avec la municipalité pour les raccordements nécessaires."
+            },
+            {
+              "q": "Est-ce que ce type de travaux nécessite des localisations de services souterrains?",
+              "a": "Absolument. Avant tout travail d'excavation, nous procédons ou coordonnons la localisation des services souterrains existants (Info-Excavation) pour assurer la sécurité du chantier et protéger les infrastructures en place."
+            }
+          ],
+          "local_landmarks": [
+            "Réseau d'aqueduc de Granby",
+            "Route 139",
+            "Autoroute 10"
+          ]
+        }
+      },
+      {
+        "slug": "chemins-acces-stationnements",
+        "nav_label": "Chemins et stationnements",
+        "h1": "Aménagement de chemins d'accès et stationnements à Granby — Le Groupe Ultra",
+        "meta_title": "Chemins et stationnements à Granby | Le Groupe Ultra",
+        "meta_description": "Aménagement de chemins d'accès et stationnements à Granby et région. Excavation, sous-fondation et préparation de surface par Le Groupe Ultra.",
+        "sections": [
+          {
+            "heading": "Construction et réfection de chemins d'accès",
+            "body": "Un chemin d'accès bien construit commence par une excavation adéquate et la pose d'une sous-fondation de qualité. Le Groupe Ultra prépare le sol, effectue le nivellement et installe les couches de gravier nécessaires pour assurer la durabilité de votre entrée ou chemin privé. Nous réalisons aussi la réfection de chemins existants qui se sont détériorés avec le temps."
+          },
+          {
+            "heading": "Préparation de stationnements commerciaux et résidentiels",
+            "body": "Pour les propriétaires commerciaux et les promoteurs immobiliers, nous préparons les surfaces de stationnement selon les plans fournis. Nos travaux comprennent l'excavation, l'installation du système de drainage et la mise en place de la sous-fondation granulaire. Nous intervenons à Granby et dans les zones industrielles et commerciales des environs."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Zone commerciale de la route 112",
+            "Parc industriel de Granby",
+            "Secteurs ruraux de la MRC de La Haute-Yamaska"
+          ],
+          "price_context": "Le coût d'un chemin d'accès ou d'un stationnement varie selon la superficie, la profondeur d'excavation et le type de surface finale souhaitée. Une visite préalable permet d'établir un prix réaliste.",
+          "faqs": [
+            {
+              "q": "Quelle épaisseur de gravier recommandez-vous pour une entrée résidentielle?",
+              "a": "L'épaisseur recommandée dépend du sol en place et du type de véhicules qui circuleront. En général, une bonne sous-fondation compactée avec une couche de finition adéquate est essentielle pour éviter les ornières et la dégradation prématurée."
+            },
+            {
+              "q": "Pouvez-vous aussi faire le drainage d'un stationnement commercial?",
+              "a": "Oui, nous intégrons la gestion des eaux de surface dans la conception et la réalisation de stationnements commerciaux, incluant fossés, puisards et pentes de drainage appropriées."
+            }
+          ],
+          "local_landmarks": [
+            "Zone commerciale route 112 Granby",
+            "Autoroute 10 sortie Granby",
+            "Parc industriel de Granby"
+          ]
+        }
+      }
+    ],
+    "service_areas": [
+      {
+        "city": "Granby",
+        "nav_label": "Granby",
+        "neighborhoods": [
+          "Centre-ville",
+          "Secteur Saint-Alphonse-de-Granby",
+          "Quartier Val-des-Cerfs",
+          "Secteur Yamaska-Est",
+          "Zone industrielle"
+        ],
+        "local_context": "Granby est la ville centrale de la MRC de La Haute-Yamaska. Le Groupe Ultra y réalise des travaux d'excavation dans des secteurs résidentiels établis et dans les zones de développement commercial autour de la route 112 et de l'autoroute 10.",
+        "faqs": [
+          {
+            "q": "Intervenez-vous pour des projets résidentiels dans tous les secteurs de Granby?",
+            "a": "Oui, nous couvrons l'ensemble du territoire de la Ville de Granby, que ce soit dans les quartiers centraux ou dans les secteurs annexés comme Saint-Alphonse-de-Granby."
+          }
+        ],
+        "local_landmarks": [
+          "Lac Boivin",
+          "Zoo de Granby",
+          "Route 112",
+          "Autoroute 10",
+          "Rivière Yamaska"
+        ]
+      },
+      {
+        "city": "Bromont",
+        "nav_label": "Bromont",
+        "neighborhoods": [
+          "Secteur Bromont-sur-le-Lac",
+          "Développements du Mont Bromont",
+          "Zone commerciale du boulevard Bromont"
+        ],
+        "local_context": "Bromont connaît une forte croissance résidentielle et touristique, notamment autour du Mont Bromont et du lac Bromont. Le Groupe Ultra intervient pour des travaux d'excavation liés aux nouvelles constructions et aux projets de développement dans ce secteur en plein essor.",
+        "faqs": [
+          {
+            "q": "Travaillez-vous sur des terrains en pente à Bromont?",
+            "a": "Oui, nous avons l'expérience des terrains inclinés typiques des secteurs montagneux de Bromont, avec les défis particuliers de terrassement et de drainage que cela implique."
+          }
+        ],
+        "local_landmarks": [
+          "Mont Bromont",
+          "Lac Bromont",
+          "Autoroute 10 sortie 74",
+          "Boulevard Bromont"
+        ]
+      },
+      {
+        "city": "Waterloo",
+        "nav_label": "Waterloo",
+        "neighborhoods": [
+          "Centre de Waterloo",
+          "Secteur rural du canton de Shefford"
+        ],
+        "local_context": "Waterloo est une ville à caractère mixte, alliant secteurs résidentiels et zones rurales dans le canton de Shefford. Le Groupe Ultra y effectue des travaux d'excavation pour des projets de construction, de drainage et d'infrastructure, dans un contexte de sols variés propres à la région.",
+        "faqs": [
+          {
+            "q": "Pouvez-vous réaliser des travaux de drainage en milieu rural à Waterloo?",
+            "a": "Oui, nous intervenons pour des projets de drainage agricole et résidentiel en milieu rural, incluant l'installation de fossés et de conduites selon les besoins du terrain."
+          }
+        ],
+        "local_landmarks": [
+          "Route 112",
+          "Mont Shefford",
+          "Rivière Yamaska Nord"
+        ]
+      },
+      {
+        "city": "Saint-Hyacinthe",
+        "nav_label": "Saint-Hyacinthe",
+        "neighborhoods": [
+          "Secteur Douville",
+          "Zone industrielle Saint-Hyacinthe",
+          "Secteurs résidentiels nord"
+        ],
+        "local_context": "Saint-Hyacinthe est un centre urbain important à l'ouest de Granby. Le Groupe Ultra peut y réaliser des travaux d'excavation pour des projets commerciaux, industriels et résidentiels, tirant profit de sa proximité avec la région de Granby via l'autoroute 20 et la route 137.",
+        "faqs": [
+          {
+            "q": "Intervenez-vous pour des projets commerciaux à Saint-Hyacinthe?",
+            "a": "Oui, nous acceptons des mandats commerciaux et industriels à Saint-Hyacinthe selon la disponibilité de nos équipes. Contactez-nous pour discuter de votre projet."
+          }
+        ],
+        "local_landmarks": [
+          "Rivière Yamaska",
+          "Autoroute 20",
+          "Parc industriel de Saint-Hyacinthe"
+        ]
+      },
+      {
+        "city": "Cowansville",
+        "nav_label": "Cowansville",
+        "neighborhoods": [
+          "Centre-ville de Cowansville",
+          "Secteur industriel",
+          "Secteurs résidentiels sud"
+        ],
+        "local_context": "Cowansville est une ville des Cantons-de-l'Est située au sud de Granby, accessible via la route 139. Le Groupe Ultra y intervient pour des travaux d'excavation, de terrassement et de drainage adaptés aux sols et aux conditions climatiques typiques de cette partie des Cantons-de-l'Est.",
+        "faqs": [
+          {
+            "q": "Quel est le délai habituel pour obtenir une soumission à Cowansville?",
+            "a": "Nous faisons notre possible pour vous soumettre une évaluation dans un délai raisonnable après la visite de terrain. Contactez-nous au (450) 378-9600 pour planifier une rencontre."
+          }
+        ],
+        "local_landmarks": [
+          "Route 139",
+          "Rivière Yamaska Sud",
+          "Aéroport de Bromont-Cowansville"
+        ]
+      }
+    ],
+    "contact": {
+      "intro": "Vous avez un projet d'excavation à Granby ou dans la région? Contactez Le Groupe Ultra au (450) 378-9600 ou remplissez le formulaire ci-dessous et nous vous reviendrons rapidement.",
+      "form_fields": [
+        {
+          "name": "name",
+          "label": "Nom complet",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "phone",
+          "label": "Téléphone",
+          "type": "tel",
+          "required": true
+        },
+        {
+          "name": "email",
+          "label": "Courriel",
+          "type": "email",
+          "required": false
+        },
+        {
+          "name": "city",
+          "label": "Ville / Municipalité",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "service",
+          "label": "Type de travaux",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Excavation de fondation",
+            "Terrassement",
+            "Drainage et gestion de l'eau",
+            "Démolition et déblaiement",
+            "Infrastructures souterraines",
+            "Chemins et stationnements",
+            "Autre"
+          ]
+        },
+        {
+          "name": "message",
+          "label": "Description du projet",
+          "type": "textarea",
+          "required": false
+        }
+      ]
+    }
+  },
+  "local_data": {
+    "neighborhoods": [
+      "Centre-ville de Granby",
+      "Secteur Saint-Alphonse-de-Granby",
+      "Quartier Val-des-Cerfs",
+      "Zone industrielle de Granby",
+      "Secteur Yamaska-Est"
+    ],
+    "price_context": "Les tarifs d'excavation dans la région de Granby varient selon la nature du projet, la superficie, le type de sol et l'accessibilité du chantier. Une soumission sur mesure est toujours recommandée.",
+    "faqs": [
+      {
+        "q": "Êtes-vous disponibles pour des urgences liées à l'excavation ou au drainage?",
+        "a": "Nous évaluons les demandes urgentes au cas par cas. Appelez-nous directement au (450) 378-9600 pour discuter de votre situation."
+      },
+      {
+        "q": "Travaillez-vous avec des entrepreneurs généraux?",
+        "a": "Oui, Le Groupe Ultra collabore régulièrement avec des entrepreneurs généraux pour des projets résidentiels et commerciaux dans la région de Granby et les environs."
+      },
+      {
+        "q": "Offrez-vous des soumissions gratuites?",
+        "a": "Oui, nous offrons des soumissions sans frais pour les projets situés dans notre zone de service. Contactez-nous pour planifier une visite de terrain."
+      }
+    ],
+    "competitor_context": "La région de Granby compte plusieurs entrepreneurs en excavation. Le Groupe Ultra se distingue par sa connaissance du territoire local et sa capacité à intervenir sur différents types de projets, des travaux résidentiels aux chantiers commerciaux.",
+    "local_landmarks": [
+      "Zoo de Granby",
+      "Lac Boivin",
+      "Autoroute 10",
+      "Route 112",
+      "Rivière Yamaska",
+      "Mont Shefford"
+    ]
+  }
+}

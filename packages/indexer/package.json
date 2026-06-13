@@ -1,0 +1,22 @@
+{
+  "name": "@nexuslocale/indexer",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Soumet les sites à GSC, suit les positions SERP via DataForSEO",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "build":     "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nexuslocale/db":       "workspace:*",
+    "@supabase/supabase-js": "^2.43.0",
+    "fast-xml-parser":       "^4.3.6",
+    "google-auth-library":   "^9.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript":  "^5.4.5"
+  }
+}

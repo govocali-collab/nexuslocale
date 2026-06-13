@@ -1,0 +1,254 @@
+'use client';
+
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import type { Prospect } from '@/lib/queries';
+import { updateProspectStatus } from '@/lib/actions';
+import { ProspectPanel } from './prospect-panel';
+
+const COLUMNS = ['new', 'demo_sent', 'negotiating', 'won', 'lost'] as const;
+
+const COLUMN_LABELS: Record<string, string> = {
+  new: 'Nouveaux', demo_sent: 'Démo envoyée',
+  negotiating: 'Négociation', won: 'Gagnés', lost: 'Perdus',
+};
+
+const COLUMN_ACCENT: Record<string, string> = {
+  new: 'border-t-slate-400', demo_sent: 'border-t-sky-500',
+  negotiating: 'border-t-amber-500', won: 'border-t-emerald-500', lost: 'border-t-red-400',
+};
+
+type Board = Record<string, Prospect[]>;
+
+function buildBoard(prospects: Prospect[]): Board {
+  const board: Board = {};
+  for (const col of COLUMNS) board[col] = [];
+  for (const p of prospects) {
+    const col = p.status in board ? p.status : 'new';
+    board[col]!.push(p);
+  }
+  return board;
+}
+
+function ScorePill({ score }: { score: number }) {
+  const color =
+    score >= 70 ? 'bg-emerald-100 text-emerald-700' :
+    score >= 40 ? 'bg-amber-100 text-amber-700' :
+                  'bg-red-100 text-red-600';
+  return (
+    <span className={`text-xs font-semibold mono rounded px-1.5 py-0.5 ${color}`}>
+      {Math.round(score)}
+    </span>
+  );
+}
+
+interface DragState {
+  id:     string;   // prospect being dragged
+  col:    string;   // source column
+  index:  number;   // source index
+}
+
+function ProspectCard({
+  p, isDragging, isDropTarget,
+  onDragStart, onDragEnter, onClick,
+}: {
+  p: Prospect;
+  isDragging: boolean;
+  isDropTarget: boolean;
+  onDragStart: () => void;
+  onDragEnter: () => void;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      draggable
+      onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; onDragStart(); }}
+      onDragEnter={onDragEnter}
+      onClick={onClick}
+      className={`bg-white border rounded-lg p-3 cursor-pointer
+                  hover:shadow-sm hover:border-indigo-200 transition-all space-y-1.5 select-none
+                  ${isDragging   ? 'opacity-40 scale-95' : ''}
+                  ${isDropTarget ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-[#D9D7F0]'}`}
+    >
+      <div className="flex items-start justify-between gap-1">
+        <span className="font-medium text-[#1C1560] text-sm leading-snug">{p.business_name}</span>
+        {p.prospect_score != null && <ScorePill score={p.prospect_score} />}
+      </div>
+      <div className="text-xs text-[#9A97C0]">{p.niche} · {p.city}</div>
+      {p.rating != null && (
+        <div className="text-xs text-amber-600">
+          ⭐ {p.rating}
+          {p.review_count != null && (
+            <span className="text-[#B0ADCC] ml-1">({p.review_count})</span>
+          )}
+        </div>
+      )}
+      <div className="flex items-center justify-between pt-0.5">
+        {p.phone
+          ? <span className="text-xs mono text-[#6B6B9E]">{p.phone}</span>
+          : <span />}
+        <div className="flex items-center gap-2">
+          {p.notes && <span className="text-xs text-[#9A97C0]" title="A des notes">📝</span>}
+          {p.demo_url && (
+            <a href={p.demo_url} target="_blank" rel="noopener noreferrer"
+               className="text-xs text-indigo-600 hover:text-indigo-800"
+               onClick={e => e.stopPropagation()}>
+              ↗ démo
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
+  const [board, setBoard]               = useState<Board>(() => buildBoard(prospects));
+  const [drag, setDrag]                 = useState<DragState | null>(null);
+  const [overCol, setOverCol]           = useState<string | null>(null);
+  const [overIndex, setOverIndex]       = useState<number | null>(null);
+  const [selected, setSelected]         = useState<Prospect | null>(null);
+  const [, startTransition]             = useTransition();
+  const router                          = useRouter();
+
+  function handleDragStart(p: Prospect, col: string, index: number) {
+    setDrag({ id: p.id, col, index });
+  }
+
+  function handleDrop(targetCol: string) {
+    if (!drag) return;
+    const { id, col: sourceCol } = drag;
+    setDrag(null);
+    setOverCol(null);
+    setOverIndex(null);
+
+    const card = board[sourceCol]!.find(p => p.id === id)!;
+    const insertAt = overIndex ?? board[targetCol]!.length;
+
+    setBoard(prev => {
+      const next = { ...prev };
+      // Remove from source
+      next[sourceCol] = prev[sourceCol]!.filter(p => p.id !== id);
+      // Insert into target at position
+      const target = [...prev[targetCol]!.filter(p => p.id !== id)];
+      target.splice(insertAt, 0, { ...card, status: targetCol });
+      next[targetCol] = target;
+      return next;
+    });
+
+    if (sourceCol !== targetCol) {
+      startTransition(async () => {
+        await updateProspectStatus(id, targetCol);
+        router.refresh();
+      });
+    }
+  }
+
+  // Called by ProspectPanel after a successful save
+  function handlePanelSaved(updated: Partial<Prospect> & { id: string }) {
+    setBoard(prev => {
+      const next = { ...prev };
+      for (const col of Object.keys(next)) {
+        const idx = next[col]!.findIndex(p => p.id === updated.id);
+        if (idx !== -1) {
+          const merged = { ...next[col]![idx]!, ...updated };
+          // If status changed, move to new column
+          if (updated.status && updated.status !== col) {
+            next[col] = next[col]!.filter(p => p.id !== updated.id);
+            next[updated.status] = [...(next[updated.status] ?? []), merged];
+          } else {
+            next[col] = next[col]!.map(p => p.id === updated.id ? merged : p);
+          }
+          break;
+        }
+      }
+      return next;
+    });
+    setSelected(prev => prev?.id === updated.id ? { ...prev, ...updated } as Prospect : prev);
+  }
+
+  function handleCardClick(p: Prospect) {
+    const fresh = Object.values(board).flat().find(c => c.id === p.id) ?? p;
+    setSelected(fresh);
+  }
+
+  return (
+    <>
+      <div
+        className="flex gap-3 overflow-x-auto pb-4"
+        style={{ minHeight: 'calc(100vh - 140px)' }}
+        onDragEnd={() => { setDrag(null); setOverCol(null); setOverIndex(null); }}
+      >
+        {COLUMNS.map(col => {
+          const cards  = board[col] ?? [];
+          const isOver = overCol === col;
+
+          return (
+            <div
+              key={col}
+              className="flex-shrink-0 w-60"
+              onDragOver={e => { e.preventDefault(); if (overCol !== col) { setOverCol(col); setOverIndex(cards.length); } }}
+              onDragLeave={e => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setOverCol(null); setOverIndex(null);
+                }
+              }}
+              onDrop={e => { e.preventDefault(); handleDrop(col); }}
+            >
+              {/* Header */}
+              <div className={`card border-t-4 ${COLUMN_ACCENT[col]} px-3 py-2 mb-2 flex items-center justify-between`}>
+                <span className="text-sm font-medium text-[#1C1560]">{COLUMN_LABELS[col]}</span>
+                <span className="text-xs mono text-[#9A97C0] bg-[#EEEDF8] rounded px-1.5 py-0.5">
+                  {cards.length}
+                </span>
+              </div>
+
+              {/* Cards */}
+              <div className={`space-y-2 min-h-24 rounded-lg p-1 transition-colors ${
+                isOver && drag?.col !== col ? 'bg-indigo-50 ring-2 ring-indigo-200 ring-inset' : ''
+              }`}>
+                {cards.map((p, i) => (
+                  <div
+                    key={p.id}
+                    onDragEnter={() => { setOverCol(col); setOverIndex(i); }}
+                  >
+                    {/* Drop indicator above */}
+                    {isOver && overIndex === i && drag?.id !== p.id && (
+                      <div className="h-1 bg-indigo-400 rounded mb-1.5" />
+                    )}
+                    <ProspectCard
+                      p={p}
+                      isDragging={drag?.id === p.id}
+                      isDropTarget={false}
+                      onDragStart={() => handleDragStart(p, col, i)}
+                      onDragEnter={() => { setOverCol(col); setOverIndex(i); }}
+                      onClick={() => handleCardClick(p)}
+                    />
+                  </div>
+                ))}
+
+                {/* Drop indicator at bottom */}
+                {isOver && (overIndex === cards.length || cards.length === 0) && (
+                  <div className="h-1 bg-indigo-400 rounded mt-1" />
+                )}
+
+                {cards.length === 0 && !isOver && (
+                  <div className="flex items-center justify-center h-16 text-xs text-[#C0BDE0]">
+                    Vide
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Slide-over panel */}
+      <ProspectPanel
+        prospect={selected}
+        onClose={() => setSelected(null)}
+        onSaved={handlePanelSaved}
+      />
+    </>
+  );
+}

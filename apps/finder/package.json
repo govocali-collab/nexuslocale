@@ -1,0 +1,22 @@
+{
+  "name": "@nexuslocale/finder",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Détecte les niches locales rentables, vérifie et achète les domaines",
+  "scripts": {
+    "cli":       "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nexuslocale/db":      "workspace:*",
+    "@supabase/supabase-js": "^2.43.0",
+    "commander":            "^12.1.0",
+    "fast-xml-parser":      "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx":         "^4.15.7",
+    "typescript":  "^5.4.5"
+  }
+}
