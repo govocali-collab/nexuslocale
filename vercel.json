@@ -1,5 +1,0 @@
-{
-  "buildCommand": "pnpm --filter @nexuslocale/dashboard build",
-  "outputDirectory": "apps/dashboard/.next",
-  "installCommand": "pnpm install --frozen-lockfile"
-}
