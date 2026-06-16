@@ -81,7 +81,7 @@ async function textSearchPage(
   query: string,
   apiKey: string,
   pageToken?: string
-): Promise<{ results: TextSearchResult[]; nextToken?: string }> {
+): Promise<{ results: TextSearchResult[]; nextToken?: string | undefined }> {
   const params = new URLSearchParams({
     query,
     key:      apiKey,
@@ -111,10 +111,26 @@ export async function fetchTextSearch(
   let page = 0;
 
   while (results.length < maxResults && page < 3) {
-    // Google exige un délai avant de réutiliser un page_token
+    // Google exige un délai avant qu'un page_token devienne valide
     if (pageToken) await sleep(2200);
 
-    const { results: pageResults, nextToken } = await textSearchPage(query, apiKey, pageToken);
+    let pageResults: TextSearchResult[];
+    let nextToken: string | undefined;
+    try {
+      ({ results: pageResults, nextToken } = await textSearchPage(query, apiKey, pageToken));
+    } catch (err) {
+      if (page === 0) throw err; // page 0 = vraie erreur (clé, requête, quota…)
+      // Les page_token de l'API Places legacy renvoient souvent INVALID_REQUEST.
+      // On réessaie une fois après un délai plus long, sinon on garde l'acquis.
+      await sleep(3000);
+      try {
+        ({ results: pageResults, nextToken } = await textSearchPage(query, apiKey, pageToken));
+      } catch {
+        console.warn(`[places] pagination arrêtée (page ${page + 1}) — ${results.length} résultat(s) conservé(s)`);
+        break;
+      }
+    }
+
     results.push(...pageResults);
     pageToken = nextToken;
     page++;
