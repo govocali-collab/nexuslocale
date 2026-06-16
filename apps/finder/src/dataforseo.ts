@@ -59,7 +59,7 @@ function normalizeAscii(s: string): string {
 function seedSignificantWords(seeds: string[]): string[] {
   const stop = new Set(['de','du','des','d','la','le','les','et','en','au','qc','canada']);
   return [...new Set(
-    seeds.flatMap(s => normalizeAscii(s).split(/\s+/).filter(w => w.length > 3 && !stop.has(w)))
+    seeds.flatMap(s => normalizeAscii(s).split(/\s+/).filter(w => w.length >= 3 && !stop.has(w)))
   )];
 }
 
@@ -76,24 +76,27 @@ async function runLabsScan(opts: {
   limit:        number;
   auth:         string;
 }): Promise<KeywordInfo[]> {
-  const seedWords = seedSignificantWords(opts.seedKeywords);
+  const niche = opts.seedKeywords[0] ?? opts.seedKeywords.join(' ');
+  const seedWords = seedSignificantWords([niche]); // pertinence ancrée sur la niche, pas la ville
+  const limit = Number.isFinite(opts.limit) && opts.limit > 0 ? opts.limit : 100;
 
-  const body = [{
-    keywords:      opts.seedKeywords,
+  const common = {
     location_name: opts.locationName,
     language_name: opts.languageName,
-    limit:         opts.limit * 3, // demande plus pour compenser le filtrage
+    limit:         limit * 3, // demande plus pour compenser le filtrage
     order_by:      ['keyword_info.search_volume,desc'],
-  }];
+  };
 
-  // keywords_for_keywords = résultats ciblés sur les seeds (mieux pour niche locale)
-  // keyword_ideas = plus large mais moins pertinent — en fallback seulement
-  const endpoints = [
-    `${BASE}/dataforseo_labs/google/keywords_for_keywords/live`,
-    `${BASE}/dataforseo_labs/google/keyword_ideas/live`,
+  // keyword_suggestions = mots-clés long-tail CONTENANT la phrase seed (idéal niche locale)
+  // keyword_ideas = plus large/sémantique — en fallback seulement
+  const endpoints: Array<{ url: string; body: unknown }> = [
+    { url:  `${BASE}/dataforseo_labs/google/keyword_suggestions/live`,
+      body: [{ keyword: niche, ...common }] },
+    { url:  `${BASE}/dataforseo_labs/google/keyword_ideas/live`,
+      body: [{ keywords: opts.seedKeywords, ...common }] },
   ];
 
-  for (const url of endpoints) {
+  for (const { url, body } of endpoints) {
     const label = url.split('/').at(-2) + '/' + url.split('/').at(-1);
     process.stdout.write(`[labs] ${label}…`);
     try {

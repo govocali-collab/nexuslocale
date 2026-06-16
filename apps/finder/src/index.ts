@@ -86,15 +86,16 @@ program
   .description('Keyword research DataForSEO + domaines Namecheap')
   .option('--country <code>',       'Code pays (défaut: CA)', 'CA')
   .option('--lang <code>',          'Langue (fr|en, défaut: fr)', 'fr')
-  .option('--max-difficulty <n>',   'KD maximum (0-100)', parseInt)
-  .option('--limit <n>',            'Nb max de mots-clés retournés', parseInt, 100)
+  .option('--max-difficulty <n>',   'KD maximum (0-100)', v => parseInt(v, 10))
+  .option('--limit <n>',            'Nb max de mots-clés retournés', v => parseInt(v, 10), 100)
   .option('--sandbox',              'Namecheap sandbox (aucun achat réel)')
   .option('--estimate',             'Estime les coûts sans appeler les API')
+  .option('--yes',                  'Confirme automatiquement le coût (non-interactif)')
   .option('--no-db',                'Ne pas écrire dans Supabase')
   .action(async (
     niche: string,
     city:  string,
-    opts: { country: string; lang: string; maxDifficulty?: number; limit: number; sandbox: boolean; estimate: boolean; db: boolean },
+    opts: { country: string; lang: string; maxDifficulty?: number; limit: number; sandbox: boolean; estimate: boolean; yes: boolean; db: boolean },
   ) => {
     console.log(`\n🔍 finder scan "${niche}" / "${city}"`);
     console.log(`   Pays: ${opts.country}  Langue: ${opts.lang}  KD max: ${opts.maxDifficulty ?? 'illimité'}  Limit: ${opts.limit}`);
@@ -137,7 +138,8 @@ program
     }
 
     // ── Confirmation coût ─────────────────────────────────────────────────────
-    const ok = await confirm(`Cette opération coûte ~$${ESTIMATED_COST_USD.toFixed(4)} USD en crédits DataForSEO. Continuer?`);
+    const ok = opts.yes
+      || await confirm(`Cette opération coûte ~$${ESTIMATED_COST_USD.toFixed(4)} USD en crédits DataForSEO. Continuer?`);
     if (!ok) { console.log('Annulé.'); return; }
 
     // ── DataForSEO ────────────────────────────────────────────────────────────

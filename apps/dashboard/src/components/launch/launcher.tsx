@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
 interface ActionQueue {
@@ -11,10 +11,11 @@ interface ActionQueue {
 }
 
 const TABS = [
-  { id: 'finder',  label: '🔍 Finder',       desc: 'Scanner une niche pour trouver des domaines' },
-  { id: 'submit',  label: '📤 Soumettre GSC', desc: 'Vérifier et indexer un site dans Search Console' },
-  { id: 'rank',    label: '📊 Tracker',       desc: 'Suivre les positions SERP d\'un site' },
-  { id: 'cron',    label: '🔄 Cron',          desc: 'Lancer le suivi hebdomadaire de tous les sites' },
+  { id: 'finder',   label: '🔍 Finder',       desc: 'Scanner une niche pour trouver des domaines' },
+  { id: 'prospect', label: '🎯 Prospector',   desc: 'Trouver des commerces à faible présence web' },
+  { id: 'submit',   label: '📤 Soumettre GSC', desc: 'Vérifier et indexer un site dans Search Console' },
+  { id: 'rank',     label: '📊 Tracker',       desc: 'Suivre les positions SERP d\'un site' },
+  { id: 'cron',     label: '🔄 Cron',          desc: 'Lancer le suivi hebdomadaire de tous les sites' },
 ] as const;
 type TabId = (typeof TABS)[number]['id'];
 
@@ -40,11 +41,23 @@ function FinderPanel() {
   const [niche,    setNiche]    = useState('');
   const [city,     setCity]     = useState('');
   const [limit,    setLimit]    = useState(100);
-  const [estimate, setEstimate] = useState(true);
+  const [maxKd,    setMaxKd]    = useState(30);
+  const [estimate, setEstimate] = useState(false);
+  const [result,   setResult]   = useState<{ out: string; ok: boolean } | null>(null);
+  const [pending,  start]       = useTransition();
 
-  const cmd = `pnpm --filter @nexuslocale/finder cli scan "${niche || '<niche>'}" "${city || '<ville>'}" --limit ${limit}${estimate ? ' --estimate' : ''}`;
+  const ready = niche.trim() !== '' && city.trim() !== '';
 
-  function copy() { navigator.clipboard.writeText(cmd); }
+  function launch() {
+    if (!ready) return;
+    setResult(null);
+    start(async () => {
+      const r = await runFinderScan(niche.trim(), city.trim(), {
+        country: 'CA', lang: 'fr', limit, maxDifficulty: maxKd, estimate,
+      });
+      setResult(r);
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -57,7 +70,7 @@ function FinderPanel() {
         </div>
         <div>
           <label className="label block mb-1">Ville</label>
-          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Montréal"
+          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Brossard"
             className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
                        placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
@@ -68,29 +81,106 @@ function FinderPanel() {
           <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} min={10} max={500}
             className="w-28 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
         </div>
+        <div>
+          <label className="label block mb-1">KD max</label>
+          <input type="number" value={maxKd} onChange={e => setMaxKd(Number(e.target.value))} min={0} max={100}
+            className="w-24 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+        </div>
         <label className="flex items-center gap-2 cursor-pointer mt-4">
           <input type="checkbox" checked={estimate} onChange={e => setEstimate(e.target.checked)}
             className="rounded border-[#D9D7F0] text-indigo-600" />
-          <span className="text-sm text-[#3D3D6B]">--estimate (coûts seulement)</span>
+          <span className="text-sm text-[#3D3D6B]">--estimate (données simulées, gratuit)</span>
         </label>
       </div>
 
-      <div>
-        <p className="label mb-1">Commande à exécuter dans le terminal</p>
-        <div className="flex items-start gap-2">
-          <pre className="flex-1 rounded-lg bg-[#1C1560] text-[#E8E6FF] text-xs p-3 font-mono overflow-x-auto whitespace-pre-wrap">
-            {cmd}
-          </pre>
-          <button onClick={copy}
-            className="shrink-0 rounded-md bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 text-xs text-white transition-colors">
-            Copier
-          </button>
-        </div>
-        <p className="text-xs text-[#9A97C0] mt-1.5">
-          Le scan crée le site dans Supabase et liste les domaines disponibles.
-          Lance depuis la racine du projet.
-        </p>
+      <div className="flex items-center gap-3">
+        <button onClick={launch} disabled={!ready || pending}
+          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed
+                     px-4 py-2 text-sm text-white transition-colors">
+          {pending ? 'Scan en cours…' : estimate ? 'Estimer (gratuit)' : 'Lancer le scan réel'}
+        </button>
+        <span className="text-xs text-[#9A97C0]">
+          {estimate
+            ? 'Mode simulé — aucun appel API, aucun coût.'
+            : 'Appel DataForSEO réel — ~$0.003 en crédits. Crée le site dans Supabase.'}
+        </span>
       </div>
+
+      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+    </div>
+  );
+}
+
+// ── Prospector ──────────────────────────────────────────────────────────────────
+function ProspectPanel() {
+  const [niche,      setNiche]      = useState('');
+  const [city,       setCity]       = useState('');
+  const [limit,      setLimit]      = useState(60);
+  const [minReviews, setMinReviews] = useState(0);
+  const [simulate,   setSimulate]   = useState(false);
+  const [result,     setResult]     = useState<{ out: string; ok: boolean } | null>(null);
+  const [pending,    start]         = useTransition();
+
+  const ready    = niche.trim() !== '' && city.trim() !== '';
+  const estCost  = (Math.ceil(limit / 20) * 0.032 + limit * 0.017).toFixed(2);
+
+  function launch() {
+    if (!ready) return;
+    setResult(null);
+    start(async () => {
+      const r = await runProspectorScan(niche.trim(), city.trim(), { limit, minReviews, simulate });
+      setResult(r);
+    });
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="label block mb-1">Niche</label>
+          <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="dégât d'eau"
+            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
+                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+        <div>
+          <label className="label block mb-1">Ville</label>
+          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Brossard QC"
+            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
+                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        <div>
+          <label className="label block mb-1">Limite entreprises</label>
+          <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} min={1} max={200}
+            className="w-28 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+        </div>
+        <div>
+          <label className="label block mb-1">Avis min.</label>
+          <input type="number" value={minReviews} onChange={e => setMinReviews(Number(e.target.value))} min={0} max={500}
+            className="w-24 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+        </div>
+        <label className="flex items-center gap-2 cursor-pointer mt-4">
+          <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
+            className="rounded border-[#D9D7F0] text-indigo-600" />
+          <span className="text-sm text-[#3D3D6B]">--simulate (fixtures, gratuit)</span>
+        </label>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button onClick={launch} disabled={!ready || pending}
+          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed
+                     px-4 py-2 text-sm text-white transition-colors">
+          {pending ? 'Scan en cours…' : simulate ? 'Tester (fixtures)' : 'Lancer le scan réel'}
+        </button>
+        <span className="text-xs text-[#9A97C0]">
+          {simulate
+            ? 'Mode fixtures — aucun appel API, aucun coût.'
+            : `Appel Google Places réel — ~$${estCost} en crédits. Écrit les prospects dans Supabase.`}
+        </span>
+      </div>
+
+      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
     </div>
   );
 }
@@ -270,7 +360,7 @@ export function Launcher({ sites, initialQueues }: { sites: Site[]; initialQueue
   return (
     <div className="space-y-3">
       {/* Tab selector */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {TABS.map(t => (
           <button
             key={t.id}
@@ -289,8 +379,9 @@ export function Launcher({ sites, initialQueues }: { sites: Site[]; initialQueue
 
       {/* Active panel */}
       <div className="card p-5">
-        {tab === 'finder' && <FinderPanel />}
-        {tab === 'submit' && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
+        {tab === 'finder'   && <FinderPanel />}
+        {tab === 'prospect' && <ProspectPanel />}
+        {tab === 'submit'   && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
         {tab === 'rank'   && <RankPanel   sites={sites} preselect={rankSite}   onPreselect={setRankSite} />}
         {tab === 'cron'   && <CronPanel />}
       </div>
