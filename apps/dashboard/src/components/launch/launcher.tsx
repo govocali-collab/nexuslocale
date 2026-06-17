@@ -383,7 +383,7 @@ function RawLogs({ out, ok }: { out: string; ok: boolean }) {
 }
 
 // ── Finder ────────────────────────────────────────────────────────────────────
-function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void }) {
+function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keywords?: string[]) => void }) {
   const [niche,    setNiche]    = useState('');
   const [city,     setCity]     = useState('');
   const [limit,    setLimit]    = useState(100);
@@ -460,7 +460,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
 
       {result?.data && result.data.keywords.length > 0 && (
         <div className="flex items-center gap-3 flex-wrap rounded-lg bg-emerald-50 border border-emerald-200 p-3">
-          <button onClick={() => onNext(niche.trim(), city.trim())}
+          <button onClick={() => onNext(niche.trim(), city.trim(), selectedKws)}
             className="rounded-md bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm text-white font-medium transition-colors">
             Prochaine étape : bâtir le site →
           </button>
@@ -560,16 +560,19 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
 
 // ── GSC Submit ────────────────────────────────────────────────────────────────
 // ── Générer le config ───────────────────────────────────────────────────────────
-function GenPanel({ initialName, initialCity }: { initialName?: string; initialCity?: string }) {
+function GenPanel({ initialName, initialCity, initialKeywords, nicheSite }: { initialName?: string; initialCity?: string; initialKeywords?: string[]; nicheSite?: boolean }) {
   const [name,     setName]     = useState(initialName ?? '');
   const [city,     setCity]     = useState(initialCity ?? '');
   const [simulate, setSimulate] = useState(true);
   const [result,   setResult]   = useState<{ out: string; ok: boolean } | null>(null);
   const [pending,  start]       = useTransition();
 
+  const keywords  = initialKeywords ?? [];
+  const isNiche   = nicheSite ?? false;
+
   function launch() {
     setResult(null);
-    start(async () => setResult(await runDemoGen(name, city, { simulate })));
+    start(async () => setResult(await runDemoGen(name, city, { simulate, keywords, nicheSite: isNiche })));
   }
 
   return (
@@ -578,10 +581,17 @@ function GenPanel({ initialName, initialCity }: { initialName?: string; initialC
         Génère le <strong className="text-[#1C1560]">config du site</strong> (contenu rédigé par l'IA) pour un commerce.
         Le fichier est écrit dans <span className="mono">configs/</span> et sert ensuite au déploiement.
       </p>
+      {keywords.length > 0 && (
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm">
+          <span className="font-medium text-[#1C1560]">🎯 {keywords.length} mot(s)-clé cible(s)</span>
+          <span className="text-[#6B6B9E]"> → une page de service par mot-clé : </span>
+          <span className="text-[#3D3D6B]">{keywords.join(' · ')}</span>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="label block mb-1">Nom du commerce</label>
-          <input value={name} onChange={e => setName(e.target.value)} placeholder="SAM Plomberie"
+          <label className="label block mb-1">{isNiche ? 'Niche' : 'Nom du commerce'}</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder={isNiche ? 'plombier' : 'SAM Plomberie'}
             className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
         <div>
@@ -602,8 +612,10 @@ function GenPanel({ initialName, initialCity }: { initialName?: string; initialC
         </button>
         <span className="text-xs text-[#9A97C0]">
           {simulate
-            ? 'Mode fictif — gratuit. Laisse le nom vide pour un test pur, ou mets un commerce existant.'
-            : 'Contenu rédigé par Claude — ~$0.08. Le commerce doit exister (scan Prospector au préalable).'}
+            ? 'Mode fictif — gratuit (le contenu IA et les mots-clés ne s\'appliquent qu\'en mode réel).'
+            : isNiche
+              ? 'Contenu rédigé par Claude — ~$0.08. Site de niche générique (aucun prospect requis).'
+              : 'Contenu rédigé par Claude — ~$0.08. Le commerce doit exister (scan Prospector au préalable).'}
         </span>
       </div>
       <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
@@ -781,12 +793,12 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
   const [submitSite, setSubmitSite] = useState(sites[0]?.id ?? '');
   const [rankSite,   setRankSite]   = useState(sites[0]?.id ?? '');
   const [proPrefill, setProPrefill] = useState<{ niche: string; city: string }>({ niche: '', city: '' });
-  const [genPrefill, setGenPrefill] = useState<{ name: string; city: string }>({ name: '', city: '' });
+  const [genPrefill, setGenPrefill] = useState<{ name: string; city: string; keywords: string[]; nicheSite: boolean }>({ name: '', city: '', keywords: [], nicheSite: false });
 
   function goSubmit(siteId: string) { setSubmitSite(siteId); setTab('submit'); }
   function goRank(siteId: string)   { setRankSite(siteId);   setTab('rank'); }
   function goProspector(niche: string, city: string) { setProPrefill({ niche, city }); setTab('prospect'); }
-  function goGenerate(name: string, city: string)    { setGenPrefill({ name, city });  setTab('generate'); }
+  function goGenerate(name: string, city: string, keywords: string[] = [], nicheSite = false) { setGenPrefill({ name, city, keywords, nicheSite }); setTab('generate'); }
 
   return (
     <div className="space-y-3">
@@ -810,9 +822,9 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
 
       {/* Active panel */}
       <div className="card p-5">
-        {tab === 'finder'   && <FinderPanel onNext={goGenerate} />}
+        {tab === 'finder'   && <FinderPanel onNext={(n, c, k) => goGenerate(n, c, k ?? [], true)} />}
         {tab === 'prospect' && <ProspectPanel key={`${proPrefill.niche}|${proPrefill.city}`} initialNiche={proPrefill.niche} initialCity={proPrefill.city} onNext={goGenerate} />}
-        {tab === 'generate' && <GenPanel key={`${genPrefill.name}|${genPrefill.city}`} initialName={genPrefill.name} initialCity={genPrefill.city} />}
+        {tab === 'generate' && <GenPanel key={`${genPrefill.name}|${genPrefill.city}|${genPrefill.keywords.join(',')}|${genPrefill.nicheSite}`} initialName={genPrefill.name} initialCity={genPrefill.city} initialKeywords={genPrefill.keywords} nicheSite={genPrefill.nicheSite} />}
         {tab === 'submit'   && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
         {tab === 'rank'   && <RankPanel   sites={sites} preselect={rankSite}   onPreselect={setRankSite} />}
         {tab === 'cron'   && <CronPanel />}

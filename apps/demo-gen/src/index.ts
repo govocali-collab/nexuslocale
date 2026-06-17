@@ -40,9 +40,9 @@ function askConfirmation(): Promise<boolean> {
 
 async function genOne(
   prospect: ProspectFull,
-  opts: { simulate: boolean; apiKey?: string | undefined; placesKey?: string | undefined },
+  opts: { simulate: boolean; apiKey?: string | undefined; placesKey?: string | undefined; targetKeywords?: string[] | undefined },
 ): Promise<void> {
-  const { simulate, apiKey, placesKey } = opts;
+  const { simulate, apiKey, placesKey, targetKeywords } = opts;
 
   // Enrichissement Places (optionnel)
   let enriched = prospect;
@@ -64,11 +64,11 @@ async function genOne(
     }
     process.stdout.write(`[gen] Génération via claude-sonnet-4-6…\n`);
     try {
-      generated = await generateContent(enriched, apiKey);
+      generated = await generateContent(enriched, apiKey, { targetKeywords });
     } catch (err) {
       const msg = (err as Error).message;
       process.stderr.write(`[gen] Échec : ${msg}\n[gen] Nouvelle tentative…\n`);
-      generated = await generateContent(enriched, apiKey, `Précédente tentative invalide : ${msg}`);
+      generated = await generateContent(enriched, apiKey, { targetKeywords, hintOnRetry: `Précédente tentative invalide : ${msg}` });
     }
   }
 
@@ -97,19 +97,42 @@ program
   .option('--top <n>',   'Prendre les N meilleurs prospects (status=new)', parseInt)
   .option('--estimate',  'Afficher le coût API estimé avant de lancer')
   .option('--simulate',  'Générer sans API (contenu fictif, pour tester)')
+  .option('--keywords <list>', 'Mots-clés cibles séparés par des virgules — une page de service par mot-clé')
+  .option('--niche-site', 'Site de niche générique : synthétise une marque (sans prospect Supabase). <nom> = la niche.')
   .action(async (name?: string, city?: string, options?: {
     top?: number;
     estimate?: boolean;
     simulate?: boolean;
+    keywords?: string;
+    nicheSite?: boolean;
   }) => {
     const simulate = options?.simulate ?? false;
     const apiKey   = process.env['ANTHROPIC_API_KEY'] || undefined;
     const placesKey = process.env['GOOGLE_PLACES_API_KEY'] || undefined;
+    const targetKeywords = options?.keywords
+      ? options.keywords.split(',').map(k => k.trim()).filter(Boolean)
+      : undefined;
 
     // Résolution des prospects
     let prospects: ProspectFull[] = [];
 
-    if (simulate && !name && !options?.top) {
+    if (options?.nicheSite && name && city) {
+      // Site de niche générique : on synthétise une marque, aucun prospect Supabase requis.
+      const niche = name;
+      const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+      prospects = [{
+        business_name:  `${cap(niche)} ${cap(city)}`,
+        niche,
+        city,
+        phone:          null,
+        rating:         null,
+        review_count:   null,
+        web_presence:   'none',
+        pain_score:     null,
+        prospect_score: null,
+        status:         'research',
+      }];
+    } else if (simulate && !name && !options?.top) {
       // Mode démo pure sans aucun arg → prospect fictif intégré
       prospects = [MOCK_PROSPECT];
     } else if (options?.top) {
@@ -135,7 +158,7 @@ program
     let success = 0;
     for (const p of prospects) {
       try {
-        await genOne(p, { simulate, apiKey, placesKey });
+        await genOne(p, { simulate, apiKey, placesKey, targetKeywords });
         success++;
       } catch (err) {
         console.error(`\n❌ ${p.business_name} : ${(err as Error).message}`);

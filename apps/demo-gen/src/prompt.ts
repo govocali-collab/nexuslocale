@@ -92,7 +92,7 @@ SCHÉMA JSON ATTENDU
 }`;
 }
 
-export function buildUserPrompt(prospect: ProspectFull): string {
+export function buildUserPrompt(prospect: ProspectFull, targetKeywords?: string[]): string {
   const parts: string[] = [
     `Génère un config JSON pour :`,
     `- Entreprise : ${prospect.business_name}`,
@@ -115,9 +115,17 @@ export function buildUserPrompt(prospect: ProspectFull): string {
     }
   }
 
+  const kws = (targetKeywords ?? []).map(k => k.trim()).filter(Boolean);
+  const servicesConsigne = kws.length > 0
+    ? `- Crée EXACTEMENT une page de service par mot-clé ciblé ci-dessous (regroupe les quasi-doublons).
+  Chaque page doit être optimisée SEO pour SON mot-clé : le mot-clé (ou sa variante naturelle)
+  dans le h1, le meta_title, le nav_label et le contenu. Mots-clés ciblés :
+${kws.map(k => `    • ${k}`).join('\n')}`
+    : `- 4 à 6 pages de service adaptées à la niche "${prospect.niche}"`;
+
   parts.push(`
 Consignes :
-- 4 à 6 pages de service adaptées à la niche "${prospect.niche}"
+${servicesConsigne}
 - Ville principale : ${prospect.city} + 3-5 municipalités voisines réelles (rayon ~40 km)
 - Contenu local authentique, quartiers et points de repère réels de la région
 - Couleurs cohérentes avec la niche (sobres, professionnelles)`);

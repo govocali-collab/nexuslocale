@@ -119,16 +119,22 @@ export async function runProspectorScan(
 export async function runDemoGen(
   name: string,
   city: string,
-  opts: { simulate: boolean },
+  opts: { simulate: boolean; keywords?: string[]; nicheSite?: boolean },
 ): Promise<{ out: string; ok: boolean }> {
   const hasNames = name.trim() !== '' && city.trim() !== '';
-  if (!opts.simulate && !hasNames) {
+  // niche-site = marque synthétisée (pas besoin de prospect Supabase) ; sinon prospect réel requis.
+  if (!opts.simulate && !opts.nicheSite && !hasNames) {
     return { out: 'Nom de l’entreprise et ville requis (le prospect doit exister dans Supabase, via un scan Prospector).', ok: false };
   }
-  // simulate sans nom = prospect fictif intégré ; sinon on cible un prospect réel.
+  if (opts.nicheSite && !hasNames) {
+    return { out: 'Niche et ville requises pour bâtir un site de niche.', ok: false };
+  }
+  const kws = (opts.keywords ?? []).map(k => k.trim()).filter(Boolean);
   const flags = [
     hasNames ? `${shellQuote(name.trim())} ${shellQuote(city.trim())}` : '',
+    opts.nicheSite ? '--niche-site' : '',
     opts.simulate ? '--simulate' : '',
+    kws.length ? `--keywords ${shellQuote(kws.join(','))}` : '',
   ].filter(Boolean).join(' ');
   return run(`pnpm --filter @nexuslocale/demo-gen gen ${flags}`, 180_000);
 }
