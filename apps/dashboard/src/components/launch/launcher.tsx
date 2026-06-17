@@ -61,7 +61,7 @@ function cpcCls(cpc: number | null) {
 
 type KwSortKey = 'keyword' | 'search_volume' | 'cpc' | 'keyword_difficulty' | 'score';
 
-function KeywordTable({ result, selected, onSelect }: { result: FinderResult; selected: string; onSelect: (kw: string) => void }) {
+function KeywordTable({ result, selected, onToggle }: { result: FinderResult; selected: string[]; onToggle: (kw: string) => void }) {
   const [q,        setQ]        = useState('');
   const [minVol,   setMinVol]   = useState('');
   const [maxKd,    setMaxKd]     = useState('');
@@ -160,12 +160,12 @@ function KeywordTable({ result, selected, onSelect }: { result: FinderResult; se
           </thead>
           <tbody>
             {rows.map((k, i) => {
-              const isSel = selected === k.keyword;
+              const isSel = selected.includes(k.keyword);
               return (
-              <tr key={k.keyword + i} onClick={() => onSelect(k.keyword)}
+              <tr key={k.keyword + i} onClick={() => onToggle(k.keyword)}
                 className={`cursor-pointer ${isSel ? 'bg-indigo-50' : 'hover:bg-[#FAFAFF]'}`}>
                 <td className={`${TD} text-center`}>
-                  <span className={`inline-block h-3.5 w-3.5 rounded-full border-2 align-middle ${isSel ? 'border-indigo-600 bg-indigo-600' : 'border-[#C0BDE0]'}`} />
+                  <span className={`inline-flex items-center justify-center h-4 w-4 rounded border-2 align-middle text-white text-[10px] font-bold ${isSel ? 'border-indigo-600 bg-indigo-600' : 'border-[#C0BDE0]'}`}>{isSel ? '✓' : ''}</span>
                 </td>
                 <td className={`${TD} text-[#1C1560] ${isSel ? 'font-semibold' : ''}`}>{k.keyword}</td>
                 <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtNum(k.search_volume)}</td>
@@ -358,15 +358,19 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
   const [maxKd,    setMaxKd]    = useState(30);
   const [estimate, setEstimate] = useState(false);
   const [result,   setResult]   = useState<{ out: string; ok: boolean; data: FinderResult | null } | null>(null);
-  const [selectedKw, setSelectedKw] = useState('');
+  const [selectedKws, setSelectedKws] = useState<string[]>([]);
   const [pending,  start]       = useTransition();
 
   const ready = niche.trim() !== '' && city.trim() !== '';
 
+  function toggleKw(kw: string) {
+    setSelectedKws(prev => prev.includes(kw) ? prev.filter(x => x !== kw) : [...prev, kw]);
+  }
+
   function launch() {
     if (!ready) return;
     setResult(null);
-    setSelectedKw('');
+    setSelectedKws([]);
     start(async () => {
       const r = await runFinderScan(niche.trim(), city.trim(), {
         country: 'CA', lang: 'fr', limit, maxDifficulty: maxKd, estimate,
@@ -429,16 +433,16 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
             Prochaine étape : trouver les clients →
           </button>
           <span className="text-xs text-[#3D6B4A]">
-            {selectedKw
-              ? <>🎯 Mot-clé cible : <strong>{selectedKw}</strong>. </>
-              : '👉 Clique un mot-clé dans le tableau pour le choisir comme cible. '}
+            {selectedKws.length > 0
+              ? <>🎯 {selectedKws.length} mot(s)-clé cible(s) : <strong>{selectedKws.slice(0, 3).join(', ')}{selectedKws.length > 3 ? '…' : ''}</strong>. </>
+              : '👉 Coche un ou plusieurs mots-clés à cibler. '}
             Puis ouvre le Prospector pour valider les clients.
           </span>
         </div>
       )}
 
       {result?.data
-        ? <><KeywordTable result={result.data} selected={selectedKw} onSelect={setSelectedKw} /><RawLogs out={result.out} ok={result.ok} /></>
+        ? <><KeywordTable result={result.data} selected={selectedKws} onToggle={toggleKw} /><RawLogs out={result.out} ok={result.ok} /></>
         : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
     </div>
   );
