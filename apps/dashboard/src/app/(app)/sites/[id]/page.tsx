@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { LaunchChecklist } from '@/components/sites/launch-checklist';
 import { CitationChecklist } from '@/components/sites/citation-checklist';
 import { PositionChart, type ChartPoint } from '@/components/charts/position-chart';
 import {
@@ -82,6 +83,9 @@ export default async function SiteDetailPage({
         </div>
         <Badge value={site.status} />
       </div>
+
+      {/* Roadmap de lancement */}
+      <LaunchChecklist siteId={id} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* ── Infos + édition ──────────────────────────────────────────── */}
