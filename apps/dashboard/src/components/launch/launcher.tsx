@@ -199,13 +199,59 @@ function painEmoji(s: number) {
   return s >= 80 ? '💀' : s >= 50 ? '🔴' : s >= 20 ? '🟡' : '🟢';
 }
 
+type ProSortKey = 'business_name' | 'rating' | 'review_count' | 'pain_score' | 'prospect_score';
+
 function ProspectTable({ result }: { result: ProspectorResult }) {
-  const [showHelp, setShowHelp] = useState(false);
-  const rows = [...result.prospects].sort((a, b) => b.prospect_score - a.prospect_score);
+  const [showHelp,   setShowHelp]   = useState(false);
+  const [q,          setQ]          = useState('');
+  const [presence,   setPresence]   = useState('');
+  const [minPain,    setMinPain]    = useState('');
+  const [minReviews, setMinReviews] = useState('');
+  const [sort,       setSort]       = useState<{ key: ProSortKey; dir: 'asc' | 'desc' }>({ key: 'prospect_score', dir: 'desc' });
+
+  const minPainNum = minPain    === '' ? null : Number(minPain);
+  const minRevNum  = minReviews === '' ? null : Number(minReviews);
+
+  const rows = result.prospects
+    .filter(p => {
+      if (q && !p.business_name.toLowerCase().includes(q.toLowerCase())) return false;
+      if (presence && p.web_presence !== presence) return false;
+      if (minPainNum != null && p.pain_score < minPainNum) return false;
+      if (minRevNum != null && (p.review_count ?? 0) < minRevNum) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const dir = sort.dir === 'asc' ? 1 : -1;
+      if (sort.key === 'business_name') return a.business_name.localeCompare(b.business_name) * dir;
+      const av = (a[sort.key] as number | null) ?? -Infinity;
+      const bv = (b[sort.key] as number | null) ?? -Infinity;
+      return (av - bv) * dir;
+    });
+
+  function toggleSort(key: ProSortKey) {
+    setSort(s => s.key === key
+      ? { key, dir: s.dir === 'desc' ? 'asc' : 'desc' }
+      : { key, dir: key === 'business_name' ? 'asc' : 'desc' });
+  }
+  const arrow = (key: ProSortKey) => sort.key === key ? (sort.dir === 'desc' ? ' ↓' : ' ↑') : '';
+  const hasFilter = q !== '' || presence !== '' || minPain !== '' || minReviews !== '';
+  const inputCls = 'rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-2 py-1 placeholder-[#9A97C0]';
+
+  const HEADERS: { key?: ProSortKey; label: string; align: string; help?: boolean }[] = [
+    { key: 'business_name',  label: 'Entreprise',   align: 'text-left' },
+    { key: 'rating',         label: 'Note',         align: 'text-center' },
+    { key: 'review_count',   label: 'Avis',         align: 'text-right' },
+    {                        label: 'Présence web', align: 'text-left',   help: true },
+    { key: 'pain_score',     label: 'Pain',         align: 'text-center', help: true },
+    { key: 'prospect_score', label: 'Score',        align: 'text-right',  help: true },
+    {                        label: 'Problèmes',    align: 'text-left' },
+    {                        label: 'Téléphone',    align: 'text-left' },
+  ];
+
   return (
     <div className="mt-4 space-y-3">
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-sm font-medium text-[#1C1560]">{rows.length} prospect(s) — triés par score</span>
+        <span className="text-sm font-medium text-[#1C1560]">{rows.length} / {result.prospects.length} prospect(s)</span>
         <button
           onClick={() => setShowHelp(h => !h)}
           aria-label="Comprendre les colonnes"
@@ -225,18 +271,41 @@ function ProspectTable({ result }: { result: ProspectorResult }) {
         </div>
       )}
 
+      {/* Barre de filtre */}
+      <div className="flex flex-wrap items-center gap-2">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Filtrer une entreprise…"
+          className={`${inputCls} flex-1 min-w-[10rem]`} />
+        <select value={presence} onChange={e => setPresence(e.target.value)} className={inputCls}>
+          <option value="">Toute présence</option>
+          <option value="none">Aucun site</option>
+          <option value="social_only">Réseaux soc.</option>
+          <option value="has_site">A un site</option>
+        </select>
+        <input value={minPain} onChange={e => setMinPain(e.target.value)} type="number" min={0} max={100} placeholder="Pain min"
+          className={`${inputCls} w-24`} />
+        <input value={minReviews} onChange={e => setMinReviews(e.target.value)} type="number" min={0} placeholder="Avis min"
+          className={`${inputCls} w-24`} />
+        {hasFilter && (
+          <button onClick={() => { setQ(''); setPresence(''); setMinPain(''); setMinReviews(''); }}
+            className="text-xs text-[#9A97C0] hover:text-[#1C1560] underline">Réinitialiser</button>
+        )}
+      </div>
+
       <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
         <table className="w-full text-sm">
           <thead className="bg-[#F5F4FF]">
             <tr>
-              <th className={`text-left ${TH}`}>Entreprise</th>
-              <th className={`text-center ${TH}`}>Note</th>
-              <th className={`text-right ${TH}`}>Avis</th>
-              <th className={`text-left ${TH}`}>Présence web</th>
-              <th className={`text-center ${TH}`}>Pain</th>
-              <th className={`text-right ${TH}`}>Score</th>
-              <th className={`text-left ${TH}`}>Problèmes</th>
-              <th className={`text-left ${TH}`}>Téléphone</th>
+              {HEADERS.map(h => (
+                <th key={h.label} className={`${h.align} ${TH} whitespace-nowrap`}>
+                  {h.key
+                    ? <button onClick={() => toggleSort(h.key as ProSortKey)} className="cursor-pointer select-none hover:text-[#1C1560] font-medium">{h.label}{arrow(h.key)}</button>
+                    : <span className="font-medium">{h.label}</span>}
+                  {h.help && (
+                    <button onClick={() => setShowHelp(true)} aria-label={`Aide : ${h.label}`}
+                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#EEEDF9] text-[#9A97C0] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
+                  )}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -255,7 +324,7 @@ function ProspectTable({ result }: { result: ProspectorResult }) {
                 </tr>
               );
             })}
-            {rows.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-[#9A97C0]">Aucun prospect trouvé.</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-[#9A97C0]">Aucun prospect ne correspond aux filtres.</td></tr>}
           </tbody>
         </table>
       </div>
