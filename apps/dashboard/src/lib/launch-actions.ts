@@ -116,6 +116,23 @@ export async function runProspectorScan(
   return { out: logs, ok, data };
 }
 
+export async function runDemoGen(
+  name: string,
+  city: string,
+  opts: { simulate: boolean },
+): Promise<{ out: string; ok: boolean }> {
+  const hasNames = name.trim() !== '' && city.trim() !== '';
+  if (!opts.simulate && !hasNames) {
+    return { out: 'Nom de l’entreprise et ville requis (le prospect doit exister dans Supabase, via un scan Prospector).', ok: false };
+  }
+  // simulate sans nom = prospect fictif intégré ; sinon on cible un prospect réel.
+  const flags = [
+    hasNames ? `${shellQuote(name.trim())} ${shellQuote(city.trim())}` : '',
+    opts.simulate ? '--simulate' : '',
+  ].filter(Boolean).join(' ');
+  return run(`pnpm --filter @nexuslocale/demo-gen gen ${flags}`, 180_000);
+}
+
 export async function runGscSubmit(
   siteId: string,
   opts: { estimate: boolean; skipVerify: boolean; force: boolean },

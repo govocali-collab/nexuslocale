@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runFinderScan, runProspectorScan, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runDemoGen, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
 import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
@@ -14,6 +14,7 @@ interface ActionQueue {
 const TABS = [
   { id: 'finder',   label: '🔍 Finder',       desc: 'Scanner une niche pour trouver des domaines' },
   { id: 'prospect', label: '🎯 Prospector',   desc: 'Trouver des commerces à faible présence web' },
+  { id: 'generate', label: '🏗️ Générer',      desc: 'Générer le config du site (contenu IA)' },
   { id: 'submit',   label: '📤 Soumettre GSC', desc: 'Vérifier et indexer un site dans Search Console' },
   { id: 'rank',     label: '📊 Tracker',       desc: 'Suivre les positions SERP d\'un site' },
   { id: 'cron',     label: '🔄 Cron',          desc: 'Lancer le suivi hebdomadaire de tous les sites' },
@@ -234,7 +235,7 @@ function painEmoji(s: number) {
 
 type ProSortKey = 'business_name' | 'rating' | 'review_count' | 'pain_score' | 'prospect_score';
 
-function ProspectTable({ result }: { result: ProspectorResult }) {
+function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: ((name: string) => void) | undefined }) {
   const [showHelp,   setShowHelp]   = useState(false);
   const [q,          setQ]          = useState('');
   const [presence,   setPresence]   = useState('');
@@ -346,7 +347,13 @@ function ProspectTable({ result }: { result: ProspectorResult }) {
               const pres = PRESENCE[p.web_presence] ?? { label: p.web_presence, cls: 'bg-[#EEEDF9] text-[#3D3D6B]' };
               return (
                 <tr key={p.business_name + i} className="hover:bg-[#FAFAFF] align-top">
-                  <td className={`${TD} text-[#1C1560] font-medium`}>{p.business_name}</td>
+                  <td className={`${TD} text-[#1C1560] font-medium`}>
+                    {p.business_name}
+                    {onPick && (
+                      <button onClick={() => onPick(p.business_name)}
+                        className="block mt-0.5 text-[11px] font-normal text-indigo-600 hover:text-indigo-800">→ Générer le site pour ce commerce</button>
+                    )}
+                  </td>
                   <td className={`${TD} text-center text-[#3D3D6B] whitespace-nowrap`}>{p.rating != null ? `⭐ ${p.rating.toFixed(1)}` : '—'}</td>
                   <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.review_count ?? '—'}</td>
                   <td className={TD}><Badge text={pres.label} cls={pres.cls} /></td>
@@ -476,7 +483,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
 }
 
 // ── Prospector ──────────────────────────────────────────────────────────────────
-function ProspectPanel({ initialNiche, initialCity }: { initialNiche?: string; initialCity?: string }) {
+function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: string; initialCity?: string; onNext?: (name: string, city: string) => void }) {
   const [niche,      setNiche]      = useState(initialNiche ?? '');
   const [city,       setCity]       = useState(initialCity ?? '');
   const [limit,      setLimit]      = useState(60);
@@ -545,8 +552,61 @@ function ProspectPanel({ initialNiche, initialCity }: { initialNiche?: string; i
       </div>
 
       {result?.data
-        ? <><ProspectTable result={result.data} /><RawLogs out={result.out} ok={result.ok} /></>
+        ? <><ProspectTable result={result.data} onPick={onNext ? (name => onNext(name, city.trim())) : undefined} /><RawLogs out={result.out} ok={result.ok} /></>
         : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
+    </div>
+  );
+}
+
+// ── GSC Submit ────────────────────────────────────────────────────────────────
+// ── Générer le config ───────────────────────────────────────────────────────────
+function GenPanel({ initialName, initialCity }: { initialName?: string; initialCity?: string }) {
+  const [name,     setName]     = useState(initialName ?? '');
+  const [city,     setCity]     = useState(initialCity ?? '');
+  const [simulate, setSimulate] = useState(true);
+  const [result,   setResult]   = useState<{ out: string; ok: boolean } | null>(null);
+  const [pending,  start]       = useTransition();
+
+  function launch() {
+    setResult(null);
+    start(async () => setResult(await runDemoGen(name, city, { simulate })));
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-[#6B6B9E]">
+        Génère le <strong className="text-[#1C1560]">config du site</strong> (contenu rédigé par l'IA) pour un commerce.
+        Le fichier est écrit dans <span className="mono">configs/</span> et sert ensuite au déploiement.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="label block mb-1">Nom du commerce</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="SAM Plomberie"
+            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+        <div>
+          <label className="label block mb-1">Ville</label>
+          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Longueuil"
+            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+      </div>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
+          className="rounded border-[#D9D7F0] text-indigo-600" />
+        <span className="text-sm text-[#3D3D6B]">--simulate (contenu fictif, gratuit)</span>
+      </label>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={launch} disabled={pending}
+          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 text-sm text-white transition-colors">
+          {pending ? 'Génération…' : simulate ? 'Générer (fictif, gratuit)' : 'Générer le config (IA)'}
+        </button>
+        <span className="text-xs text-[#9A97C0]">
+          {simulate
+            ? 'Mode fictif — gratuit. Laisse le nom vide pour un test pur, ou mets un commerce existant.'
+            : 'Contenu rédigé par Claude — ~$0.08. Le commerce doit exister (scan Prospector au préalable).'}
+        </span>
+      </div>
+      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
     </div>
   );
 }
@@ -721,15 +781,17 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
   const [submitSite, setSubmitSite] = useState(sites[0]?.id ?? '');
   const [rankSite,   setRankSite]   = useState(sites[0]?.id ?? '');
   const [proPrefill, setProPrefill] = useState<{ niche: string; city: string }>({ niche: '', city: '' });
+  const [genPrefill, setGenPrefill] = useState<{ name: string; city: string }>({ name: '', city: '' });
 
   function goSubmit(siteId: string) { setSubmitSite(siteId); setTab('submit'); }
   function goRank(siteId: string)   { setRankSite(siteId);   setTab('rank'); }
   function goProspector(niche: string, city: string) { setProPrefill({ niche, city }); setTab('prospect'); }
+  function goGenerate(name: string, city: string)    { setGenPrefill({ name, city });  setTab('generate'); }
 
   return (
     <div className="space-y-3">
       {/* Tab selector */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
         {TABS.map(t => (
           <button
             key={t.id}
@@ -749,7 +811,8 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
       {/* Active panel */}
       <div className="card p-5">
         {tab === 'finder'   && <FinderPanel onNext={goProspector} />}
-        {tab === 'prospect' && <ProspectPanel key={`${proPrefill.niche}|${proPrefill.city}`} initialNiche={proPrefill.niche} initialCity={proPrefill.city} />}
+        {tab === 'prospect' && <ProspectPanel key={`${proPrefill.niche}|${proPrefill.city}`} initialNiche={proPrefill.niche} initialCity={proPrefill.city} onNext={goGenerate} />}
+        {tab === 'generate' && <GenPanel key={`${genPrefill.name}|${genPrefill.city}`} initialName={genPrefill.name} initialCity={genPrefill.city} />}
         {tab === 'submit'   && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
         {tab === 'rank'   && <RankPanel   sites={sites} preselect={rankSite}   onPreselect={setRankSite} />}
         {tab === 'cron'   && <CronPanel />}
