@@ -144,7 +144,13 @@ function KeywordTable({ result }: { result: FinderResult }) {
                 <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
               </tr>
             ))}
-            {rows.length === 0 && <tr><td colSpan={5} className="px-3 py-6 text-center text-[#9A97C0]">Aucun mot-clé ne correspond aux filtres.</td></tr>}
+            {rows.length === 0 && (
+              <tr><td colSpan={5} className="px-3 py-6 text-center text-[#9A97C0]">
+                {result.keywords.length === 0
+                  ? "Le scan n'a trouvé aucun mot-clé — vérifie l'orthographe de la niche (ex. « ostéopathe », pas « ostéoathe »)."
+                  : 'Aucun mot-clé ne correspond aux filtres.'}
+              </td></tr>
+            )}
           </tbody>
         </table>
       </div>
