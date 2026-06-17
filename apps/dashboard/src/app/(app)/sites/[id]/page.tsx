@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { CitationChecklist } from '@/components/sites/citation-checklist';
 import { PositionChart, type ChartPoint } from '@/components/charts/position-chart';
 import {
   getSiteDetail, getSiteLeads, getSiteRankings, updateSiteField,
@@ -162,6 +163,9 @@ export default async function SiteDetailPage({
               ))}
             </dl>
           </div>
+
+          {/* Checklist citations / SEO */}
+          <CitationChecklist siteId={id} />
         </div>
 
         {/* ── Droite : courbe + leads ───────────────────────────────────── */}
