@@ -343,7 +343,7 @@ function RawLogs({ out, ok }: { out: string; ok: boolean }) {
 }
 
 // ── Finder ────────────────────────────────────────────────────────────────────
-function FinderPanel() {
+function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void }) {
   const [niche,    setNiche]    = useState('');
   const [city,     setCity]     = useState('');
   const [limit,    setLimit]    = useState(100);
@@ -415,14 +415,24 @@ function FinderPanel() {
       {result?.data
         ? <><KeywordTable result={result.data} /><RawLogs out={result.out} ok={result.ok} /></>
         : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
+
+      {result?.data && result.data.keywords.length > 0 && (
+        <div className="flex items-center gap-3 flex-wrap rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+          <button onClick={() => onNext(niche.trim(), city.trim())}
+            className="rounded-md bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm text-white font-medium transition-colors">
+            Prochaine étape : trouver les clients →
+          </button>
+          <span className="text-xs text-[#3D6B4A]">Ouvre le Prospector pour « {niche.trim()} » à « {city.trim()} » (valider qu'il y a des commerces à louer).</span>
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Prospector ──────────────────────────────────────────────────────────────────
-function ProspectPanel() {
-  const [niche,      setNiche]      = useState('');
-  const [city,       setCity]       = useState('');
+function ProspectPanel({ initialNiche, initialCity }: { initialNiche?: string; initialCity?: string }) {
+  const [niche,      setNiche]      = useState(initialNiche ?? '');
+  const [city,       setCity]       = useState(initialCity ?? '');
   const [limit,      setLimit]      = useState(60);
   const [minReviews, setMinReviews] = useState(0);
   const [simulate,   setSimulate]   = useState(false);
@@ -664,9 +674,11 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
   const [tab,        setTab]        = useState<TabId>(startTab);
   const [submitSite, setSubmitSite] = useState(sites[0]?.id ?? '');
   const [rankSite,   setRankSite]   = useState(sites[0]?.id ?? '');
+  const [proPrefill, setProPrefill] = useState<{ niche: string; city: string }>({ niche: '', city: '' });
 
   function goSubmit(siteId: string) { setSubmitSite(siteId); setTab('submit'); }
   function goRank(siteId: string)   { setRankSite(siteId);   setTab('rank'); }
+  function goProspector(niche: string, city: string) { setProPrefill({ niche, city }); setTab('prospect'); }
 
   return (
     <div className="space-y-3">
@@ -690,8 +702,8 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
 
       {/* Active panel */}
       <div className="card p-5">
-        {tab === 'finder'   && <FinderPanel />}
-        {tab === 'prospect' && <ProspectPanel />}
+        {tab === 'finder'   && <FinderPanel onNext={goProspector} />}
+        {tab === 'prospect' && <ProspectPanel key={`${proPrefill.niche}|${proPrefill.city}`} initialNiche={proPrefill.niche} initialCity={proPrefill.city} />}
         {tab === 'submit'   && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
         {tab === 'rank'   && <RankPanel   sites={sites} preselect={rankSite}   onPreselect={setRankSite} />}
         {tab === 'cron'   && <CronPanel />}
