@@ -22,6 +22,43 @@ function classifyWebPresence(website: string | null | undefined): WebPresence {
   return 'has_site';
 }
 
+// ─── Filtre de pertinence (types Google Places) ──────────────────────────────
+
+// Métiers de service locaux ciblés par le rank-and-rent → toujours pertinents.
+const SERVICE_TYPES = new Set([
+  'plumber', 'general_contractor', 'roofing_contractor', 'electrician',
+  'painter', 'locksmith', 'moving_company', 'car_repair', 'hardware_store',
+]);
+
+// Catégories clairement hors-sujet → écartées (santé, resto, commerce, loisirs…).
+const IRRELEVANT_TYPES = new Set([
+  'restaurant', 'food', 'cafe', 'bar', 'meal_takeaway', 'meal_delivery', 'bakery',
+  'health', 'doctor', 'hospital', 'dentist', 'pharmacy', 'physiotherapist', 'veterinary_care',
+  'spa', 'beauty_salon', 'hair_care', 'gym',
+  'school', 'university', 'library', 'museum', 'park', 'tourist_attraction',
+  'lodging', 'bank', 'finance', 'insurance_agency', 'real_estate_agency', 'travel_agency',
+  'car_dealer', 'gas_station', 'supermarket', 'grocery_or_supermarket', 'shopping_mall',
+  'clothing_store', 'shoe_store', 'jewelry_store', 'book_store', 'store',
+  'church', 'place_of_worship', 'night_club', 'movie_theater',
+]);
+
+const deburr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function nicheWords(niche: string): string[] {
+  const stop = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'et', 'en', 'au', 'aux', 'pour', 'dans', 'qc']);
+  return deburr(niche).replace(/[^a-z0-9]/g, ' ').split(/\s+/).filter(w => w.length >= 4 && !stop.has(w));
+}
+
+// Pertinent si : (a) un type métier de service, sinon (b) pas un type hors-sujet
+// et le nom contient un mot de la niche. Les commerces/santé/loisirs sont écartés.
+function isRelevantPlace(name: string, types: string[] | undefined, words: string[]): boolean {
+  const t = types ?? [];
+  if (t.some(x => SERVICE_TYPES.has(x)))    return true;
+  if (t.some(x => IRRELEVANT_TYPES.has(x))) return false;
+  const n = deburr(name);
+  return words.some(w => n.includes(w));
+}
+
 // ─── Retry avec backoff exponentiel ──────────────────────────────────────────
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -51,6 +88,7 @@ interface TextSearchResult {
   formatted_address:   string;
   rating?:             number;
   user_ratings_total?: number;
+  types?:              string[];
 }
 
 interface TextSearchResponse {
@@ -181,8 +219,18 @@ export async function collectPlaces(
   const searchResults = await fetchTextSearch(niche, location, apiKey, options.limit);
   process.stdout.write(`[places] ${searchResults.length} résultats trouvés\n`);
 
+  // Filtre de pertinence : on écarte les commerces hors-sujet (santé, resto, magasins…)
+  // que Google ajoute quand la recherche texte est floue.
+  const words    = nicheWords(niche);
+  const onTopic  = searchResults.filter((r) => isRelevantPlace(r.name, r.types, words));
+  // Repli : si le filtre vide tout (niche au type Google inhabituel), on garde l'original.
+  const relevant = onTopic.length > 0 ? onTopic : searchResults;
+  process.stdout.write(
+    `[places] ${relevant.length} pertinents (${searchResults.length - relevant.length} hors-sujet écartés)\n`
+  );
+
   // Filtre préliminaire sur les avis (évite des appels Place Details inutiles)
-  const filtered = searchResults.filter(
+  const filtered = relevant.filter(
     (r) => (r.user_ratings_total ?? 0) >= options.minReviews
   );
   process.stdout.write(
