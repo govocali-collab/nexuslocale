@@ -53,28 +53,83 @@ function kdCls(kd: number | null) {
   return kd <= 30 ? 'bg-green-100 text-green-700' : kd <= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
 }
 
+type KwSortKey = 'keyword' | 'search_volume' | 'cpc' | 'keyword_difficulty' | 'score';
+
 function KeywordTable({ result }: { result: FinderResult }) {
-  const kws     = [...result.keywords].sort((a, b) => b.score - a.score);
-  const domains = (result.candidates ?? []).filter(d => d.available);
+  const [q,      setQ]      = useState('');
+  const [minVol, setMinVol] = useState('');
+  const [maxKd,  setMaxKd]  = useState('');
+  const [sort,   setSort]   = useState<{ key: KwSortKey; dir: 'asc' | 'desc' }>({ key: 'score', dir: 'desc' });
+
+  const domains   = (result.candidates ?? []).filter(d => d.available);
+  const minVolNum = minVol === '' ? null : Number(minVol);
+  const maxKdNum  = maxKd  === '' ? null : Number(maxKd);
+
+  const rows = result.keywords
+    .filter(k => {
+      if (q && !k.keyword.toLowerCase().includes(q.toLowerCase())) return false;
+      if (minVolNum != null && (k.search_volume ?? 0) < minVolNum) return false;
+      if (maxKdNum != null && k.keyword_difficulty != null && k.keyword_difficulty > maxKdNum) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const dir = sort.dir === 'asc' ? 1 : -1;
+      if (sort.key === 'keyword') return a.keyword.localeCompare(b.keyword) * dir;
+      const av = (a[sort.key] as number | null) ?? -Infinity;
+      const bv = (b[sort.key] as number | null) ?? -Infinity;
+      return (av - bv) * dir;
+    });
+
+  function toggleSort(key: KwSortKey) {
+    setSort(s => s.key === key
+      ? { key, dir: s.dir === 'desc' ? 'asc' : 'desc' }
+      : { key, dir: key === 'keyword' ? 'asc' : 'desc' });
+  }
+  const arrow = (key: KwSortKey) => sort.key === key ? (sort.dir === 'desc' ? ' ↓' : ' ↑') : '';
+  const hasFilter = q !== '' || minVol !== '' || maxKd !== '';
+  const inputCls = 'rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-2 py-1 placeholder-[#9A97C0]';
+
   return (
     <div className="mt-4 space-y-3">
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-sm font-medium text-[#1C1560]">{kws.length} mot(s)-clé</span>
+        <span className="text-sm font-medium text-[#1C1560]">{rows.length} / {result.keywords.length} mot(s)-clé</span>
         <Badge text={`Niche score ${result.niche_score}`} cls="bg-indigo-100 text-indigo-700" />
       </div>
+
+      {/* Barre de filtre */}
+      <div className="flex flex-wrap items-center gap-2">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Filtrer un mot-clé…"
+          className={`${inputCls} flex-1 min-w-[10rem]`} />
+        <input value={minVol} onChange={e => setMinVol(e.target.value)} type="number" min={0} placeholder="Volume min"
+          className={`${inputCls} w-28`} />
+        <input value={maxKd} onChange={e => setMaxKd(e.target.value)} type="number" min={0} max={100} placeholder="KD max"
+          className={`${inputCls} w-24`} />
+        {hasFilter && (
+          <button onClick={() => { setQ(''); setMinVol(''); setMaxKd(''); }}
+            className="text-xs text-[#9A97C0] hover:text-[#1C1560] underline">Réinitialiser</button>
+        )}
+      </div>
+
       <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
         <table className="w-full text-sm">
           <thead className="bg-[#F5F4FF]">
             <tr>
-              <th className={`text-left ${TH}`}>Mot-clé</th>
-              <th className={`text-right ${TH}`}>Volume</th>
-              <th className={`text-right ${TH}`}>CPC</th>
-              <th className={`text-center ${TH}`}>KD</th>
-              <th className={`text-right ${TH}`}>Score</th>
+              {([
+                ['keyword',            'Mot-clé', 'text-left'],
+                ['search_volume',      'Volume',  'text-right'],
+                ['cpc',                'CPC',     'text-right'],
+                ['keyword_difficulty', 'KD',      'text-center'],
+                ['score',              'Score',   'text-right'],
+              ] as [KwSortKey, string, string][]).map(([key, label, align]) => (
+                <th key={key} onClick={() => toggleSort(key)}
+                  className={`${align} ${TH} cursor-pointer select-none hover:text-[#1C1560] whitespace-nowrap`}>
+                  {label}{arrow(key)}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {kws.map((k, i) => (
+            {rows.map((k, i) => (
               <tr key={k.keyword + i} className="hover:bg-[#FAFAFF]">
                 <td className={`${TD} text-[#1C1560]`}>{k.keyword}</td>
                 <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtNum(k.search_volume)}</td>
@@ -83,7 +138,7 @@ function KeywordTable({ result }: { result: FinderResult }) {
                 <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
               </tr>
             ))}
-            {kws.length === 0 && <tr><td colSpan={5} className="px-3 py-6 text-center text-[#9A97C0]">Aucun mot-clé retenu (essaie un KD max plus élevé).</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={5} className="px-3 py-6 text-center text-[#9A97C0]">Aucun mot-clé ne correspond aux filtres.</td></tr>}
           </tbody>
         </table>
       </div>
