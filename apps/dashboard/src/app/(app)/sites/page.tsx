@@ -75,7 +75,7 @@ export default async function SitesPage({
               <th className="px-3 py-2.5 label">Type</th>
               <th className="px-3 py-2.5 label">Niche / Ville</th>
               <th className="px-3 py-2.5 label">Statut</th>
-              <th className="px-3 py-2.5 label text-right">Vol./mois</th>
+              <th className="px-3 py-2.5 label text-right">Top mot-clé /mois</th>
               <th className="px-3 py-2.5 label text-right">Niche score</th>
               <th className="px-3 py-2.5 label text-right">Leads/mois</th>
               <th className="px-3 py-2.5 label text-right">Top pos.</th>
@@ -103,8 +103,8 @@ export default async function SitesPage({
                 </td>
                 <td className="px-3 py-2.5"><Badge value={s.status} /></td>
                 <td className="px-3 py-2.5 text-right mono text-[#3D3D6B]">
-                  {s.total_volume != null
-                    ? <>{s.total_volume.toLocaleString('fr-CA')}<span className="text-[#C0BDE0] text-xs"> · {s.keyword_count} mc</span></>
+                  {s.top_volume != null
+                    ? <>{s.top_volume.toLocaleString('fr-CA')}<span className="text-[#C0BDE0] text-xs"> · {s.keyword_count} mc</span></>
                     : <span className="text-[#C0BDE0]">—</span>}
                 </td>
                 <td className="px-3 py-2.5 text-right mono">

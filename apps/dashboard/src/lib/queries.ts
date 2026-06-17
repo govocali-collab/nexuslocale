@@ -38,7 +38,7 @@ export interface SiteRow {
   leads_month:    number;
   best_position:  number | null;
   niche_score:    number | null;
-  total_volume:   number | null;
+  top_volume:     number | null;
   keyword_count:  number;
 }
 
@@ -214,8 +214,8 @@ export async function getSitesList(filters?: {
   return (sitesRes.data ?? []).map(s => {
     const rd = s.research_data as
       { niche_score?: number; keywords?: { search_volume?: number | null }[] } | null;
-    const kws       = rd?.keywords ?? [];
-    const totalVol  = kws.reduce((n, k) => n + (k.search_volume ?? 0), 0);
+    const kws    = rd?.keywords ?? [];
+    const topVol = kws.reduce((max, k) => Math.max(max, k.search_volume ?? 0), 0);
     return {
       id:            s.id as string,
       domain:        s.domain as string | null,
@@ -228,7 +228,7 @@ export async function getSitesList(filters?: {
       leads_month:   leadsPerSite[s.id as string]       ?? 0,
       best_position: bestPositionPerSite[s.id as string] ?? null,
       niche_score:   rd?.niche_score ?? null,
-      total_volume:  kws.length ? totalVol : null,
+      top_volume:    kws.length ? topVol : null,
       keyword_count: kws.length,
     };
   });
