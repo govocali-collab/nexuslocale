@@ -10,6 +10,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 
@@ -34,17 +35,14 @@ interface SiteConfig {
   branding: Branding;
 }
 
-// ─── Chargement de police (Inter Regular depuis Google Fonts) ─────────────────
+// ─── Chargement de police (Inter embarquée localement — aucun réseau) ─────────
 
-async function fetchFont(url: string): Promise<ArrayBuffer> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Impossible de charger la police : ${url}`);
-  return res.arrayBuffer();
+const FONTS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'fonts');
+
+function loadFont(file: string): ArrayBuffer {
+  const buf = fs.readFileSync(path.join(FONTS_DIR, file));
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
 }
-
-// URL stable Inter Regular woff — chemin court pour Google Fonts CDN
-const INTER_URL =
-  'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff';
 
 // ─── Templates JSX-like (Satori attend des objets React.ReactElement) ─────────
 
@@ -107,7 +105,7 @@ function heroElement(config: SiteConfig) {
                           color: '#ffffff',
                           padding: '8px 20px', borderRadius: 8,
                           marginBottom: 12,
-                          display: 'inline-flex',
+                          display: 'flex', alignSelf: 'flex-start',
                         },
                         children: `${niche.toUpperCase()} — ${city.toUpperCase()}`,
                       },
@@ -231,11 +229,10 @@ async function main() {
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8')) as SiteConfig;
   fs.mkdirSync(outputDir, { recursive: true });
 
-  console.log(`[images] Chargement de la police Inter…`);
-  const fontData = await fetchFont(INTER_URL);
+  console.log(`[images] Chargement de la police Inter (locale)…`);
   const fonts = [
-    { name: 'Inter', data: fontData, weight: 400 as const, style: 'normal' as const },
-    { name: 'Inter', data: fontData, weight: 700 as const, style: 'normal' as const },
+    { name: 'Inter', data: loadFont('Inter-Regular.ttf'), weight: 400 as const, style: 'normal' as const },
+    { name: 'Inter', data: loadFont('Inter-Bold.ttf'),    weight: 700 as const, style: 'normal' as const },
   ];
 
   const slug = domainSlug(config.domain);
