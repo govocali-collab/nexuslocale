@@ -146,9 +146,13 @@ function KeywordTable({ result }: { result: FinderResult }) {
                 ['keyword_difficulty', 'KD',      'text-center'],
                 ['score',              'Score',   'text-right'],
               ] as [KwSortKey, string, string][]).map(([key, label, align]) => (
-                <th key={key} onClick={() => toggleSort(key)}
-                  className={`${align} ${TH} cursor-pointer select-none hover:text-[#1C1560] whitespace-nowrap`}>
-                  {label}{arrow(key)}
+                <th key={key} className={`${align} ${TH} whitespace-nowrap`}>
+                  <button onClick={() => toggleSort(key)}
+                    className="cursor-pointer select-none hover:text-[#1C1560] font-medium">{label}{arrow(key)}</button>
+                  {key !== 'keyword' && (
+                    <button onClick={() => setShowHelp(true)} aria-label={`Aide : ${label}`}
+                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#EEEDF9] text-[#9A97C0] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
+                  )}
                 </th>
               ))}
             </tr>
