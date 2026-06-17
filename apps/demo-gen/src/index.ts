@@ -78,15 +78,20 @@ async function genOne(
   const pexelsKey = process.env['PEXELS_API_KEY'];
   if (!simulate && pexelsKey) {
     const svcList = generated.pages.services;
-    const query = nicheToQuery(enriched.niche);
-    process.stdout.write(`[pexels] Recherche de photos « ${query} »…\n`);
-    const pics = await searchPexelsPhotos(query, pexelsKey, svcList.length + 1);
-    if (pics.length > 0) {
-      const services: Record<string, PexelsPhoto> = {};
-      svcList.forEach((s, i) => { const p = pics[(i + 1) % pics.length]; if (p) services[s.slug] = p; });
-      photos = { hero: pics[0] ?? null, services };
+    process.stdout.write('[pexels] Recherche de photos par service…\n');
+    // Hero : photo générale du métier ; chaque service : sa requête anglaise spécifique.
+    const heroPics = await searchPexelsPhotos(nicheToQuery(enriched.niche), pexelsKey, 3);
+    const svcResults = await Promise.all(svcList.map(async (s) => {
+      const q = s.image_query?.trim() ? s.image_query : nicheToQuery(enriched.niche);
+      const pics = await searchPexelsPhotos(q, pexelsKey, 2);
+      return [s.slug, q, pics[0] ?? null] as const;
+    }));
+    const services: Record<string, PexelsPhoto> = {};
+    for (const [slug, q, p] of svcResults) {
+      if (p) { services[slug] = p; process.stdout.write(`[pexels]   ${slug} ← « ${q} »\n`); }
     }
-    process.stdout.write(`[pexels] ✓ ${pics.length} photo(s)\n`);
+    photos = { hero: heroPics[0] ?? null, services };
+    process.stdout.write(`[pexels] ✓ hero + ${Object.keys(services).length} photos de service\n`);
   }
 
   // Assemblage + validation + écriture

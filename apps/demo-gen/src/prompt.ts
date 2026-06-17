@@ -18,7 +18,9 @@ RÈGLES ABSOLUES
 7. Chaque page service → local_data avec ≥2 champs parmi :
    neighborhoods, price_context, faqs, competitor_context, local_landmarks.
 8. Chaque page zone → neighborhoods (≥1 quartier réel) + local_context (≥80 car. spécifiques).
-9. RÉPONDS UNIQUEMENT EN JSON BRUT — zéro markdown, zéro préambule, zéro commentaire.
+9. image_query : 2-3 mots EN, spécifiques au service de la page (pas juste le métier
+   générique) — c'est la requête de recherche photo. Ex. page « débouchage » → "drain cleaning".
+10. RÉPONDS UNIQUEMENT EN JSON BRUT — zéro markdown, zéro préambule, zéro commentaire.
 
 SCHÉMA JSON ATTENDU
 {
@@ -47,6 +49,7 @@ SCHÉMA JSON ATTENDU
         "h1": "Titre SEO long et descriptif avec ville",
         "meta_title": "≤60 car. ABSOLUS",
         "meta_description": "≤160 car. ABSOLUS",
+        "image_query": "2-3 mots EN décrivant une photo stock pour CE service précis (ex. 'emergency plumbing repair', 'water heater installation', 'drain cleaning')",
         "sections": [
           { "heading": "...", "body": "2-4 phrases" }
         ],
