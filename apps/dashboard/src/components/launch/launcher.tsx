@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { runFinderScan, runProspectorScan, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
-import type { FinderResult, ProspectorResult } from '@/lib/launch-actions';
+import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
 interface ActionQueue {
