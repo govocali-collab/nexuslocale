@@ -166,16 +166,16 @@ console.log('\n[5/7] Déploiement sur Vercel…');
 
 const vercelBin = path.join(ROOT, 'node_modules', '.bin', 'vercel');
 
-// Build via Vercel (crée .vercel/output)
+// Build via Vercel (crée .vercel/output) — vercelBin entre guillemets (le chemin peut contenir des espaces)
 run(
-  `${vercelBin} build ${isDemo ? '' : '--prod'} --token="${VERCEL_TOKEN}" --yes`,
+  `"${vercelBin}" build ${isDemo ? '' : '--prod'} --token="${VERCEL_TOKEN}" --yes`,
   SITE_TEMPLATE_PATH,
   { SITE_CONFIG_PATH: configPath }
 );
 
 // Deploy le prebuilt
 const deployOutput = execSync(
-  `${vercelBin} deploy --prebuilt ${isDemo ? '' : '--prod'} --token="${VERCEL_TOKEN}" --yes`,
+  `"${vercelBin}" deploy --prebuilt ${isDemo ? '' : '--prod'} --token="${VERCEL_TOKEN}" --yes`,
   { cwd: SITE_TEMPLATE_PATH, encoding: 'utf8' }
 ).trim();
 
