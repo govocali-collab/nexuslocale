@@ -412,10 +412,6 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
         </span>
       </div>
 
-      {result?.data
-        ? <><KeywordTable result={result.data} /><RawLogs out={result.out} ok={result.ok} /></>
-        : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
-
       {result?.data && result.data.keywords.length > 0 && (
         <div className="flex items-center gap-3 flex-wrap rounded-lg bg-emerald-50 border border-emerald-200 p-3">
           <button onClick={() => onNext(niche.trim(), city.trim())}
@@ -425,6 +421,10 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
           <span className="text-xs text-[#3D6B4A]">Ouvre le Prospector pour « {niche.trim()} » à « {city.trim()} » (valider qu'il y a des commerces à louer).</span>
         </div>
       )}
+
+      {result?.data
+        ? <><KeywordTable result={result.data} /><RawLogs out={result.out} ok={result.ok} /></>
+        : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
     </div>
   );
 }
