@@ -68,7 +68,6 @@ function KeywordTable({ result, selected, onToggle }: { result: FinderResult; se
   const [showHelp, setShowHelp] = useState(false);
   const [sort,     setSort]     = useState<{ key: KwSortKey; dir: 'asc' | 'desc' }>({ key: 'score', dir: 'desc' });
 
-  const domains   = (result.candidates ?? []).filter(d => d.available);
   const minVolNum = minVol === '' ? null : Number(minVol);
   const maxKdNum  = maxKd  === '' ? null : Number(maxKd);
 
@@ -185,10 +184,36 @@ function KeywordTable({ result, selected, onToggle }: { result: FinderResult; se
           </tbody>
         </table>
       </div>
-      {domains.length > 0 && (
-        <p className="text-xs text-[#3D3D6B]">
-          <span className="font-medium">Domaines dispo : </span>
-          {domains.slice(0, 6).map(d => `${d.domain}${d.price_usd ? ` ($${d.price_usd.toFixed(2)})` : ''}`).join('  ·  ')}
+    </div>
+  );
+}
+
+function DomainCard({ candidates }: { candidates: FinderDomain[] }) {
+  const available = candidates.filter(d => d.available);
+  const taken     = candidates.filter(d => !d.available);
+  return (
+    <div className="rounded-lg border border-[#D9D7F0] bg-white p-4">
+      <p className="label mb-2">🌐 Domaines disponibles ({available.length})</p>
+      {available.length === 0 ? (
+        <p className="text-sm text-[#9A97C0]">Aucun domaine exact disponible — essaie une variante de niche/ville.</p>
+      ) : (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+          {available.map(d => (
+            <li key={d.domain} className="flex items-center justify-between rounded-md bg-[#F5F4FF] px-3 py-1.5">
+              <span className="mono text-sm text-[#1C1560]">{d.domain}</span>
+              <span className="text-xs text-emerald-600 font-medium whitespace-nowrap">
+                {d.price_usd ? `$${d.price_usd.toFixed(2)}/an` : 'dispo'}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {taken.length > 0 && (
+        <p className="text-xs text-[#C0BDE0] mt-2">Déjà pris : {taken.map(d => d.domain).join(' · ')}</p>
+      )}
+      {available.length > 0 && (
+        <p className="text-[11px] text-[#9A97C0] mt-2">
+          Pour réserver : <span className="mono">finder buy {available[0]?.domain}</span> (achat ~13 $).
         </p>
       )}
     </div>
@@ -440,6 +465,8 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
           </span>
         </div>
       )}
+
+      {result?.data && result.data.candidates.length > 0 && <DomainCard candidates={result.data.candidates} />}
 
       {result?.data
         ? <><KeywordTable result={result.data} selected={selectedKws} onToggle={toggleKw} /><RawLogs out={result.out} ok={result.ok} /></>
