@@ -196,10 +196,31 @@ function painEmoji(s: number) {
 }
 
 function ProspectTable({ result }: { result: ProspectorResult }) {
+  const [showHelp, setShowHelp] = useState(false);
   const rows = [...result.prospects].sort((a, b) => b.prospect_score - a.prospect_score);
   return (
     <div className="mt-4 space-y-3">
-      <span className="text-sm font-medium text-[#1C1560]">{rows.length} prospect(s) — triés par score</span>
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-sm font-medium text-[#1C1560]">{rows.length} prospect(s) — triés par score</span>
+        <button
+          onClick={() => setShowHelp(h => !h)}
+          aria-label="Comprendre les colonnes"
+          className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold transition-colors ${
+            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#EEEDF9] text-[#6B6B9E] hover:bg-indigo-100 hover:text-indigo-700'
+          }`}
+        >?</button>
+      </div>
+
+      {showHelp && (
+        <div className="rounded-lg border border-[#D9D7F0] bg-[#F5F4FF] p-3 text-sm space-y-1.5">
+          <p><span className="font-semibold text-[#1C1560]">Note / Avis</span> <span className="text-[#6B6B9E]">— sa note Google (étoiles) et son nombre d'avis. Beaucoup d'avis = commerce établi et occupé.</span></p>
+          <p><span className="font-semibold text-[#1C1560]">Présence web</span> <span className="text-[#6B6B9E]">— a-t-il un site? 🔴 « Aucun site » = facile à dépasser sur Google.</span></p>
+          <p><span className="font-semibold text-[#1C1560]">Pain</span> <span className="text-[#6B6B9E]">— à quel point son site est faible/absent (0-100). 🔴 Élevé = mauvais ou pas de site → facile à dépasser ET client affamé.</span></p>
+          <p><span className="font-semibold text-[#1C1560]">Score</span> <span className="text-[#6B6B9E]">— à quel point c'est un <strong>bon prospect à contacter</strong> = commerce réputé (avis + note) <strong>mais</strong> site faible. Plus haut = à appeler en premier.</span></p>
+          <p className="pt-1 text-[#1C1560]">👉 <strong>Le prospect en or : beaucoup d'avis + Pain 🔴 élevé</strong> (un vrai bon commerce sans bon site).</p>
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
         <table className="w-full text-sm">
           <thead className="bg-[#F5F4FF]">
