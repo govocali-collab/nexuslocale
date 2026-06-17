@@ -62,10 +62,11 @@ function cpcCls(cpc: number | null) {
 type KwSortKey = 'keyword' | 'search_volume' | 'cpc' | 'keyword_difficulty' | 'score';
 
 function KeywordTable({ result }: { result: FinderResult }) {
-  const [q,      setQ]      = useState('');
-  const [minVol, setMinVol] = useState('');
-  const [maxKd,  setMaxKd]  = useState('');
-  const [sort,   setSort]   = useState<{ key: KwSortKey; dir: 'asc' | 'desc' }>({ key: 'score', dir: 'desc' });
+  const [q,        setQ]        = useState('');
+  const [minVol,   setMinVol]   = useState('');
+  const [maxKd,    setMaxKd]     = useState('');
+  const [showHelp, setShowHelp] = useState(false);
+  const [sort,     setSort]     = useState<{ key: KwSortKey; dir: 'asc' | 'desc' }>({ key: 'score', dir: 'desc' });
 
   const domains   = (result.candidates ?? []).filter(d => d.available);
   const minVolNum = minVol === '' ? null : Number(minVol);
@@ -100,7 +101,25 @@ function KeywordTable({ result }: { result: FinderResult }) {
       <div className="flex items-center gap-3 flex-wrap">
         <span className="text-sm font-medium text-[#1C1560]">{rows.length} / {result.keywords.length} mot(s)-clé</span>
         <Badge text={`Niche score ${result.niche_score}`} cls="bg-indigo-100 text-indigo-700" />
+        <button
+          onClick={() => setShowHelp(h => !h)}
+          aria-label="Comprendre les colonnes"
+          className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold transition-colors ${
+            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#EEEDF9] text-[#6B6B9E] hover:bg-indigo-100 hover:text-indigo-700'
+          }`}
+        >?</button>
       </div>
+
+      {/* Encadré d'aide */}
+      {showHelp && (
+        <div className="rounded-lg border border-[#D9D7F0] bg-[#F5F4FF] p-3 text-sm space-y-1.5">
+          <p><span className="font-semibold text-[#1C1560]">Volume</span> <span className="text-[#6B6B9E]">— combien de fois ce mot-clé est cherché par mois (au Québec). Gros = beaucoup de monde cherche. ⚠️ Peu fiable en local.</span></p>
+          <p><span className="font-semibold text-[#1C1560]">CPC</span> <span className="text-[#6B6B9E]">— ce qu'un annonceur paie par clic. 🟢 Élevé = un client vaut cher. <strong>Ton meilleur indicateur.</strong></span></p>
+          <p><span className="font-semibold text-[#1C1560]">KD</span> <span className="text-[#6B6B9E]">— difficulté à ranker (0-100). 🟢 Bas (≤30) = facile à atteindre le top de Google.</span></p>
+          <p><span className="font-semibold text-[#1C1560]">Score</span> <span className="text-[#6B6B9E]">— note globale = valeur × demande ÷ difficulté. Plus haut = meilleure opportunité.</span></p>
+          <p className="pt-1 text-[#1C1560]">👉 <strong>Le combo gagnant : CPC 🟢 vert + KD 🟢 vert.</strong></p>
+        </div>
+      )}
 
       {/* Barre de filtre */}
       <div className="flex flex-wrap items-center gap-2">
