@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { runFinderScan, runProspectorScan, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
+import type { FinderResult, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
 interface ActionQueue {
@@ -36,6 +37,131 @@ function Output({ out, ok, pending }: { out: string; ok: boolean; pending: boole
   );
 }
 
+// ── Tableaux de résultats ───────────────────────────────────────────────────────
+const fmtNum = (n: number | null) => (n == null ? '—' : n.toLocaleString('fr-CA'));
+const fmtCpc = (n: number | null) => (n == null ? '—' : `$${n.toFixed(2)}`);
+
+const TH = 'px-3 py-2 font-medium text-[#3D3D6B]';
+const TD = 'px-3 py-2 border-t border-[#EEEDF9]';
+
+function Badge({ text, cls }: { text: string; cls: string }) {
+  return <span className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${cls}`}>{text}</span>;
+}
+
+function kdCls(kd: number | null) {
+  if (kd == null) return 'bg-[#EEEDF9] text-[#9A97C0]';
+  return kd <= 30 ? 'bg-green-100 text-green-700' : kd <= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
+}
+
+function KeywordTable({ result }: { result: FinderResult }) {
+  const kws     = [...result.keywords].sort((a, b) => b.score - a.score);
+  const domains = (result.candidates ?? []).filter(d => d.available);
+  return (
+    <div className="mt-4 space-y-3">
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-[#1C1560]">{kws.length} mot(s)-clé</span>
+        <Badge text={`Niche score ${result.niche_score}`} cls="bg-indigo-100 text-indigo-700" />
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+        <table className="w-full text-sm">
+          <thead className="bg-[#F5F4FF]">
+            <tr>
+              <th className={`text-left ${TH}`}>Mot-clé</th>
+              <th className={`text-right ${TH}`}>Volume</th>
+              <th className={`text-right ${TH}`}>CPC</th>
+              <th className={`text-center ${TH}`}>KD</th>
+              <th className={`text-right ${TH}`}>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {kws.map((k, i) => (
+              <tr key={k.keyword + i} className="hover:bg-[#FAFAFF]">
+                <td className={`${TD} text-[#1C1560]`}>{k.keyword}</td>
+                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtNum(k.search_volume)}</td>
+                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtCpc(k.cpc)}</td>
+                <td className={`${TD} text-center`}><Badge text={k.keyword_difficulty == null ? '—' : String(k.keyword_difficulty)} cls={kdCls(k.keyword_difficulty)} /></td>
+                <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
+              </tr>
+            ))}
+            {kws.length === 0 && <tr><td colSpan={5} className="px-3 py-6 text-center text-[#9A97C0]">Aucun mot-clé retenu (essaie un KD max plus élevé).</td></tr>}
+          </tbody>
+        </table>
+      </div>
+      {domains.length > 0 && (
+        <p className="text-xs text-[#3D3D6B]">
+          <span className="font-medium">Domaines dispo : </span>
+          {domains.slice(0, 6).map(d => `${d.domain}${d.price_usd ? ` ($${d.price_usd.toFixed(2)})` : ''}`).join('  ·  ')}
+        </p>
+      )}
+    </div>
+  );
+}
+
+const PRESENCE: Record<string, { label: string; cls: string }> = {
+  none:        { label: 'Aucun site',   cls: 'bg-red-100 text-red-700' },
+  social_only: { label: 'Réseaux soc.', cls: 'bg-amber-100 text-amber-700' },
+  has_site:    { label: 'A un site',    cls: 'bg-[#EEEDF9] text-[#3D3D6B]' },
+};
+function painCls(s: number) {
+  return s >= 50 ? 'bg-red-100 text-red-700' : s >= 20 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+}
+function painEmoji(s: number) {
+  return s >= 80 ? '💀' : s >= 50 ? '🔴' : s >= 20 ? '🟡' : '🟢';
+}
+
+function ProspectTable({ result }: { result: ProspectorResult }) {
+  const rows = [...result.prospects].sort((a, b) => b.prospect_score - a.prospect_score);
+  return (
+    <div className="mt-4 space-y-3">
+      <span className="text-sm font-medium text-[#1C1560]">{rows.length} prospect(s) — triés par score</span>
+      <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+        <table className="w-full text-sm">
+          <thead className="bg-[#F5F4FF]">
+            <tr>
+              <th className={`text-left ${TH}`}>Entreprise</th>
+              <th className={`text-center ${TH}`}>Note</th>
+              <th className={`text-right ${TH}`}>Avis</th>
+              <th className={`text-left ${TH}`}>Présence web</th>
+              <th className={`text-center ${TH}`}>Pain</th>
+              <th className={`text-right ${TH}`}>Score</th>
+              <th className={`text-left ${TH}`}>Problèmes</th>
+              <th className={`text-left ${TH}`}>Téléphone</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((p, i) => {
+              const pres = PRESENCE[p.web_presence] ?? { label: p.web_presence, cls: 'bg-[#EEEDF9] text-[#3D3D6B]' };
+              return (
+                <tr key={p.business_name + i} className="hover:bg-[#FAFAFF] align-top">
+                  <td className={`${TD} text-[#1C1560] font-medium`}>{p.business_name}</td>
+                  <td className={`${TD} text-center text-[#3D3D6B] whitespace-nowrap`}>{p.rating != null ? `⭐ ${p.rating.toFixed(1)}` : '—'}</td>
+                  <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.review_count ?? '—'}</td>
+                  <td className={TD}><Badge text={pres.label} cls={pres.cls} /></td>
+                  <td className={`${TD} text-center`}><Badge text={`${painEmoji(p.pain_score)} ${p.pain_score}`} cls={painCls(p.pain_score)} /></td>
+                  <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{p.prospect_score}</td>
+                  <td className={`${TD} text-xs text-[#6B6B9E] max-w-[18rem]`}>{p.detected_issues.slice(0, 3).join(', ') || '—'}</td>
+                  <td className={`${TD} text-[#3D3D6B] whitespace-nowrap`}>{p.phone ?? '—'}</td>
+                </tr>
+              );
+            })}
+            {rows.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-[#9A97C0]">Aucun prospect trouvé.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function RawLogs({ out, ok }: { out: string; ok: boolean }) {
+  if (!out) return null;
+  return (
+    <details className="mt-3">
+      <summary className="text-xs text-[#9A97C0] cursor-pointer hover:text-[#6B6B9E]">Voir les logs bruts</summary>
+      <Output out={out} ok={ok} pending={false} />
+    </details>
+  );
+}
+
 // ── Finder ────────────────────────────────────────────────────────────────────
 function FinderPanel() {
   const [niche,    setNiche]    = useState('');
@@ -43,7 +169,7 @@ function FinderPanel() {
   const [limit,    setLimit]    = useState(100);
   const [maxKd,    setMaxKd]    = useState(30);
   const [estimate, setEstimate] = useState(false);
-  const [result,   setResult]   = useState<{ out: string; ok: boolean } | null>(null);
+  const [result,   setResult]   = useState<{ out: string; ok: boolean; data: FinderResult | null } | null>(null);
   const [pending,  start]       = useTransition();
 
   const ready = niche.trim() !== '' && city.trim() !== '';
@@ -106,7 +232,9 @@ function FinderPanel() {
         </span>
       </div>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {result?.data
+        ? <><KeywordTable result={result.data} /><RawLogs out={result.out} ok={result.ok} /></>
+        : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
     </div>
   );
 }
@@ -118,7 +246,7 @@ function ProspectPanel() {
   const [limit,      setLimit]      = useState(60);
   const [minReviews, setMinReviews] = useState(0);
   const [simulate,   setSimulate]   = useState(false);
-  const [result,     setResult]     = useState<{ out: string; ok: boolean } | null>(null);
+  const [result,     setResult]     = useState<{ out: string; ok: boolean; data: ProspectorResult | null } | null>(null);
   const [pending,    start]         = useTransition();
 
   const ready    = niche.trim() !== '' && city.trim() !== '';
@@ -180,7 +308,9 @@ function ProspectPanel() {
         </span>
       </div>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {result?.data
+        ? <><ProspectTable result={result.data} /><RawLogs out={result.out} ok={result.ok} /></>
+        : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
     </div>
   );
 }

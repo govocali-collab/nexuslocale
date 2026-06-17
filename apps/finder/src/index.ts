@@ -91,11 +91,12 @@ program
   .option('--sandbox',              'Namecheap sandbox (aucun achat réel)')
   .option('--estimate',             'Estime les coûts sans appeler les API')
   .option('--yes',                  'Confirme automatiquement le coût (non-interactif)')
+  .option('--json',                 'Émet aussi le résultat en JSON (pour le dashboard)')
   .option('--no-db',                'Ne pas écrire dans Supabase')
   .action(async (
     niche: string,
     city:  string,
-    opts: { country: string; lang: string; maxDifficulty?: number; limit: number; sandbox: boolean; estimate: boolean; yes: boolean; db: boolean },
+    opts: { country: string; lang: string; maxDifficulty?: number; limit: number; sandbox: boolean; estimate: boolean; yes: boolean; json: boolean; db: boolean },
   ) => {
     console.log(`\n🔍 finder scan "${niche}" / "${city}"`);
     console.log(`   Pays: ${opts.country}  Langue: ${opts.lang}  KD max: ${opts.maxDifficulty ?? 'illimité'}  Limit: ${opts.limit}`);
@@ -187,6 +188,11 @@ program
       best_domain: best,
       scanned_at:  new Date().toISOString(),
     };
+
+    // ── Sortie JSON (consommée par le dashboard) ────────────────────────────────
+    if (opts.json) {
+      console.log('__NEXUS_JSON__' + JSON.stringify(result) + '__NEXUS_END__');
+    }
 
     // ── Affichage ─────────────────────────────────────────────────────────────
     printKeywordsTable(keywords);

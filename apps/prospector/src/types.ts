@@ -34,6 +34,7 @@ export interface ScanOptions {
   minReviews:  number;
   estimate:    boolean;
   simulate:    boolean;
+  json:        boolean;
 }
 
 // Coût approximatif Google Places API (vérifier console.cloud.google.com pour prix actuels)

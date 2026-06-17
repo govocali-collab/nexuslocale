@@ -28,12 +28,14 @@ program
   .option('--simulate',          'Utilise les données de fixtures (sans appeler l\'API)')
   .option('--limit <n>',         'Nombre max d\'entreprises analysées', '60')
   .option('--min-reviews <n>',   'Exclure les entreprises sous ce nombre d\'avis', '0')
+  .option('--json',              'Émet aussi les résultats en JSON (pour le dashboard)')
   .action(async (niche: string, location: string, opts: Record<string, string | boolean>) => {
     const options: ScanOptions = {
       limit:      Number(opts['limit']      ?? 60),
       minReviews: Number(opts['minReviews'] ?? 0),
       estimate:   Boolean(opts['estimate']),
       simulate:   Boolean(opts['simulate']),
+      json:       Boolean(opts['json']),
     };
 
     await runScan(niche, location, options);
@@ -112,6 +114,11 @@ async function runScan(niche: string, location: string, options: ScanOptions) {
 
   // ── Scoring ────────────────────────────────────────────────────────────
   const scored = scoreAll(analyzed);
+
+  // ── Sortie JSON (consommée par le dashboard) ───────────────────────────
+  if (options.json) {
+    console.log('__NEXUS_JSON__' + JSON.stringify({ niche, city, prospects: scored }) + '__NEXUS_END__');
+  }
 
   // ── Tableau terminal ───────────────────────────────────────────────────
   printTable(scored);
