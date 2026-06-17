@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SiteConfigSchema } from '../../site-template/src/schema/config.js';
 import type { GeneratedContent, ProspectFull } from './types.js';
+import type { PexelsPhoto } from './pexels.js';
 import { demoSubdomain, nicheColors, nicheHeroImage } from './branding.js';
 
 const ROOT = path.resolve(
@@ -78,6 +79,7 @@ export interface AssembledConfig {
 export function assembleAndWrite(
   prospect: ProspectFull,
   generated: GeneratedContent,
+  photos?: { hero?: PexelsPhoto | null; services?: Record<string, PexelsPhoto> },
 ): AssembledConfig {
   const colors = nicheColors(prospect.niche);
 
@@ -123,6 +125,15 @@ export function assembleAndWrite(
         .map((e) => `  • ${e.path.join('.')}: ${e.message}`)
         .join('\n');
       throw new Error(`Config invalide après auto-correction :\n${errors}`);
+    }
+  }
+
+  // Injection des photos réelles (Pexels) après validation — champs optionnels du schéma.
+  if (photos) {
+    if (photos.hero?.url) result.data.branding.hero_image_url = photos.hero.url;
+    for (const svc of result.data.pages.services) {
+      const p = photos.services?.[svc.slug];
+      if (p?.url) svc.image_url = p.url;
     }
   }
 

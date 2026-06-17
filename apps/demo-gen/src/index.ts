@@ -5,6 +5,7 @@ import { enrichFromPlaces } from './enrich.js';
 import { generateContent } from './generator.js';
 import { generateMockContent, MOCK_PROSPECT } from './mock.js';
 import { assembleAndWrite } from './assembler.js';
+import { searchPexelsPhotos, nicheToQuery, type PexelsPhoto } from './pexels.js';
 import { ANTHROPIC_COST, type ProspectFull } from './types.js';
 
 // ─── Coût estimé ─────────────────────────────────────────────────────────────
@@ -72,8 +73,24 @@ async function genOne(
     }
   }
 
+  // Photos réelles (Pexels) — requête EN par niche, photos variées (hero + une par service)
+  let photos: { hero?: PexelsPhoto | null; services?: Record<string, PexelsPhoto> } | undefined;
+  const pexelsKey = process.env['PEXELS_API_KEY'];
+  if (!simulate && pexelsKey) {
+    const svcList = generated.pages.services;
+    const query = nicheToQuery(enriched.niche);
+    process.stdout.write(`[pexels] Recherche de photos « ${query} »…\n`);
+    const pics = await searchPexelsPhotos(query, pexelsKey, svcList.length + 1);
+    if (pics.length > 0) {
+      const services: Record<string, PexelsPhoto> = {};
+      svcList.forEach((s, i) => { const p = pics[(i + 1) % pics.length]; if (p) services[s.slug] = p; });
+      photos = { hero: pics[0] ?? null, services };
+    }
+    process.stdout.write(`[pexels] ✓ ${pics.length} photo(s)\n`);
+  }
+
   // Assemblage + validation + écriture
-  const result = assembleAndWrite(enriched, generated);
+  const result = assembleAndWrite(enriched, generated, photos);
 
   console.log(`
 ✅ ${prospect.business_name}

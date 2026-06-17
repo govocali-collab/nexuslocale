@@ -77,7 +77,7 @@ export default function HomePage() {
                         <div className="relative h-44 overflow-hidden">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={serviceImageUrl(s.slug)}
+                            src={s.image_url ?? serviceImageUrl(s.slug)}
                             alt=""
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />

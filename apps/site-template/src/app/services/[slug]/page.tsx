@@ -47,7 +47,7 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
       <section
         className="relative text-white py-20 px-4"
         style={{
-          backgroundImage: `url(${serviceImageUrl(slug)})`,
+          backgroundImage: `url(${service.image_url ?? serviceImageUrl(slug)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
