@@ -46,3 +46,6 @@ Thumbs.db
 # Finder scan exports (generated)
 apps/finder/finder-*.csv
 apps/finder/finder-*.json
+
+# Prospector scan exports (generated)
+apps/prospector/prospects-*.csv
