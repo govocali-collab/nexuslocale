@@ -31,7 +31,7 @@ function askConfirmation(): Promise<boolean> {
     process.stdout.write('\nContinuer? [o/N] ');
     process.stdin.setEncoding('utf8');
     process.stdin.once('data', (chunk) => {
-      resolve((chunk as string).trim().toLowerCase() === 'o');
+      resolve(String(chunk).trim().toLowerCase() === 'o');
     });
   });
 }
@@ -40,7 +40,7 @@ function askConfirmation(): Promise<boolean> {
 
 async function genOne(
   prospect: ProspectFull,
-  opts: { simulate: boolean; apiKey?: string; placesKey?: string },
+  opts: { simulate: boolean; apiKey?: string | undefined; placesKey?: string | undefined },
 ): Promise<void> {
   const { simulate, apiKey, placesKey } = opts;
 
