@@ -479,8 +479,9 @@ function CronPanel() {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-export function Launcher({ sites, initialQueues }: { sites: Site[]; initialQueues?: ActionQueue }) {
-  const [tab,        setTab]        = useState<TabId>('finder');
+export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; initialQueues?: ActionQueue; initialTab?: string | undefined }) {
+  const startTab = (TABS.some(t => t.id === initialTab) ? initialTab : 'finder') as TabId;
+  const [tab,        setTab]        = useState<TabId>(startTab);
   const [submitSite, setSubmitSite] = useState(sites[0]?.id ?? '');
   const [rankSite,   setRankSite]   = useState(sites[0]?.id ?? '');
 
