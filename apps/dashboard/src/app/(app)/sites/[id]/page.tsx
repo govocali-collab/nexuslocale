@@ -182,7 +182,8 @@ export default async function SiteDetailPage({
             <div className="px-4 py-3 border-b border-[#D9D7F0] bg-[#F5F4FF]">
               <p className="label">Leads ({leads.length})</p>
             </div>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[520px]">
               <thead>
                 <tr className="border-b border-[#EAE8F8] text-left">
                   <th className="px-4 py-2 label">Type</th>
@@ -227,6 +228,7 @@ export default async function SiteDetailPage({
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>

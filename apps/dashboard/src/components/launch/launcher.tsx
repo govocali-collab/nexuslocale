@@ -58,7 +58,7 @@ function KeywordTable({ result }: { result: FinderResult }) {
   const domains = (result.candidates ?? []).filter(d => d.available);
   return (
     <div className="mt-4 space-y-3">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <span className="text-sm font-medium text-[#1C1560]">{kws.length} mot(s)-clé</span>
         <Badge text={`Niche score ${result.niche_score}`} cls="bg-indigo-100 text-indigo-700" />
       </div>
@@ -187,7 +187,7 @@ function FinderPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label block mb-1">Niche</label>
           <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="plombier"
@@ -201,7 +201,7 @@ function FinderPanel() {
                        placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <div>
           <label className="label block mb-1">Limite mots-clés</label>
           <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} min={10} max={500}
@@ -219,7 +219,7 @@ function FinderPanel() {
         </label>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <button onClick={launch} disabled={!ready || pending}
           className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed
                      px-4 py-2 text-sm text-white transition-colors">
@@ -263,7 +263,7 @@ function ProspectPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label block mb-1">Niche</label>
           <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="dégât d'eau"
@@ -277,7 +277,7 @@ function ProspectPanel() {
                        placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <div>
           <label className="label block mb-1">Limite entreprises</label>
           <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} min={1} max={200}
@@ -295,7 +295,7 @@ function ProspectPanel() {
         </label>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <button onClick={launch} disabled={!ready || pending}
           className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed
                      px-4 py-2 text-sm text-white transition-colors">
@@ -393,7 +393,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label block mb-1">Site</label>
           <select value={siteId} onChange={e => setSiteId(e.target.value)}
@@ -491,7 +491,7 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
   return (
     <div className="space-y-3">
       {/* Tab selector */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
         {TABS.map(t => (
           <button
             key={t.id}

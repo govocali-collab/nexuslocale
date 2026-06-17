@@ -67,7 +67,8 @@ export default async function SitesPage({
 
       {/* ── Table ────────────────────────────────────────────────────────── */}
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-[#D9D7F0] text-left bg-[#F5F4FF]">
               <th className="px-4 py-2.5 label">Domaine</th>
@@ -116,6 +117,7 @@ export default async function SitesPage({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
