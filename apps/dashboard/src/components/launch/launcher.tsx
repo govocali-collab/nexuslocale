@@ -61,7 +61,7 @@ function cpcCls(cpc: number | null) {
 
 type KwSortKey = 'keyword' | 'search_volume' | 'cpc' | 'keyword_difficulty' | 'score';
 
-function KeywordTable({ result }: { result: FinderResult }) {
+function KeywordTable({ result, selected, onSelect }: { result: FinderResult; selected: string; onSelect: (kw: string) => void }) {
   const [q,        setQ]        = useState('');
   const [minVol,   setMinVol]   = useState('');
   const [maxKd,    setMaxKd]     = useState('');
@@ -139,6 +139,7 @@ function KeywordTable({ result }: { result: FinderResult }) {
         <table className="w-full text-sm">
           <thead className="bg-[#F5F4FF]">
             <tr>
+              <th className={`${TH} w-8`}></th>
               {([
                 ['keyword',            'Mot-clé', 'text-left'],
                 ['search_volume',      'Volume',  'text-right'],
@@ -158,17 +159,24 @@ function KeywordTable({ result }: { result: FinderResult }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((k, i) => (
-              <tr key={k.keyword + i} className="hover:bg-[#FAFAFF]">
-                <td className={`${TD} text-[#1C1560]`}>{k.keyword}</td>
+            {rows.map((k, i) => {
+              const isSel = selected === k.keyword;
+              return (
+              <tr key={k.keyword + i} onClick={() => onSelect(k.keyword)}
+                className={`cursor-pointer ${isSel ? 'bg-indigo-50' : 'hover:bg-[#FAFAFF]'}`}>
+                <td className={`${TD} text-center`}>
+                  <span className={`inline-block h-3.5 w-3.5 rounded-full border-2 align-middle ${isSel ? 'border-indigo-600 bg-indigo-600' : 'border-[#C0BDE0]'}`} />
+                </td>
+                <td className={`${TD} text-[#1C1560] ${isSel ? 'font-semibold' : ''}`}>{k.keyword}</td>
                 <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtNum(k.search_volume)}</td>
                 <td className={`${TD} text-right`}><Badge text={fmtCpc(k.cpc)} cls={cpcCls(k.cpc)} /></td>
                 <td className={`${TD} text-center`}><Badge text={k.keyword_difficulty == null ? '—' : String(k.keyword_difficulty)} cls={kdCls(k.keyword_difficulty)} /></td>
                 <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
               </tr>
-            ))}
+              );
+            })}
             {rows.length === 0 && (
-              <tr><td colSpan={5} className="px-3 py-6 text-center text-[#9A97C0]">
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-[#9A97C0]">
                 {result.keywords.length === 0
                   ? "Le scan n'a trouvé aucun mot-clé — vérifie l'orthographe de la niche (ex. « ostéopathe », pas « ostéoathe »)."
                   : 'Aucun mot-clé ne correspond aux filtres.'}
@@ -350,6 +358,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
   const [maxKd,    setMaxKd]    = useState(30);
   const [estimate, setEstimate] = useState(false);
   const [result,   setResult]   = useState<{ out: string; ok: boolean; data: FinderResult | null } | null>(null);
+  const [selectedKw, setSelectedKw] = useState('');
   const [pending,  start]       = useTransition();
 
   const ready = niche.trim() !== '' && city.trim() !== '';
@@ -357,6 +366,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
   function launch() {
     if (!ready) return;
     setResult(null);
+    setSelectedKw('');
     start(async () => {
       const r = await runFinderScan(niche.trim(), city.trim(), {
         country: 'CA', lang: 'fr', limit, maxDifficulty: maxKd, estimate,
@@ -418,12 +428,17 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
             className="rounded-md bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm text-white font-medium transition-colors">
             Prochaine étape : trouver les clients →
           </button>
-          <span className="text-xs text-[#3D6B4A]">Ouvre le Prospector pour « {niche.trim()} » à « {city.trim()} » (valider qu'il y a des commerces à louer).</span>
+          <span className="text-xs text-[#3D6B4A]">
+            {selectedKw
+              ? <>🎯 Mot-clé cible : <strong>{selectedKw}</strong>. </>
+              : '👉 Clique un mot-clé dans le tableau pour le choisir comme cible. '}
+            Puis ouvre le Prospector pour valider les clients.
+          </span>
         </div>
       )}
 
       {result?.data
-        ? <><KeywordTable result={result.data} /><RawLogs out={result.out} ok={result.ok} /></>
+        ? <><KeywordTable result={result.data} selected={selectedKw} onSelect={setSelectedKw} /><RawLogs out={result.out} ok={result.ok} /></>
         : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
     </div>
   );
