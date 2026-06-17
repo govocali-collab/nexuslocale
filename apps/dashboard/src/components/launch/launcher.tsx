@@ -53,6 +53,12 @@ function kdCls(kd: number | null) {
   return kd <= 30 ? 'bg-green-100 text-green-700' : kd <= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
 }
 
+// CPC : plus c'est élevé, plus le client vaut cher → vert = vaut la peine.
+function cpcCls(cpc: number | null) {
+  if (cpc == null || cpc <= 0) return 'bg-[#EEEDF9] text-[#9A97C0]';
+  return cpc >= 10 ? 'bg-green-100 text-green-700' : cpc >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-[#EEEDF9] text-[#6B6B9E]';
+}
+
 type KwSortKey = 'keyword' | 'search_volume' | 'cpc' | 'keyword_difficulty' | 'score';
 
 function KeywordTable({ result }: { result: FinderResult }) {
@@ -133,7 +139,7 @@ function KeywordTable({ result }: { result: FinderResult }) {
               <tr key={k.keyword + i} className="hover:bg-[#FAFAFF]">
                 <td className={`${TD} text-[#1C1560]`}>{k.keyword}</td>
                 <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtNum(k.search_volume)}</td>
-                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtCpc(k.cpc)}</td>
+                <td className={`${TD} text-right`}><Badge text={fmtCpc(k.cpc)} cls={cpcCls(k.cpc)} /></td>
                 <td className={`${TD} text-center`}><Badge text={k.keyword_difficulty == null ? '—' : String(k.keyword_difficulty)} cls={kdCls(k.keyword_difficulty)} /></td>
                 <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
               </tr>
