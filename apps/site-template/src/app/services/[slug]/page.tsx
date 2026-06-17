@@ -44,14 +44,13 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
       {faqs.length > 0 && <SchemaLD data={buildFaqLd(faqs)!} />}
 
       {/* ── Hero service ── */}
-      <section
-        className="relative text-white py-20 px-4"
-        style={{
-          backgroundImage: `url(${service.image_url ?? serviceImageUrl(slug)})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+      <section className="relative text-white py-20 px-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={service.image_url ?? serviceImageUrl(slug)}
+          alt={service.h1}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative max-w-4xl mx-auto">
           <nav className="text-sm text-white/60 mb-4">
