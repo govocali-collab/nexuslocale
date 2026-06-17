@@ -68,13 +68,15 @@ export default async function SitesPage({
       {/* ── Table ────────────────────────────────────────────────────────── */}
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[640px]">
+        <table className="w-full text-sm min-w-[780px]">
           <thead>
             <tr className="border-b border-[#D9D7F0] text-left bg-[#F5F4FF]">
               <th className="px-4 py-2.5 label">Domaine</th>
               <th className="px-3 py-2.5 label">Type</th>
               <th className="px-3 py-2.5 label">Niche / Ville</th>
               <th className="px-3 py-2.5 label">Statut</th>
+              <th className="px-3 py-2.5 label text-right">Vol./mois</th>
+              <th className="px-3 py-2.5 label text-right">Niche score</th>
               <th className="px-3 py-2.5 label text-right">Leads/mois</th>
               <th className="px-3 py-2.5 label text-right">Top pos.</th>
               <th className="px-3 py-2.5 label text-right">Loyer/mois</th>
@@ -83,7 +85,7 @@ export default async function SitesPage({
           <tbody className="divide-y divide-[#EAE8F8]">
             {sites.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-[#9A97C0]">
+                <td colSpan={9} className="px-4 py-8 text-center text-[#9A97C0]">
                   Aucun site trouvé.
                 </td>
               </tr>
@@ -100,6 +102,16 @@ export default async function SitesPage({
                   <span className="text-[#9A97C0] ml-1">· {s.city}</span>
                 </td>
                 <td className="px-3 py-2.5"><Badge value={s.status} /></td>
+                <td className="px-3 py-2.5 text-right mono text-[#3D3D6B]">
+                  {s.total_volume != null
+                    ? <>{s.total_volume.toLocaleString('fr-CA')}<span className="text-[#C0BDE0] text-xs"> · {s.keyword_count} mc</span></>
+                    : <span className="text-[#C0BDE0]">—</span>}
+                </td>
+                <td className="px-3 py-2.5 text-right mono">
+                  {s.niche_score != null
+                    ? <span className="text-indigo-600 font-medium">{Math.round(s.niche_score).toLocaleString('fr-CA')}</span>
+                    : <span className="text-[#C0BDE0]">—</span>}
+                </td>
                 <td className="px-3 py-2.5 text-right mono text-[#3D3D6B]">
                   {s.leads_month > 0 ? s.leads_month : <span className="text-[#C0BDE0]">—</span>}
                 </td>
