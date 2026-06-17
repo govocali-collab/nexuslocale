@@ -3,6 +3,7 @@ import { program }                               from 'commander';
 import * as readline                             from 'readline';
 import { runKeywordScan, ESTIMATED_COST_USD }   from './dataforseo.js';
 import { filterKeywords, clusterKeywords }      from './keywords.js';
+import { filterByCity }                          from './geo.js';
 import { generateCandidates }                   from './domains.js';
 import { checkDomains, purchaseDomain,
          setVercelNameservers }                 from './namecheap.js';
@@ -155,8 +156,14 @@ program
     });
 
     const filterOpts = opts.maxDifficulty !== undefined ? { maxDifficulty: opts.maxDifficulty } : {};
-    const keywords = filterKeywords(rawKeywords, filterOpts);
-    console.log(`[keywords] ${keywords.length} / ${rawKeywords.length} retenus après filtrage`);
+    const kdFiltered = filterKeywords(rawKeywords, filterOpts);
+    // Filtre géo : ne garde que les mots-clés pertinents à la ville cible + sa région.
+    const geo      = filterByCity(kdFiltered, city);
+    const keywords = geo.kept.length > 0 ? geo.kept : kdFiltered; // repli si tout filtré
+    console.log(
+      `[keywords] ${kdFiltered.length} retenus (KD) · ${keywords.length} après filtre ville "${city}"` +
+      (geo.dropped > 0 ? ` (${geo.dropped} autres villes écartées)` : ''),
+    );
     const clusters = clusterKeywords(keywords);
 
     // ── Domaines ──────────────────────────────────────────────────────────────
