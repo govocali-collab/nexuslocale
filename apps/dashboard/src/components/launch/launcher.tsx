@@ -462,13 +462,13 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string) => void
         <div className="flex items-center gap-3 flex-wrap rounded-lg bg-emerald-50 border border-emerald-200 p-3">
           <button onClick={() => onNext(niche.trim(), city.trim())}
             className="rounded-md bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm text-white font-medium transition-colors">
-            Prochaine étape : trouver les clients →
+            Prochaine étape : bâtir le site →
           </button>
           <span className="text-xs text-[#3D6B4A]">
             {selectedKws.length > 0
               ? <>🎯 {selectedKws.length} mot(s)-clé cible(s) : <strong>{selectedKws.slice(0, 3).join(', ')}{selectedKws.length > 3 ? '…' : ''}</strong>. </>
               : '👉 Coche un ou plusieurs mots-clés à cibler. '}
-            Puis ouvre le Prospector pour valider les clients.
+            Puis génère le config du site (les clients, ce sera plus tard, une fois le site rangé).
           </span>
         </div>
       )}
@@ -810,7 +810,7 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
 
       {/* Active panel */}
       <div className="card p-5">
-        {tab === 'finder'   && <FinderPanel onNext={goProspector} />}
+        {tab === 'finder'   && <FinderPanel onNext={goGenerate} />}
         {tab === 'prospect' && <ProspectPanel key={`${proPrefill.niche}|${proPrefill.city}`} initialNiche={proPrefill.niche} initialCity={proPrefill.city} onNext={goGenerate} />}
         {tab === 'generate' && <GenPanel key={`${genPrefill.name}|${genPrefill.city}`} initialName={genPrefill.name} initialCity={genPrefill.city} />}
         {tab === 'submit'   && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}

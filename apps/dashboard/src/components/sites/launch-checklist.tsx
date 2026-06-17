@@ -6,7 +6,7 @@ const GROUPS: { phase: string; items: string[] }[] = [
   { phase: '1 · Recherche', items: [
     'Choisir une niche (métier Tier 1)',
     'Valider la demande — Finder (CPC 🟢 + KD 🟢)',
-    'Valider les clients — Prospector (8+ commerces, Pain élevé)',
+    'Vérifier qu\'il y a un marché (assez de commerces dans la niche)',
   ] },
   { phase: '2 · Mise en ligne', items: [
     'Acheter le domaine',
@@ -21,7 +21,9 @@ const GROUPS: { phase: string; items: string[] }[] = [
   ] },
   { phase: '4 · Monétisation', items: [
     'Brancher le call tracking (Twilio)',
-    'Contacter un client (liste Prospector)',
+    '~1 mois d\'appels — accumuler la preuve',
+    'Trouver les clients — Prospector (commerces à Pain élevé)',
+    'Contacter avec la preuve (« X appels/mois »)',
     'Louer le site 💰',
   ] },
 ];

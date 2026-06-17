@@ -5,10 +5,10 @@ import { Launcher } from '@/components/launch/launcher';
 
 // Cycle de vie d'un site → action(s) du lanceur qui font avancer chaque étape.
 const WORKFLOW: { status: string; cls: string; actions: { label: string; tab?: string }[] }[] = [
-  { status: 'research', cls: 'bg-slate-100 text-slate-600',    actions: [{ label: '🔍 Finder', tab: 'finder' }, { label: '🎯 Prospector', tab: 'prospect' }] },
-  { status: 'built',    cls: 'bg-sky-100 text-sky-700',        actions: [{ label: '📤 Soumettre GSC', tab: 'submit' }] },
+  { status: 'research', cls: 'bg-slate-100 text-slate-600',    actions: [{ label: '🔍 Finder', tab: 'finder' }] },
+  { status: 'built',    cls: 'bg-sky-100 text-sky-700',        actions: [{ label: '🏗️ Générer', tab: 'generate' }, { label: '📤 Soumettre GSC', tab: 'submit' }] },
   { status: 'indexed',  cls: 'bg-amber-100 text-amber-700',    actions: [{ label: '📊 Tracker', tab: 'rank' }] },
-  { status: 'ranking',  cls: 'bg-orange-100 text-orange-700',  actions: [{ label: '🤝 Louer' }] },
+  { status: 'ranking',  cls: 'bg-orange-100 text-orange-700',  actions: [{ label: '🎯 Prospector', tab: 'prospect' }, { label: '🤝 Louer' }] },
   { status: 'rented',   cls: 'bg-emerald-100 text-emerald-700', actions: [{ label: '🔄 Cron hebdo', tab: 'cron' }] },
   { status: 'sold',     cls: 'bg-violet-100 text-violet-700',  actions: [{ label: '✓ Vendu' }] },
 ];
