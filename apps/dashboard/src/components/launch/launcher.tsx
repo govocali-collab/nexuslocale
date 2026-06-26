@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult } from '@/lib/launch-actions';
 import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
@@ -366,6 +366,16 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
                           className="inline-flex items-center justify-center h-5 w-5 rounded-md text-indigo-600 hover:bg-indigo-50 hover:text-indigo-800 transition-colors">
                           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                          </svg>
+                        </a>
+                      )}
+                      {p.maps_url && (
+                        <a href={p.maps_url} target="_blank" rel="noopener noreferrer"
+                          title="Ouvrir la fiche Google Maps" aria-label="Ouvrir Google Maps"
+                          className="inline-flex items-center justify-center h-5 w-5 rounded-md text-rose-600 hover:bg-rose-50 hover:text-rose-800 transition-colors">
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                           </svg>
                         </a>
                       )}
@@ -822,7 +832,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
   const [estimate, setEstimate] = useState(true);
   const [withGsc,  setWithGsc] = useState(false);
   const [top,      setTop]     = useState(20);
-  const [result,   setResult]  = useState<{ out: string; ok: boolean } | null>(null);
+  const [result,   setResult]  = useState<{ out: string; ok: boolean; data: RankResult | null } | null>(null);
   const [pending,  start]      = useTransition();
 
   function launch() {
@@ -874,7 +884,61 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
         Tracker les positions
       </button>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {pending && <Output out="" ok pending />}
+      {!pending && result?.data?.positions?.length ? (
+        <>
+          <PositionsTable data={result.data} />
+          <RawLogs out={result.out} ok={result.ok} />
+        </>
+      ) : !pending && result ? (
+        <Output out={result.out} ok={result.ok} pending={false} />
+      ) : null}
+    </div>
+  );
+}
+
+// Table des positions SERP (Tracker) — remplace les logs ASCII bruts.
+function PositionsTable({ data }: { data: RankResult }) {
+  const posCls = (p: number | null) =>
+    p == null         ? 'bg-[#EEEDF9] text-[#9A97C0]'
+    : p <= 3          ? 'bg-emerald-100 text-emerald-700'
+    : p <= 10         ? 'bg-lime-100 text-lime-700'
+    : p <= 20         ? 'bg-amber-100 text-amber-700'
+    :                   'bg-orange-100 text-orange-700';
+  const posLabel = (p: number | null) => (p == null ? '—' : `#${p}`);
+  const ranked = data.positions.filter(p => p.position != null).length;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm text-[#3D3D6B]">
+        <span className="font-medium text-[#1C1560]">{data.domain ?? data.site_id}</span>
+        {data.estimate && <Badge text="simulé" cls="bg-amber-100 text-amber-700" />}
+        <span className="text-[#9A97C0]">· {ranked}/{data.positions.length} positionnés</span>
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+        <table className="w-full text-sm">
+          <thead className="bg-[#F5F4FF]">
+            <tr>
+              <th className={`${TH} text-left`}>Mot-clé</th>
+              <th className={`${TH} text-center`}>Position</th>
+              <th className={`${TH} text-left`}>Page</th>
+              <th className={`${TH} text-right`}>Clics</th>
+              <th className={`${TH} text-right`}>Impr.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.positions.map((p, i) => (
+              <tr key={p.keyword + i} className="hover:bg-[#FAFAFF]">
+                <td className={`${TD} text-[#1C1560]`}>{p.keyword}</td>
+                <td className={`${TD} text-center`}><Badge text={posLabel(p.position)} cls={posCls(p.position)} /></td>
+                <td className={`${TD} text-[#6B6B9E]`}>{p.position != null ? (p.page ?? '/') : <span className="text-[#9A97C0]">hors top 100</span>}</td>
+                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.clicks ?? '—'}</td>
+                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.impressions ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

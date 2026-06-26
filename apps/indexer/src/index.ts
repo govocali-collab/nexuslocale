@@ -97,6 +97,28 @@ function printPositions(positions: SerpPosition[]): void {
   }
 }
 
+// Sortie JSON consommée par le dashboard (Tracker) — entre marqueurs.
+function emitRankJson(
+  siteId: string,
+  domain: string | null,
+  estimate: boolean,
+  positions: SerpPosition[],
+  gsc?: Map<string, { impressions: number; clicks: number; ctr: number }>,
+): void {
+  const rows = positions.map(p => {
+    const g = gsc?.get(p.keyword);
+    return {
+      keyword:     p.keyword,
+      position:    p.position,
+      page:        p.page ? (p.page.replace(/^https?:\/\/[^/]+/, '') || '/') : null,
+      clicks:      g?.clicks      ?? null,
+      impressions: g?.impressions ?? null,
+      ctr:         g?.ctr         ?? null,
+    };
+  });
+  console.log('__NEXUS_JSON__' + JSON.stringify({ site_id: siteId, domain, estimate, positions: rows }) + '__NEXUS_END__');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMMANDE : submit
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -257,7 +279,8 @@ program
   .option('--estimate',  'Montre le coût estimé sans appeler DataForSEO')
   .option('--with-gsc',  'Enrichit avec les données GSC Search Analytics (clics/impressions)')
   .option('--top <n>',   'Nombre de mots-clés à vérifier (défaut: 20)', parseInt, 20)
-  .action(async (siteId: string, opts: { estimate: boolean; withGsc: boolean; top: number }) => {
+  .option('--json',      'Émet aussi les positions en JSON (pour le dashboard)')
+  .action(async (siteId: string, opts: { estimate: boolean; withGsc: boolean; top: number; json: boolean }) => {
     console.log(`\n📊 indexer rank ${siteId}${opts.estimate ? ' [ESTIMATE]' : ''}`);
 
     // ── Récupération du site ──────────────────────────────────────────────────
@@ -298,6 +321,7 @@ program
       }));
       printPositions(mock);
       console.log('\n  ℹ  Positions fictives. Retirez --estimate pour les vraies métriques.');
+      if (opts.json) emitRankJson(siteId, site.domain, true, mock);
       return;
     }
 
@@ -344,6 +368,7 @@ program
 
     // ── Affichage ─────────────────────────────────────────────────────────────
     printPositions(positions);
+    if (opts.json) emitRankJson(siteId, site.domain, false, positions, gscRows);
 
     // ── Sauvegarde dans rankings ──────────────────────────────────────────────
     const checkedAt = today();

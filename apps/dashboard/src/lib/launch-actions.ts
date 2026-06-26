@@ -194,16 +194,34 @@ export async function runGscSubmit(
   return run(`pnpm --filter @nexuslocale/indexer-cli cli submit ${siteId} ${flags}`, 120_000);
 }
 
+export interface RankPosition {
+  keyword: string;
+  position: number | null;
+  page: string | null;
+  clicks: number | null;
+  impressions: number | null;
+  ctr: number | null;
+}
+export interface RankResult {
+  site_id: string;
+  domain: string | null;
+  estimate: boolean;
+  positions: RankPosition[];
+}
+
 export async function runRank(
   siteId: string,
   opts: { estimate: boolean; withGsc: boolean; top: number },
-): Promise<{ out: string; ok: boolean }> {
+): Promise<{ out: string; ok: boolean; data: RankResult | null }> {
   const flags = [
     opts.estimate ? '--estimate' : '',
     opts.withGsc  ? '--with-gsc' : '',
     `--top ${opts.top}`,
+    '--json',
   ].filter(Boolean).join(' ');
-  return run(`pnpm --filter @nexuslocale/indexer-cli cli rank ${siteId} ${flags}`, 360_000);
+  const { out, ok } = await run(`pnpm --filter @nexuslocale/indexer-cli cli rank ${siteId} ${flags}`, 360_000);
+  const { data, logs } = extractJson<RankResult>(out);
+  return { out: logs, ok, data };
 }
 
 export async function runCron(dryRun: boolean): Promise<{ out: string; ok: boolean }> {
