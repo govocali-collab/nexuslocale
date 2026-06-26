@@ -12,13 +12,13 @@ interface ActionQueue {
 }
 
 const TABS = [
-  { id: 'finder',   label: '🔍 Finder',       desc: 'Scanner une niche pour trouver des domaines' },
-  { id: 'prospect', label: '🎯 Prospector',   desc: 'Trouver des commerces à faible présence web' },
-  { id: 'generate', label: '🏗️ Générer',      desc: 'Générer le config du site (contenu IA)' },
-  { id: 'beau',     label: '🎨 Beau site',    desc: 'Site one-page esthétique (design libre, Opus)' },
-  { id: 'submit',   label: '📤 Soumettre GSC', desc: 'Vérifier et indexer un site dans Search Console' },
-  { id: 'rank',     label: '📊 Tracker',       desc: 'Suivre les positions SERP d\'un site' },
-  { id: 'cron',     label: '🔄 Cron',          desc: 'Lancer le suivi hebdomadaire de tous les sites' },
+  { id: 'finder',   label: '🔍 Finder',       desc: '1 · Trouver la niche, les mots-clés et le domaine' },
+  { id: 'generate', label: '🏗️ Générer',      desc: '2 · Bâtir le site SEO (contenu IA + photos)' },
+  { id: 'submit',   label: '📤 Soumettre GSC', desc: '3 · Indexer le site dans Google Search Console' },
+  { id: 'rank',     label: '📊 Tracker',       desc: '4 · Suivre les positions Google chaque semaine' },
+  { id: 'prospect', label: '🎯 Prospector',   desc: '5 · Après ~1 mois : trouver les clients à qui louer' },
+  { id: 'beau',     label: '🎨 Beau site',    desc: 'Offre à part : beau site one-page pour un client' },
+  { id: 'cron',     label: '🔄 Cron',          desc: 'Automatisation : suivi hebdomadaire de tous les sites' },
 ] as const;
 type TabId = (typeof TABS)[number]['id'];
 
