@@ -16,3 +16,6 @@ create index if not exists published_sites_slug_idx on public.published_sites (s
 -- RLS activé sans policy : seul le service_role (route + action serveur) y accède.
 -- Le HTML est servi côté serveur, jamais exposé via l'API publique.
 alter table public.published_sites enable row level security;
+
+-- Le service_role (clé serveur) doit avoir les privilèges sur la table.
+grant all on table public.published_sites to service_role;
