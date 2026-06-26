@@ -214,7 +214,7 @@ function DomainCard({ candidates }: { candidates: FinderDomain[] }) {
       )}
       {available.length > 0 && (
         <p className="text-[11px] text-[#9A97C0] mt-2">
-          Pour réserver : <span className="mono">finder buy {available[0]?.domain}</span> (achat ~13 $).
+          Pour réserver : <span className="font-mono text-xs">finder buy {available[0]?.domain}</span> (achat ~13 $).
         </p>
       )}
     </div>

@@ -17,7 +17,9 @@
 @layer components {
   .card  { @apply bg-white border border-zinc-200/80 rounded-xl shadow-sm; }
   .label { @apply text-xs font-medium text-zinc-500 uppercase tracking-wide; }
-  .mono  { @apply font-mono text-sm; }
+  /* "mono" = chiffres/domaines alignés mais en Geist Sans (plus le look robotique du monospace).
+     Le vrai monospace reste réservé au code/logs via `font-mono` directement. */
+  .mono  { @apply font-sans tabular-nums text-sm; }
   /* Bouton de marque premium */
   .btn-brand { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed; }
 }
