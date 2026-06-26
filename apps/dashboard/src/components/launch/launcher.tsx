@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
 import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
@@ -632,17 +632,29 @@ function GenBeauPanel() {
   const [details,     setDetails]     = useState('');
   const [result,      setResult]      = useState<{ html: string; ok: boolean; error?: string } | null>(null);
   const [pending,     start]          = useTransition();
+  const [slug,        setSlug]        = useState('');
+  const [pub,         setPub]         = useState<{ ok: boolean; url?: string; error?: string } | null>(null);
+  const [pubPending,  startPub]       = useTransition();
 
   const ready  = name.trim() !== '' && industry.trim() !== '' && description.trim() !== '';
   const inCls  = 'w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-ink text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500';
+  const mkSlug = (s: string) => s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
   function launch() {
     if (!ready) return;
-    setResult(null);
+    setResult(null); setPub(null);
     start(async () => {
       const brief = { businessName: name.trim(), industry: industry.trim(), description: description.trim(), details: details.trim() || undefined };
-      setResult(await generateBeautifulSite(brief));
+      const r = await generateBeautifulSite(brief);
+      setResult(r);
+      if (r.ok && !slug) setSlug(mkSlug(name));
     });
+  }
+
+  function publish() {
+    if (!result?.html || !slug.trim()) return;
+    setPub(null);
+    startPub(async () => setPub(await publishBeautifulSite(slug, name.trim(), result.html)));
   }
 
   function download() {
@@ -704,6 +716,22 @@ function GenBeauPanel() {
             className="w-full h-[640px] rounded-lg border border-zinc-200 bg-white"
             sandbox="allow-scripts"
           />
+
+          {/* Publier (hébergement multi-tenant à /s/<slug>) */}
+          <div className="flex items-center gap-2 flex-wrap border-t border-zinc-200 pt-3">
+            <span className="text-xs text-zinc-500 whitespace-nowrap">Publier à <span className="font-mono">/s/</span></span>
+            <input value={slug} onChange={e => setSlug(mkSlug(e.target.value))} placeholder="studio-lumiere"
+              className="rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-ink text-sm px-2 py-1 w-48" />
+            <button onClick={publish} disabled={pubPending || !slug.trim()} className="btn-brand py-1.5">
+              {pubPending ? 'Publication…' : 'Publier'}
+            </button>
+            {pub?.ok && pub.url && (
+              <a href={pub.url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline">
+                ✓ en ligne → {pub.url}
+              </a>
+            )}
+            {pub && !pub.ok && <span className="text-xs text-red-600">{pub.error}</span>}
+          </div>
         </div>
       )}
     </div>

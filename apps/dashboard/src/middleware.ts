@@ -23,9 +23,11 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const isLoginPage = request.nextUrl.pathname === '/login';
+  const path = request.nextUrl.pathname;
+  const isLoginPage = path === '/login';
+  const isPublicSite = path.startsWith('/s/'); // sites « beaux » hébergés publiquement
 
-  if (!user && !isLoginPage) {
+  if (!user && !isLoginPage && !isPublicSite) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);

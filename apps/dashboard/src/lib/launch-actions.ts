@@ -3,6 +3,32 @@
 import { exec } from 'child_process';
 import path from 'path';
 import { generateBeautifulHtml, type SiteBrief } from './site-generator';
+import { createAdminClient } from './admin';
+
+function slugify(s: string): string {
+  return s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+export async function publishBeautifulSite(
+  slug: string,
+  businessName: string,
+  html: string,
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  const s = slugify(slug);
+  if (!s) return { ok: false, error: 'Slug invalide.' };
+  if (!html.trim()) return { ok: false, error: 'Aucun HTML à publier.' };
+  try {
+    const db = createAdminClient();
+    const { error } = await db
+      .from('published_sites')
+      .upsert({ slug: s, business_name: businessName, html, updated_at: new Date().toISOString() }, { onConflict: 'slug' });
+    if (error) throw error;
+    return { ok: true, url: `/s/${s}` };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
 
 const ROOT = path.resolve(process.cwd(), '../..');
 
