@@ -357,7 +357,20 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
                   </td>
                   <td className={`${TD} text-center text-[#3D3D6B] whitespace-nowrap`}>{p.rating != null ? `⭐ ${p.rating.toFixed(1)}` : '—'}</td>
                   <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.review_count ?? '—'}</td>
-                  <td className={TD}><Badge text={pres.label} cls={pres.cls} /></td>
+                  <td className={TD}>
+                    <div className="flex items-center gap-1.5">
+                      <Badge text={pres.label} cls={pres.cls} />
+                      {p.website && (
+                        <a href={p.website} target="_blank" rel="noopener noreferrer"
+                          title={`Voir le site : ${p.website}`} aria-label="Voir le site"
+                          className="inline-flex items-center justify-center h-5 w-5 rounded-md text-indigo-600 hover:bg-indigo-50 hover:text-indigo-800 transition-colors">
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </td>
                   <td className={`${TD} text-center`}><Badge text={`${painEmoji(p.pain_score)} ${p.pain_score}`} cls={painCls(p.pain_score)} /></td>
                   <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{p.prospect_score}</td>
                   <td className={`${TD} text-xs text-[#6B6B9E] max-w-[18rem]`}>{p.detected_issues.slice(0, 3).join(', ') || '—'}</td>
