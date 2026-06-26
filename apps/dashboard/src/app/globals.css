@@ -3,12 +3,21 @@
 @tailwind utilities;
 
 @layer base {
-  html { @apply bg-[#EEEDF8] text-[#1C1560]; }
-  * { @apply border-[#D9D7F0]; }
+  html { @apply bg-app text-ink; }
+  * { @apply border-zinc-200; }
+  /* Fond grille subtil (style SiteDrop) */
+  body {
+    background-image:
+      linear-gradient(to right, rgba(87, 1, 243, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(87, 1, 243, 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
 }
 
 @layer components {
-  .card  { @apply bg-white border border-[#D9D7F0] rounded-lg shadow-sm; }
-  .label { @apply text-xs font-medium text-[#7A77A8] uppercase tracking-wide; }
+  .card  { @apply bg-white border border-zinc-200/80 rounded-xl shadow-sm; }
+  .label { @apply text-xs font-medium text-zinc-500 uppercase tracking-wide; }
   .mono  { @apply font-mono text-sm; }
+  /* Bouton de marque premium */
+  .btn-brand { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed; }
 }
