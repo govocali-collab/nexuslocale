@@ -43,7 +43,7 @@ export default function PrivacyPage() {
           'Ask us to delete your information, subject to legal limits',
           'Withdraw your consent at any time',
         ]} />
-        <P>To exercise these rights, email us at contact@nexuslocale.com.</P>
+        <P>To exercise these rights, email us at support@nexuslocale.com.</P>
       </Section>
 
       <Section title="7. Security">
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="9. Contact">
-        <P>Questions about your privacy? Reach us at contact@nexuslocale.com.</P>
+        <P>Questions about your privacy? Reach us at support@nexuslocale.com.</P>
       </Section>
     </LegalShell>
   );

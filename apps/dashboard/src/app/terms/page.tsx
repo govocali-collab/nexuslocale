@@ -60,7 +60,7 @@ export default function TermsPage() {
       </Section>
 
       <Section title="12. Contact">
-        <P>Questions about these terms? Reach us at contact@nexuslocale.com.</P>
+        <P>Questions about these terms? Reach us at support@nexuslocale.com.</P>
       </Section>
     </LegalShell>
   );

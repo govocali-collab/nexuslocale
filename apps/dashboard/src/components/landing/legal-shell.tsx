@@ -33,7 +33,7 @@ export function LegalShell({ title, updated, children }: { title: string; update
           <div className="flex items-center gap-6">
             <Link href="/terms" className="hover:text-[#0a0a0a]">Terms</Link>
             <Link href="/privacy" className="hover:text-[#0a0a0a]">Privacy</Link>
-            <a href="mailto:contact@nexuslocale.com" className="hover:text-[#0a0a0a]">contact@nexuslocale.com</a>
+            <a href="mailto:support@nexuslocale.com" className="hover:text-[#0a0a0a]">support@nexuslocale.com</a>
           </div>
         </div>
       </footer>
