@@ -1112,14 +1112,14 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`rounded-lg border px-3 py-3 text-left transition-all ${
+            className={`flex flex-col rounded-lg border px-3 py-3 text-left transition-all ${
               tab === t.id
                 ? 'border-indigo-400 bg-indigo-50 ring-2 ring-indigo-200'
                 : 'card hover:border-indigo-200 hover:bg-[#F5F4FF]'
             }`}
           >
-            <p className="text-sm font-medium text-[#1C1560] leading-tight min-h-[2.25rem]">{t.label}</p>
-            <p className="text-xs text-[#9A97C0] mt-0.5 leading-snug">{t.desc}</p>
+            <p className="text-sm font-medium text-[#1C1560] leading-tight truncate">{t.label}</p>
+            <p className="text-xs text-[#9A97C0] mt-1.5 leading-snug">{t.desc}</p>
           </button>
         ))}
       </div>
