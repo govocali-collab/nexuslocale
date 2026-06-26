@@ -215,7 +215,7 @@ function DomainCard({ candidates }: { candidates: FinderDomain[] }) {
       )}
       {available.length > 0 && (
         <p className="text-[11px] text-[#9A97C0] mt-2">
-          Pour réserver : <span className="font-mono text-xs">finder buy {available[0]?.domain}</span> (achat ~13 $).
+          Pour réserver : <span className="mono">finder buy {available[0]?.domain}</span> (achat ~13 $).
         </p>
       )}
     </div>
@@ -747,7 +747,7 @@ function GenBeauPanel() {
 
           {/* Publier (hébergement multi-tenant à /s/<slug>) */}
           <div className="flex items-center gap-2 flex-wrap border-t border-zinc-200 pt-3">
-            <span className="text-xs text-zinc-500 whitespace-nowrap">Publier à <span className="font-mono">/s/</span></span>
+            <span className="text-xs text-zinc-500 whitespace-nowrap">Publier à <span className="mono">/s/</span></span>
             <input value={slug} onChange={e => setSlug(mkSlug(e.target.value))} placeholder="studio-lumiere"
               className="rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-ink text-sm px-2 py-1 w-48" />
             <button onClick={publish} disabled={pubPending || !slug.trim()} className="btn-brand py-1.5">
