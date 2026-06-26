@@ -509,21 +509,25 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keyword
 function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: string; initialCity?: string; onNext?: (name: string, city: string) => void }) {
   const [niche,      setNiche]      = useState(initialNiche ?? '');
   const [city,       setCity]       = useState(initialCity ?? '');
-  const [limit,      setLimit]      = useState(60);
-  const [minReviews, setMinReviews] = useState(0);
+  const [limit,      setLimit]      = useState('');
+  const [minReviews, setMinReviews] = useState('');
   const [simulate,   setSimulate]   = useState(false);
   const [judge,      setJudge]      = useState(false);
   const [result,     setResult]     = useState<{ out: string; ok: boolean; data: ProspectorResult | null } | null>(null);
   const [pending,    start]         = useTransition();
 
+  // Champs vides par défaut → valeurs par défaut au lancement.
+  const limitN      = Number(limit) || 60;
+  const minReviewsN = Number(minReviews) || 0;
+
   const ready    = niche.trim() !== '' && city.trim() !== '';
-  const estCost  = (Math.ceil(limit / 20) * 0.032 + limit * 0.017).toFixed(2);
+  const estCost  = (Math.ceil(limitN / 20) * 0.032 + limitN * 0.017).toFixed(2);
 
   function launch() {
     if (!ready) return;
     setResult(null);
     start(async () => {
-      const r = await runProspectorScan(niche.trim(), city.trim(), { limit, minReviews, simulate, judge });
+      const r = await runProspectorScan(niche.trim(), city.trim(), { limit: limitN, minReviews: minReviewsN, simulate, judge });
       setResult(r);
     });
   }
@@ -547,13 +551,13 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
       <div className="flex items-center gap-4 flex-wrap">
         <div>
           <label className="label block mb-1">Limite entreprises</label>
-          <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} min={1} max={200}
-            className="w-28 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+          <input type="number" value={limit} onChange={e => setLimit(e.target.value)} min={1} max={200} placeholder="60"
+            className="w-28 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0]" />
         </div>
         <div>
           <label className="label block mb-1">Avis min.</label>
-          <input type="number" value={minReviews} onChange={e => setMinReviews(Number(e.target.value))} min={0} max={500}
-            className="w-24 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+          <input type="number" value={minReviews} onChange={e => setMinReviews(e.target.value)} min={0} max={500} placeholder="0"
+            className="w-24 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0]" />
         </div>
         <label className="flex items-center gap-2 cursor-pointer mt-4">
           <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
