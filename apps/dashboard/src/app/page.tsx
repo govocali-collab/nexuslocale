@@ -62,6 +62,7 @@ export default function LandingPage() {
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-neutral-600">
             <a href="#why" className="hover:text-[#0a0a0a] transition-colors">Why us</a>
             <a href="#how" className="hover:text-[#0a0a0a] transition-colors">How it works</a>
+            <a href="#websites" className="hover:text-[#0a0a0a] transition-colors">Websites</a>
             <a href="#contact" className="hover:text-[#0a0a0a] transition-colors">Contact</a>
             <Link href="/login" className="hover:text-[#0a0a0a] transition-colors">Sign in</Link>
             <Link href="/login" className="rounded-lg px-4 py-2 text-white font-semibold shadow-sm hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>Get started</Link>
@@ -136,8 +137,37 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA final - fond BLANC ───────────────────────────────────────── */}
-      <section className="bg-white py-20">
+      {/* ── Website building (web design seul, pas rank-and-rent) - fond BLANC ── */}
+      <section id="websites" className="bg-white py-24">
+        <div className="max-w-5xl mx-auto px-5">
+          <div className="rounded-3xl border border-neutral-200 p-8 sm:p-12" style={{ backgroundColor: '#faf9ff' }}>
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div>
+                <span className="eyebrow inline-block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: VIOLET }}>Just need a website?</span>
+                <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">We build websites too</h2>
+                <p className="mt-4 text-neutral-600 leading-relaxed">
+                  Not every business wants rank-and-rent. If you simply need a beautiful, professional
+                  website that you own, we design and build it for you.
+                </p>
+                <a href="#contact" className="mt-7 inline-flex items-center gap-2 rounded-lg px-6 py-3 font-semibold text-white shadow-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>
+                  Get your website <span aria-hidden>→</span>
+                </a>
+              </div>
+              <ul className="space-y-3">
+                {['Custom design for your brand', 'Yours to keep, forever', 'Live in days, not months', 'Mobile-friendly and SEO-ready'].map((it) => (
+                  <li key={it} className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3">
+                    <span className="mt-0.5 grid size-5 flex-none place-items-center rounded-full text-white text-xs" style={{ backgroundColor: VIOLET }}>✓</span>
+                    <span className="text-sm font-medium text-[#0a0a0a]">{it}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA final - fond GRIS #f4f4f4 ────────────────────────────────── */}
+      <section className="py-20" style={{ backgroundColor: '#f4f4f4' }}>
         <div className="max-w-6xl mx-auto px-5">
           <div className="rounded-3xl px-8 py-14 text-center text-white" style={{ background: `linear-gradient(135deg, ${VIOLET}, #4801cc)` }}>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Ready to own Google in your city?</h2>
@@ -149,8 +179,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Contact - fond GRIS #f4f4f4 ──────────────────────────────────── */}
-      <section id="contact" className="py-24" style={{ backgroundColor: '#f4f4f4' }}>
+      {/* ── Contact - fond BLANC ─────────────────────────────────────────── */}
+      <section id="contact" className="bg-white py-24">
         <div className="max-w-2xl mx-auto px-5">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Let&apos;s get you more customers</h2>
@@ -160,8 +190,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer - fond BLANC ──────────────────────────────────────────── */}
-      <footer className="border-t border-neutral-200 bg-white">
+      {/* ── Footer - fond GRIS #f4f4f4 ───────────────────────────────────── */}
+      <footer className="border-t border-neutral-200" style={{ backgroundColor: '#f4f4f4' }}>
         <div className="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#0a0a0a]/50">
           <Image src="/NexusLocale-logo.png" alt="NexusLocale" width={140} height={40} className="h-7 w-auto" />
           <div className="flex items-center gap-6">
