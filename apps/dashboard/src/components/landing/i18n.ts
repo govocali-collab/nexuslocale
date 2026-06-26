@@ -8,7 +8,7 @@ export const DICT = {
       badge: '✦ Des sites web locaux qui rankent sur Google',
       titlePre: 'Soyez trouvé sur Google. Plus de ',
       titleAccent: 'clients',
-      subtitle: 'On design et on ranke des sites web pour les business locaux. Votre site monte dans le top de Google, et les appels rentrent directement chez vous.',
+      subtitle: 'On bâtit et on ranke des sites web locaux. Ils montent dans le top de Google, et on vous envoie les appels et les leads directement.',
       ctaPrimary: 'Avoir plus de clients',
       ctaSecondary: 'Comment ça marche',
       micro: "Aucuns frais d'avance • Vous payez juste quand vous êtes dans le top",
@@ -20,9 +20,9 @@ export const DICT = {
         { t: 'Fait pour votre métier', d: 'Un site propre et professionnel, bâti autour de votre business local : plomberie, électricité, excavation et plus.' },
         { t: 'Bâti pour le top de Google', d: 'Le SEO local est intégré dès le départ, ciblé sur les recherches que le monde fait dans votre ville.' },
         { t: "Plus d'appels et de leads", d: 'Le monde qui cherche votre service sur Google vous trouve en premier, et vous contacte directement.' },
-        { t: "Aucuns frais d'avance", d: 'Modèle rank-and-rent : vous payez juste pendant que votre site est dans le top et vous ramène du business.' },
+        { t: "Aucuns frais d'avance", d: 'Modèle rank-and-rent : le site nous appartient. Vous payez juste pendant qu’il est dans le top et qu’il vous envoie des leads.' },
         { t: 'Géré au complet', d: "Domaine, hébergement, mises à jour, le technique : on s'occupe de tout pour vous." },
-        { t: 'Des résultats clairs et mesurables', d: 'Suivez vos positions Google et vos leads entrants. Vous voyez exactement ce que vous payez.' },
+        { t: 'Des résultats clairs et mesurables', d: 'Suivez les positions Google et vos leads entrants. Vous voyez exactement ce que vous payez.' },
       ],
     },
     how: {
@@ -30,8 +30,8 @@ export const DICT = {
       sub: 'On s’occupe du site et du SEO. Vous, vous ramassez les clients.',
       steps: [
         { n: '1', t: 'On bâtit et on ranke', d: 'On design un site optimisé pour votre métier et votre ville, fait pour monter dans le top de Google.' },
-        { n: '2', t: 'Il monte dans le top', d: 'Votre site ranke sur les recherches locales qui comptent, comme « plombier dans votre ville ».' },
-        { n: '3', t: 'Vous le louez, vous recevez les leads', d: 'Chaque appel et chaque demande rentre directement chez vous. Vous payez juste tant que le site reste dans le top.' },
+        { n: '2', t: 'Il monte dans le top', d: 'Le site ranke sur les recherches locales qui comptent, comme « plombier dans votre ville ».' },
+        { n: '3', t: 'Vous recevez les leads', d: 'On garde et on gère le site ; vous, vous recevez chaque appel et chaque demande directement. Vous payez juste tant que ça vous ramène du business.' },
       ],
     },
     websites: {
@@ -68,7 +68,7 @@ export const DICT = {
       badge: '✦ Local websites that rank on Google',
       titlePre: 'Get found on Google. Get more ',
       titleAccent: 'customers',
-      subtitle: 'We design and rank websites for local businesses. Your site climbs to the top of Google, and the calls come straight to you.',
+      subtitle: 'We build and rank local websites. They climb to the top of Google, and we send the calls and leads straight to you.',
       ctaPrimary: 'Get more customers',
       ctaSecondary: 'How it works',
       micro: 'No upfront cost • Pay only while you rank',
@@ -80,9 +80,9 @@ export const DICT = {
         { t: 'Designed for your trade', d: 'A clean, professional website built around your local business: plumbing, electrical, excavation and more.' },
         { t: 'Built to rank', d: 'Local SEO is baked in from day one, targeting the exact searches people make in your city.' },
         { t: 'More calls & leads', d: 'The people searching for your service on Google find you first, and reach out directly.' },
-        { t: 'No upfront cost', d: 'Rank-and-rent model: you pay only while your site ranks and brings you business.' },
+        { t: 'No upfront cost', d: 'Rank-and-rent model: we own the site. You pay only while it ranks and sends you leads.' },
         { t: 'Fully managed', d: "Domain, hosting, updates, technical work: we handle everything so you don't have to." },
-        { t: 'Real, trackable results', d: "Follow your Google rankings and incoming leads. You see exactly what you're paying for." },
+        { t: 'Real, trackable results', d: "Follow the Google rankings and your incoming leads. You see exactly what you're paying for." },
       ],
     },
     how: {
@@ -90,8 +90,8 @@ export const DICT = {
       sub: 'We do the building and the ranking. You get the customers.',
       steps: [
         { n: '1', t: 'We build & rank', d: 'We design a website optimized for your trade and city, engineered to climb to the top of Google.' },
-        { n: '2', t: 'It reaches the top', d: 'Your site ranks for the local searches that matter, like “plumber in your city”.' },
-        { n: '3', t: 'You rent it, get leads', d: 'Every call and request comes straight to you. You pay only while the site keeps ranking.' },
+        { n: '2', t: 'It reaches the top', d: 'The site ranks for the local searches that matter, like “plumber in your city”.' },
+        { n: '3', t: 'You get the leads', d: 'We keep and manage the site; every call and request comes straight to you. You pay only while it brings you business.' },
       ],
     },
     websites: {
