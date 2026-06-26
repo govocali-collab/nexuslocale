@@ -2,6 +2,7 @@
 
 import { exec } from 'child_process';
 import path from 'path';
+import { generateBeautifulHtml, type SiteBrief } from './site-generator';
 
 const ROOT = path.resolve(process.cwd(), '../..');
 
@@ -12,6 +13,21 @@ function run(cmd: string, timeoutMs = 90_000): Promise<{ out: string; ok: boolea
       resolve({ out: out || (err?.message ?? '(aucune sortie)'), ok: !err || !!stdout });
     });
   });
+}
+
+export async function generateBeautifulSite(
+  brief: SiteBrief,
+  feedback?: string,
+): Promise<{ html: string; ok: boolean; error?: string }> {
+  if (!brief.businessName.trim() || !brief.industry.trim()) {
+    return { html: '', ok: false, error: 'Nom du commerce et industrie requis.' };
+  }
+  try {
+    const { html } = await generateBeautifulHtml(brief, feedback);
+    return { html, ok: true };
+  } catch (e) {
+    return { html: '', ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 function shellQuote(s: string): string {

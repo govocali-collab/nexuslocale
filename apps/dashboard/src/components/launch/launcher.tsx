@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runFinderScan, runProspectorScan, runDemoGen, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
 import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
@@ -15,6 +15,7 @@ const TABS = [
   { id: 'finder',   label: '🔍 Finder',       desc: 'Scanner une niche pour trouver des domaines' },
   { id: 'prospect', label: '🎯 Prospector',   desc: 'Trouver des commerces à faible présence web' },
   { id: 'generate', label: '🏗️ Générer',      desc: 'Générer le config du site (contenu IA)' },
+  { id: 'beau',     label: '🎨 Beau site',    desc: 'Site one-page esthétique (design libre, Opus)' },
   { id: 'submit',   label: '📤 Soumettre GSC', desc: 'Vérifier et indexer un site dans Search Console' },
   { id: 'rank',     label: '📊 Tracker',       desc: 'Suivre les positions SERP d\'un site' },
   { id: 'cron',     label: '🔄 Cron',          desc: 'Lancer le suivi hebdomadaire de tous les sites' },
@@ -623,6 +624,92 @@ function GenPanel({ initialName, initialCity, initialKeywords, nicheSite }: { in
   );
 }
 
+// ── Beau site (générateur design-first, style SiteDrop) ───────────────────────────
+function GenBeauPanel() {
+  const [name,        setName]        = useState('');
+  const [industry,    setIndustry]    = useState('');
+  const [description, setDescription] = useState('');
+  const [details,     setDetails]     = useState('');
+  const [result,      setResult]      = useState<{ html: string; ok: boolean; error?: string } | null>(null);
+  const [pending,     start]          = useTransition();
+
+  const ready  = name.trim() !== '' && industry.trim() !== '' && description.trim() !== '';
+  const inCls  = 'w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-ink text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500';
+
+  function launch() {
+    if (!ready) return;
+    setResult(null);
+    start(async () => {
+      const brief = { businessName: name.trim(), industry: industry.trim(), description: description.trim(), details: details.trim() || undefined };
+      setResult(await generateBeautifulSite(brief));
+    });
+  }
+
+  function download() {
+    if (!result?.html) return;
+    const blob = new Blob([result.html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `${name.trim().toLowerCase().replace(/\s+/g, '-') || 'site'}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-zinc-500">
+        Génère un <strong className="text-ink">beau site one-page</strong> (design libre, Claude Opus) — pour un client qui veut un site esthétique.
+        ⚠️ Appel réel ~$0.22, ~1 minute.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="label block mb-1">Nom du commerce</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Studio Lumière" className={inCls} />
+        </div>
+        <div>
+          <label className="label block mb-1">Industrie</label>
+          <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="salon de coiffure" className={inCls} />
+        </div>
+      </div>
+      <div>
+        <label className="label block mb-1">Ce que fait le commerce</label>
+        <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
+          placeholder="Coupe, coloration, soins capillaires haut de gamme à Brossard…" className={inCls} />
+      </div>
+      <div>
+        <label className="label block mb-1">Préférences (optionnel)</label>
+        <textarea value={details} onChange={e => setDetails(e.target.value)} rows={2}
+          placeholder="Couleurs, ton, sections incontournables, coordonnées…" className={inCls} />
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={launch} disabled={!ready || pending} className="btn-brand">
+          {pending ? 'Génération… (~1 min)' : 'Générer le beau site'}
+        </button>
+        <span className="text-xs text-[#9A97C0]">Design unique à chaque génération. Pas de SEO multi-pages (c'est l'autre mode).</span>
+      </div>
+
+      {pending && <Output out="" ok pending />}
+      {result && !result.ok && <Output out={result.error ?? 'Erreur de génération.'} ok={false} pending={false} />}
+      {result?.ok && result.html && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-ink">Aperçu</span>
+            <button onClick={download} className="text-xs text-indigo-600 hover:underline">⬇ Télécharger le .html</button>
+          </div>
+          <iframe
+            srcDoc={result.html}
+            title="Aperçu du site"
+            className="w-full h-[640px] rounded-lg border border-zinc-200 bg-white"
+            sandbox="allow-scripts"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── GSC Submit ────────────────────────────────────────────────────────────────
 function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect: string; onPreselect: (id: string) => void }) {
   const siteId    = preselect;
@@ -803,7 +890,7 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
   return (
     <div className="space-y-3">
       {/* Tab selector */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
         {TABS.map(t => (
           <button
             key={t.id}
@@ -825,6 +912,7 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
         {tab === 'finder'   && <FinderPanel onNext={(n, c, k) => goGenerate(n, c, k ?? [], true)} />}
         {tab === 'prospect' && <ProspectPanel key={`${proPrefill.niche}|${proPrefill.city}`} initialNiche={proPrefill.niche} initialCity={proPrefill.city} onNext={goGenerate} />}
         {tab === 'generate' && <GenPanel key={`${genPrefill.name}|${genPrefill.city}|${genPrefill.keywords.join(',')}|${genPrefill.nicheSite}`} initialName={genPrefill.name} initialCity={genPrefill.city} initialKeywords={genPrefill.keywords} nicheSite={genPrefill.nicheSite} />}
+        {tab === 'beau'     && <GenBeauPanel />}
         {tab === 'submit'   && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
         {tab === 'rank'   && <RankPanel   sites={sites} preselect={rankSite}   onPreselect={setRankSite} />}
         {tab === 'cron'   && <CronPanel />}
