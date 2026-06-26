@@ -38,8 +38,10 @@ export const DICT = {
       eyebrow: 'Vous voulez juste un site web ?',
       heading: 'On fait des sites web aussi',
       text: "Ce ne sont pas tous les business qui veulent du rank-and-rent. Si vous avez juste besoin d'un beau site web professionnel qui vous appartient, on le design et on le bâtit pour vous.",
+      text2: "Page d'accueil, pages de services, photos, formulaire de contact, Google Maps : on s'occupe de tout, de A à Z. Vous obtenez un site rapide, clair et qui inspire confiance, prêt à attirer des clients.",
       cta: 'Avoir mon site web',
-      points: ['Design sur mesure à votre image', 'Il vous appartient, pour de bon', 'Online en quelques jours, pas des mois', 'Adapté au mobile et prêt pour le SEO'],
+      points: ['Design sur mesure à votre image', 'Il vous appartient, pour de bon', 'Online en quelques jours, pas des mois', 'Adapté au mobile et prêt pour le SEO', 'Hébergement et nom de domaine inclus', 'On s’occupe des mises à jour'],
+      perfectFor: 'Parfait pour : restaurants, salons, contracteurs, services pro et plus.',
     },
     finalCta: {
       heading: 'Prêt à dominer Google dans votre ville ?',
@@ -98,8 +100,10 @@ export const DICT = {
       eyebrow: 'Just need a website?',
       heading: 'We build websites too',
       text: 'Not every business wants rank-and-rent. If you simply need a beautiful, professional website that you own, we design and build it for you.',
+      text2: 'Homepage, service pages, photos, contact form, Google Maps: we handle it all, end to end. You get a fast, clean website that builds trust and is ready to bring in customers.',
       cta: 'Get your website',
-      points: ['Custom design for your brand', 'Yours to keep, forever', 'Live in days, not months', 'Mobile-friendly and SEO-ready'],
+      points: ['Custom design for your brand', 'Yours to keep, forever', 'Live in days, not months', 'Mobile-friendly and SEO-ready', 'Hosting and domain included', 'We handle the updates'],
+      perfectFor: 'Perfect for: restaurants, salons, contractors, pro services and more.',
     },
     finalCta: {
       heading: 'Ready to own Google in your city?',

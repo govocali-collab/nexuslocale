@@ -142,9 +142,11 @@ export function LandingContent() {
                 <span className="inline-block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: VIOLET }}>{t.websites.eyebrow}</span>
                 <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">{t.websites.heading}</h2>
                 <p className="mt-4 text-neutral-600 leading-relaxed">{t.websites.text}</p>
+                <p className="mt-3 text-neutral-600 leading-relaxed">{t.websites.text2}</p>
                 <a href="#contact" className="mt-7 inline-flex items-center gap-2 rounded-lg px-6 py-3 font-semibold text-white shadow-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>
                   {t.websites.cta} <span aria-hidden>→</span>
                 </a>
+                <p className="mt-4 text-sm text-neutral-500">{t.websites.perfectFor}</p>
               </div>
               <ul className="space-y-3">
                 {t.websites.points.map((it) => (
