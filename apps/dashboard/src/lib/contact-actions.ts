@@ -8,9 +8,7 @@ export interface ContactInput {
   reason: string;
   message: string;
   // Anti-robot
-  captchaA: number;
-  captchaB: number;
-  captchaAnswer: string;
+  turnstileToken: string; // jeton Cloudflare Turnstile
   website: string; // honeypot — doit rester vide
 }
 
@@ -30,9 +28,20 @@ export async function submitContact(input: ContactInput): Promise<{ ok: boolean;
     return { ok: false, error: 'Adresse courriel invalide.' };
   }
 
-  // 3. Captcha (question mathématique)
-  if (Number(input.captchaAnswer) !== Number(input.captchaA) + Number(input.captchaB)) {
-    return { ok: false, error: 'Réponse anti-robot incorrecte.' };
+  // 3. Captcha Cloudflare Turnstile
+  const secret = process.env['TURNSTILE_SECRET_KEY'];
+  if (!secret) return { ok: false, error: 'Captcha non configuré (TURNSTILE_SECRET_KEY manquant).' };
+  if (!input.turnstileToken) return { ok: false, error: 'Veuillez compléter le captcha.' };
+  try {
+    const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret, response: input.turnstileToken }),
+    });
+    const outcome = (await verify.json()) as { success: boolean };
+    if (!outcome.success) return { ok: false, error: 'Échec du captcha, veuillez réessayer.' };
+  } catch {
+    return { ok: false, error: 'Impossible de vérifier le captcha.' };
   }
 
   // 4. Envoi via Resend
