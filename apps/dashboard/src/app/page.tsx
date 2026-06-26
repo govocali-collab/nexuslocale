@@ -65,9 +65,9 @@ export default function LandingPage() {
             <a href="#websites" className="hover:text-[#0a0a0a] transition-colors">Websites</a>
             <a href="#contact" className="hover:text-[#0a0a0a] transition-colors">Contact</a>
             <Link href="/login" className="hover:text-[#0a0a0a] transition-colors">Sign in</Link>
-            <Link href="/login" className="rounded-lg px-4 py-2 text-white font-semibold shadow-sm hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>Get started</Link>
+            <Link href="#contact" className="rounded-lg px-4 py-2 text-white font-semibold shadow-sm hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>Get started</Link>
           </nav>
-          <Link href="/login" className="md:hidden rounded-lg px-4 py-2 text-white text-sm font-semibold" style={{ backgroundColor: VIOLET }}>Get started</Link>
+          <Link href="#contact" className="md:hidden rounded-lg px-4 py-2 text-white text-sm font-semibold" style={{ backgroundColor: VIOLET }}>Get started</Link>
         </div>
       </header>
 
@@ -86,7 +86,7 @@ export default function LandingPage() {
             We design and rank websites for local businesses. Your site climbs to the top of Google, and the calls come straight to you.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/login" className="inline-flex items-center gap-2 rounded-lg px-6 py-3 font-semibold text-white shadow-lg transition-colors" style={{ backgroundColor: VIOLET }}>
+            <Link href="#contact" className="inline-flex items-center gap-2 rounded-lg px-6 py-3 font-semibold text-white shadow-lg transition-colors" style={{ backgroundColor: VIOLET }}>
               Get more customers <span aria-hidden>→</span>
             </Link>
             <a href="#how" className="rounded-lg border border-white/20 px-6 py-3 font-semibold text-white hover:bg-white/10 transition-colors">
@@ -172,7 +172,7 @@ export default function LandingPage() {
           <div className="rounded-3xl px-8 py-14 text-center text-white" style={{ background: `linear-gradient(135deg, ${VIOLET}, #4801cc)` }}>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Ready to own Google in your city?</h2>
             <p className="mt-3 text-white/80 max-w-xl mx-auto">No upfront cost, no risk. We rank it first, and you only pay while it brings you customers.</p>
-            <Link href="/login" className="mt-7 inline-block rounded-xl bg-white px-7 py-3.5 font-semibold shadow-lg hover:-translate-y-0.5 transition-transform" style={{ color: VIOLET }}>
+            <Link href="#contact" className="mt-7 inline-block rounded-xl bg-white px-7 py-3.5 font-semibold shadow-lg hover:-translate-y-0.5 transition-transform" style={{ color: VIOLET }}>
               Get started
             </Link>
           </div>
