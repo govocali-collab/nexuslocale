@@ -147,6 +147,9 @@ importers:
 
   apps/prospector:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^0.106.0
+        version: 0.106.0(zod@4.1.11)
       '@nexuslocale/db':
         specifier: workspace:*
         version: link:../../packages/db

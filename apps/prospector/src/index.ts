@@ -7,6 +7,7 @@ import { program } from 'commander';
 
 import { collectPlaces } from './places.js';
 import { analyzeAll } from './analyzer.js';
+import { judgeSites } from './judge.js';
 import { scoreAll } from './scorer.js';
 import { upsertProspects } from './db.js';
 import { printTable, exportCsv } from './output.js';
@@ -29,6 +30,7 @@ program
   .option('--limit <n>',         'Nombre max d\'entreprises analysées', '60')
   .option('--min-reviews <n>',   'Exclure les entreprises sous ce nombre d\'avis', '0')
   .option('--json',              'Émet aussi les résultats en JSON (pour le dashboard)')
+  .option('--judge',             'Jugement IA des sites « a un site » (Claude ouvre et évalue vieux/cassé)')
   .action(async (niche: string, location: string, opts: Record<string, string | boolean>) => {
     const options: ScanOptions = {
       limit:      Number(opts['limit']      ?? 60),
@@ -36,6 +38,7 @@ program
       estimate:   Boolean(opts['estimate']),
       simulate:   Boolean(opts['simulate']),
       json:       Boolean(opts['json']),
+      judge:      Boolean(opts['judge']),
     };
 
     await runScan(niche, location, options);
@@ -108,9 +111,17 @@ async function runScan(niche: string, location: string, options: ScanOptions) {
   console.log(`\n[analyzer] Analyse de ${places.length} site(s) web…`);
 
   // En mode simulate, on génère des analyses fictives cohérentes
-  const analyzed = options.simulate
+  let analyzed = options.simulate
     ? simulateAnalysis(places)
     : await analyzeAll(places);
+
+  // ── Jugement IA des sites (optionnel, avant le scoring) ─────────────────
+  const anthropicKey = process.env['ANTHROPIC_API_KEY'];
+  if (options.judge && !options.simulate && anthropicKey) {
+    analyzed = await judgeSites(analyzed, anthropicKey);
+  } else if (options.judge && !anthropicKey) {
+    console.warn('[judge] ANTHROPIC_API_KEY manquant — jugement IA ignoré.');
+  }
 
   // ── Scoring ────────────────────────────────────────────────────────────
   const scored = scoreAll(analyzed);

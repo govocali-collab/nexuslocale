@@ -490,6 +490,7 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
   const [limit,      setLimit]      = useState(60);
   const [minReviews, setMinReviews] = useState(0);
   const [simulate,   setSimulate]   = useState(false);
+  const [judge,      setJudge]      = useState(false);
   const [result,     setResult]     = useState<{ out: string; ok: boolean; data: ProspectorResult | null } | null>(null);
   const [pending,    start]         = useTransition();
 
@@ -500,7 +501,7 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
     if (!ready) return;
     setResult(null);
     start(async () => {
-      const r = await runProspectorScan(niche.trim(), city.trim(), { limit, minReviews, simulate });
+      const r = await runProspectorScan(niche.trim(), city.trim(), { limit, minReviews, simulate, judge });
       setResult(r);
     });
   }
@@ -536,6 +537,11 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
           <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
             className="rounded border-[#D9D7F0] text-indigo-600" />
           <span className="text-sm text-[#3D3D6B]">--simulate (fixtures, gratuit)</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer mt-4" title="Claude ouvre les sites « a un site » et juge vieux/cassé">
+          <input type="checkbox" checked={judge} onChange={e => setJudge(e.target.checked)}
+            className="rounded border-[#D9D7F0] text-indigo-600" />
+          <span className="text-sm text-[#3D3D6B]">🤖 Analyse IA des sites</span>
         </label>
       </div>
 
