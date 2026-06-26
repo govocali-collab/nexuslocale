@@ -72,53 +72,59 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Why us (bénéfices) ───────────────────────────────────────────── */}
-      <section id="why" className="max-w-6xl mx-auto px-5 py-24">
-        <div className="text-center max-w-xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Websites that bring you business</h2>
-          <p className="mt-3 text-neutral-600">Beautiful design and local SEO, built to turn Google searches into customers.</p>
-        </div>
-        <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {BENEFITS.map((f) => (
-            <div key={f.t} className="rounded-2xl border border-neutral-200 p-6 transition-shadow hover:shadow-md">
-              <div className="grid size-10 place-items-center rounded-xl mb-4 text-lg" style={{ backgroundColor: '#f0ebfe', color: VIOLET_DARK }}>◆</div>
-              <h3 className="font-semibold text-[#0a0a0a]">{f.t}</h3>
-              <p className="mt-1.5 text-sm text-neutral-600 leading-relaxed">{f.d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── How it works (rank-and-rent) ─────────────────────────────────── */}
-      <section id="how" className="max-w-6xl mx-auto px-5 py-20">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">How it works</h2>
-          <p className="mt-3 text-[#0a0a0a]/60">We do the building and the ranking. You get the customers.</p>
-        </div>
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
-          {STEPS.map((s) => (
-            <div key={s.n} className="rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm">
-              <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold mb-5" style={{ backgroundColor: VIOLET }}>{s.n}</div>
-              <h3 className="text-lg font-bold">{s.t}</h3>
-              <p className="mt-2 text-sm text-[#0a0a0a]/60 leading-relaxed">{s.d}</p>
-            </div>
-          ))}
+      {/* ── Why us (bénéfices) — fond BLANC ──────────────────────────────── */}
+      <section id="why" className="bg-white py-24">
+        <div className="max-w-6xl mx-auto px-5">
+          <div className="text-center max-w-xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Websites that bring you business</h2>
+            <p className="mt-3 text-neutral-600">Beautiful design and local SEO, built to turn Google searches into customers.</p>
+          </div>
+          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {BENEFITS.map((f) => (
+              <div key={f.t} className="rounded-2xl border border-neutral-200 bg-white p-6 transition-shadow hover:shadow-md">
+                <div className="grid size-10 place-items-center rounded-xl mb-4 text-lg" style={{ backgroundColor: '#f0ebfe', color: VIOLET_DARK }}>◆</div>
+                <h3 className="font-semibold text-[#0a0a0a]">{f.t}</h3>
+                <p className="mt-1.5 text-sm text-neutral-600 leading-relaxed">{f.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── CTA final ────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 pb-20">
-        <div className="rounded-3xl px-8 py-14 text-center text-white" style={{ background: `linear-gradient(135deg, ${VIOLET}, #4801cc)` }}>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Ready to own Google in your city?</h2>
-          <p className="mt-3 text-white/80 max-w-xl mx-auto">No upfront cost, no risk. We rank it first — you only pay while it brings you customers.</p>
-          <Link href="/login" className="mt-7 inline-block rounded-xl bg-white px-7 py-3.5 font-semibold shadow-lg hover:-translate-y-0.5 transition-transform" style={{ color: VIOLET }}>
-            Get started
-          </Link>
+      {/* ── How it works — fond GRIS #f4f4f4 ─────────────────────────────── */}
+      <section id="how" className="py-24" style={{ backgroundColor: '#f4f4f4' }}>
+        <div className="max-w-6xl mx-auto px-5">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">How it works</h2>
+            <p className="mt-3 text-neutral-600">We do the building and the ranking. You get the customers.</p>
+          </div>
+          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5">
+            {STEPS.map((s) => (
+              <div key={s.n} className="rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm">
+                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold mb-5" style={{ backgroundColor: VIOLET }}>{s.n}</div>
+                <h3 className="text-lg font-bold">{s.t}</h3>
+                <p className="mt-2 text-sm text-neutral-600 leading-relaxed">{s.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="border-t border-neutral-200">
+      {/* ── CTA final — fond BLANC ───────────────────────────────────────── */}
+      <section className="bg-white py-20">
+        <div className="max-w-6xl mx-auto px-5">
+          <div className="rounded-3xl px-8 py-14 text-center text-white" style={{ background: `linear-gradient(135deg, ${VIOLET}, #4801cc)` }}>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Ready to own Google in your city?</h2>
+            <p className="mt-3 text-white/80 max-w-xl mx-auto">No upfront cost, no risk. We rank it first — you only pay while it brings you customers.</p>
+            <Link href="/login" className="mt-7 inline-block rounded-xl bg-white px-7 py-3.5 font-semibold shadow-lg hover:-translate-y-0.5 transition-transform" style={{ color: VIOLET }}>
+              Get started
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer — fond GRIS #f4f4f4 ───────────────────────────────────── */}
+      <footer className="border-t border-neutral-200" style={{ backgroundColor: '#f4f4f4' }}>
         <div className="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#0a0a0a]/50">
           <span className="font-bold" style={{ color: VIOLET }}>NexusLocale</span>
           <div className="flex items-center gap-6">
