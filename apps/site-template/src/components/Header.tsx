@@ -9,7 +9,7 @@ export function Header({ config }: HeaderProps) {
   const { business, pages, branding } = config;
 
   return (
-    <header className="bg-primary text-white shadow-md">
+    <header className="sticky top-0 z-50 bg-primary text-white shadow-lg shadow-black/10">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
 
         {/* Logo / nom */}

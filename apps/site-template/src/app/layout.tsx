@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import type React from 'react';
+import { Sora, Plus_Jakarta_Sans } from 'next/font/google';
 import '../styles/globals.css';
 import { getConfig } from '@/lib/config';
+
+// Police premium : Sora pour les titres (caractère), Plus Jakarta Sans pour le corps.
+const display = Sora({ subsets: ['latin'], variable: '--font-display', weight: ['600', '700', '800'] });
+const body    = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-body' });
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SchemaLD } from '@/components/SchemaLD';
@@ -34,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   } as React.CSSProperties;
 
   return (
-    <html lang="fr" style={cssVars}>
+    <html lang="fr" style={cssVars} className={`${display.variable} ${body.variable}`}>
       <head>
         <SchemaLD data={buildLocalBusinessLd(config)} />
         {/* Bandeau démo visible en haut du site — supprimé en production */}
