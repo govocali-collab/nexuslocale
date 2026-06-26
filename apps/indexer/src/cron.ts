@@ -45,13 +45,15 @@ function extractKeywords(site: IndexerSite): string[] {
 export interface CronResult {
   siteId:       string;
   domain:       string;
+  status:       'tracked' | 'skipped' | 'dry-run' | 'error';
+  note?:        string;
   keywordsChecked: number;
   top20Count:   number;
   statusChanged: boolean;
   error?:       string;
 }
 
-export async function runRankCron(opts: { dryRun?: boolean } = {}): Promise<CronResult[]> {
+export async function runRankCron(opts: { dryRun?: boolean; json?: boolean } = {}): Promise<CronResult[]> {
   const dfsLogin    = process.env['DATAFORSEO_LOGIN'];
   const dfsPassword = process.env['DATAFORSEO_PASSWORD'];
   if (!dfsLogin || !dfsPassword) {
@@ -66,12 +68,14 @@ export async function runRankCron(opts: { dryRun?: boolean } = {}): Promise<Cron
   for (const site of sites) {
     if (!site.domain) {
       console.log(`  ⚠  ${site.id} — pas de domaine, ignoré`);
+      results.push({ siteId: site.id, domain: '(sans domaine)', status: 'skipped', note: 'pas de domaine', keywordsChecked: 0, top20Count: 0, statusChanged: false });
       continue;
     }
 
     const keywords = extractKeywords(site);
     if (keywords.length === 0) {
       console.log(`  ⚠  ${site.domain} — pas de mots-clés, ignoré`);
+      results.push({ siteId: site.id, domain: site.domain, status: 'skipped', note: 'pas de mots-clés', keywordsChecked: 0, top20Count: 0, statusChanged: false });
       continue;
     }
 
@@ -79,7 +83,7 @@ export async function runRankCron(opts: { dryRun?: boolean } = {}): Promise<Cron
 
     if (opts.dryRun) {
       console.log(`    → DRY-RUN : aucun appel API`);
-      results.push({ siteId: site.id, domain: site.domain, keywordsChecked: keywords.length, top20Count: 0, statusChanged: false });
+      results.push({ siteId: site.id, domain: site.domain, status: 'dry-run', note: 'simulation', keywordsChecked: keywords.length, top20Count: 0, statusChanged: false });
       continue;
     }
 
@@ -144,24 +148,32 @@ export async function runRankCron(opts: { dryRun?: boolean } = {}): Promise<Cron
         }
       }
 
-      results.push({ siteId: site.id, domain: site.domain, keywordsChecked: keywords.length, top20Count, statusChanged });
+      results.push({ siteId: site.id, domain: site.domain, status: 'tracked', keywordsChecked: keywords.length, top20Count, statusChanged });
       console.log(`    ✓ ${positions.length} positions enregistrées`);
 
     } catch (e: unknown) {
       const error = e instanceof Error ? e.message : String(e);
       console.error(`    ✗ Erreur : ${error}`);
-      results.push({ siteId: site.id, domain: site.domain, keywordsChecked: 0, top20Count: 0, statusChanged: false, error });
+      results.push({ siteId: site.id, domain: site.domain, status: 'error', keywordsChecked: 0, top20Count: 0, statusChanged: false, error });
     }
   }
 
-  console.log(`\n[cron] Terminé — ${results.filter(r => !r.error).length}/${sites.length} sites traités`);
+  const processed = results.filter(r => r.status === 'tracked').length;
+  console.log(`\n[cron] Terminé — ${processed}/${sites.length} sites traités`);
+
+  if (opts.json) {
+    console.log('__NEXUS_JSON__' + JSON.stringify({
+      kind: 'cron', date: today(), dryRun: !!opts.dryRun, total: sites.length, processed, results,
+    }) + '__NEXUS_END__');
+  }
   return results;
 }
 
 // ─── Point d'entrée direct ────────────────────────────────────────────────────
 
 const isDryRun = process.argv.includes('--dry-run');
-runRankCron({ dryRun: isDryRun }).catch(e => {
+const isJson   = process.argv.includes('--json');
+runRankCron({ dryRun: isDryRun, json: isJson }).catch(e => {
   console.error('[cron] Erreur fatale :', e instanceof Error ? e.message : e);
   process.exit(1);
 });

@@ -238,7 +238,27 @@ export async function runRank(
   return { out: logs, ok, data };
 }
 
-export async function runCron(dryRun: boolean): Promise<{ out: string; ok: boolean }> {
-  const flags = dryRun ? '--dry-run' : '';
-  return run(`pnpm --filter @nexuslocale/indexer-cli cron ${flags}`, 300_000);
+export interface CronSiteResult {
+  siteId: string;
+  domain: string;
+  status: 'tracked' | 'skipped' | 'dry-run' | 'error';
+  note?: string;
+  keywordsChecked: number;
+  top20Count: number;
+  statusChanged: boolean;
+  error?: string;
+}
+export interface CronResult {
+  date: string;
+  dryRun: boolean;
+  total: number;
+  processed: number;
+  results: CronSiteResult[];
+}
+
+export async function runCron(dryRun: boolean): Promise<{ out: string; ok: boolean; data: CronResult | null }> {
+  const flags = [dryRun ? '--dry-run' : '', '--json'].filter(Boolean).join(' ');
+  const { out, ok } = await run(`pnpm --filter @nexuslocale/indexer-cli cron ${flags}`, 300_000);
+  const { data, logs } = extractJson<CronResult>(out);
+  return { out: logs, ok, data };
 }

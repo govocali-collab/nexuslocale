@@ -128,6 +128,7 @@ program
         console.log(`  → finder buy ${bd.domain}`);
       }
       console.log('\n  ℹ  Données simulées. Retirez --estimate pour les vraies métriques.');
+      if (opts.json) console.log('__NEXUS_JSON__' + JSON.stringify(mock) + '__NEXUS_END__');
       return;
     }
 

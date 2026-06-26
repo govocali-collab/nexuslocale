@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult, type SubmitResult } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult, type SubmitResult, type CronResult } from '@/lib/launch-actions';
 import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
@@ -994,7 +994,7 @@ function PositionsTable({ data }: { data: RankResult }) {
 // ── Cron ──────────────────────────────────────────────────────────────────────
 function CronPanel() {
   const [dryRun, setDryRun] = useState(true);
-  const [result, setResult] = useState<{ out: string; ok: boolean } | null>(null);
+  const [result, setResult] = useState<{ out: string; ok: boolean; data: CronResult | null } | null>(null);
   const [pending, start]    = useTransition();
 
   function launch() {
@@ -1027,7 +1027,65 @@ function CronPanel() {
         {dryRun ? 'Simuler le cron' : '🚀 Lancer le cron (réel)'}
       </button>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {pending && <Output out="" ok pending />}
+      {!pending && result?.data ? (
+        <>
+          <CronTable data={result.data} />
+          <RawLogs out={result.out} ok={result.ok} />
+        </>
+      ) : !pending && result ? (
+        <Output out={result.out} ok={result.ok} pending={false} />
+      ) : null}
+    </div>
+  );
+}
+
+// Résumé du cron (par site : traité / ignoré / erreur) — remplace les logs ASCII.
+function CronTable({ data }: { data: CronResult }) {
+  const st = (s: CronResult['results'][number]['status']) =>
+    s === 'tracked' ? { label: '✓ traité',  cls: 'bg-emerald-100 text-emerald-700' }
+    : s === 'dry-run' ? { label: 'simulé',   cls: 'bg-indigo-100 text-indigo-700' }
+    : s === 'skipped' ? { label: 'ignoré',   cls: 'bg-[#EEEDF9] text-[#9A97C0]' }
+    :                   { label: '✗ erreur', cls: 'bg-red-100 text-red-700' };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm text-[#3D3D6B]">
+        <span className="font-medium text-[#1C1560]">{data.processed}/{data.total} sites traités</span>
+        {data.dryRun && <Badge text="simulation" cls="bg-amber-100 text-amber-700" />}
+        <span className="text-[#9A97C0]">· {data.date}</span>
+      </div>
+      {data.results.length === 0 ? (
+        <p className="text-sm text-[#9A97C0]">Aucun site à suivre (statuts indexed / ranking / rented).</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+          <table className="w-full text-sm">
+            <thead className="bg-[#F5F4FF]">
+              <tr>
+                <th className={`${TH} text-left`}>Site</th>
+                <th className={`${TH} text-center`}>Statut</th>
+                <th className={`${TH} text-right`}>Mots-clés</th>
+                <th className={`${TH} text-right`}>Top 20</th>
+                <th className={`${TH} text-left`}>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.results.map((r, i) => {
+                const b = st(r.status);
+                return (
+                  <tr key={r.siteId + i} className="hover:bg-[#FAFAFF]">
+                    <td className={`${TD} mono text-[#1C1560]`}>{r.domain}</td>
+                    <td className={`${TD} text-center`}><Badge text={b.label} cls={b.cls} /></td>
+                    <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{r.keywordsChecked || '—'}</td>
+                    <td className={`${TD} text-right tabular-nums`}>{r.top20Count > 0 ? <span className="text-emerald-600 font-medium">{r.top20Count}</span> : '—'}</td>
+                    <td className={`${TD} text-xs text-[#6B6B9E]`}>{r.error ?? r.note ?? (r.statusChanged ? '→ status ranking' : '—')}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
