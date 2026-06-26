@@ -182,16 +182,30 @@ export async function runDemoGen(
   return run(`pnpm --filter @nexuslocale/demo-gen gen ${flags}`, 180_000);
 }
 
+export interface SubmitStep { title: string; details: string[] }
+export interface SubmitResult {
+  site_id: string;
+  domain: string | null;
+  estimate: boolean;
+  sitemap: string;
+  steps: SubmitStep[];
+  urls: string[];
+  keywords: string[];
+}
+
 export async function runGscSubmit(
   siteId: string,
   opts: { estimate: boolean; skipVerify: boolean; force: boolean },
-): Promise<{ out: string; ok: boolean }> {
+): Promise<{ out: string; ok: boolean; data: SubmitResult | null }> {
   const flags = [
     opts.estimate   ? '--estimate'    : '',
     opts.skipVerify ? '--skip-verify' : '',
     opts.force      ? '--force'       : '',
+    '--json',
   ].filter(Boolean).join(' ');
-  return run(`pnpm --filter @nexuslocale/indexer-cli cli submit ${siteId} ${flags}`, 120_000);
+  const { out, ok } = await run(`pnpm --filter @nexuslocale/indexer-cli cli submit ${siteId} ${flags}`, 120_000);
+  const { data, logs } = extractJson<SubmitResult>(out);
+  return { out: logs, ok, data };
 }
 
 export interface RankPosition {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult, type SubmitResult } from '@/lib/launch-actions';
 import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
@@ -369,16 +369,15 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
                           </svg>
                         </a>
                       )}
-                      {p.maps_url && (
-                        <a href={p.maps_url} target="_blank" rel="noopener noreferrer"
-                          title="Ouvrir la fiche Google Maps" aria-label="Ouvrir Google Maps"
-                          className="inline-flex items-center justify-center h-5 w-5 rounded-md text-rose-600 hover:bg-rose-50 hover:text-rose-800 transition-colors">
-                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                          </svg>
-                        </a>
-                      )}
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.business_name)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        title={`Chercher « ${p.business_name} » sur Google Maps`} aria-label="Ouvrir Google Maps"
+                        className="inline-flex items-center justify-center h-5 w-5 rounded-md text-rose-600 hover:bg-rose-50 hover:text-rose-800 transition-colors">
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                      </a>
                     </div>
                   </td>
                   <td className={`${TD} text-center`}><Badge text={`${painEmoji(p.pain_score)} ${p.pain_score}`} cls={painCls(p.pain_score)} /></td>
@@ -774,7 +773,7 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
   const [estimate,  setEstimate]  = useState(true);
   const [skipVerif, setSkipVerif] = useState(false);
   const [force,     setForce]     = useState(false);
-  const [result,    setResult]    = useState<{ out: string; ok: boolean } | null>(null);
+  const [result,    setResult]    = useState<{ out: string; ok: boolean; data: SubmitResult | null } | null>(null);
   const [pending,   start]        = useTransition();
 
   function launch() {
@@ -820,7 +819,56 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
         Lancer la soumission
       </button>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {pending && <Output out="" ok pending />}
+      {!pending && result?.data?.steps?.length ? (
+        <>
+          <SubmitPlan data={result.data} />
+          <RawLogs out={result.out} ok={result.ok} />
+        </>
+      ) : !pending && result ? (
+        <Output out={result.out} ok={result.ok} pending={false} />
+      ) : null}
+    </div>
+  );
+}
+
+// Plan de soumission GSC (étapes + URLs + mots-clés) — remplace les logs ASCII.
+function SubmitPlan({ data }: { data: SubmitResult }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 text-sm text-[#3D3D6B]">
+        <span className="font-medium text-[#1C1560]">{data.domain ?? data.site_id}</span>
+        {data.estimate && <Badge text="aperçu" cls="bg-amber-100 text-amber-700" />}
+        <span className="text-[#9A97C0]">· {data.urls.length} URLs · {data.keywords.length} mots-clés</span>
+      </div>
+
+      <ol className="space-y-2">
+        {data.steps.map((s, i) => (
+          <li key={i} className="flex gap-3 rounded-lg border border-[#D9D7F0] bg-white p-3">
+            <span className="flex-none flex items-center justify-center h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">{i + 1}</span>
+            <div className="min-w-0">
+              <div className="text-sm font-medium text-[#1C1560]">{s.title}</div>
+              <ul className="mt-1 space-y-0.5">
+                {s.details.map((d, j) => (
+                  <li key={j} className="text-xs text-[#6B6B9E] break-all">{d.startsWith('http') ? <span className="mono text-indigo-600">{d}</span> : <>→ {d}</>}</li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {data.keywords.length > 0 && (
+        <div>
+          <div className="label mb-1">Mots-clés qui seront trackés</div>
+          <div className="flex flex-wrap gap-1.5">
+            {data.keywords.slice(0, 12).map((k, i) => (
+              <span key={i} className="inline-block rounded-md bg-[#F5F4FF] border border-[#D9D7F0] px-2 py-0.5 text-xs text-[#3D3D6B]">{k}</span>
+            ))}
+            {data.keywords.length > 12 && <span className="text-xs text-[#9A97C0] self-center">+{data.keywords.length - 12}</span>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

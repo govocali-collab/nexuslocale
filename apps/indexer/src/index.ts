@@ -130,8 +130,9 @@ program
   .option('--skip-verify',     'Saute la vérification DNS (site déjà vérifié dans GSC)')
   .option('--force',           'Re-soumet même si gsc_property est déjà renseigné')
   .option('--use-indexing-api','Appelle aussi Google Indexing API (limité aux pages Job/BroadcastEvent)')
+  .option('--json',            'Émet aussi le plan en JSON (pour le dashboard)')
   .action(async (siteId: string, opts: {
-    estimate: boolean; skipVerify: boolean; force: boolean; useIndexingApi: boolean;
+    estimate: boolean; skipVerify: boolean; force: boolean; useIndexingApi: boolean; json: boolean;
   }) => {
     console.log(`\n🚀 indexer submit ${siteId}${opts.estimate ? ' [ESTIMATE]' : ''}`);
 
@@ -188,6 +189,16 @@ program
         console.log('     cette option peut fonctionner mais n\'est pas garantie par Google.');
       }
       console.log('\n  ℹ  Retirez --estimate pour exécuter réellement.');
+      if (opts.json) {
+        const steps = [
+          { title: 'Vérification DNS TXT', details: ['Token Google via Site Verification API', 'Ajout d\'un enregistrement TXT', 'Vérification de la propriété'] },
+          { title: 'Ajout propriété Search Console', details: [`PUT sc-domain:${domain}`] },
+          { title: 'Soumission du sitemap', details: [sitemapUrl] },
+          { title: `Inspection des URLs (${urls.length})`, details: urls },
+          { title: 'Mise à jour Supabase', details: [`gsc_property = "${siteUrl}"`, 'status : built → indexed'] },
+        ];
+        console.log('__NEXUS_JSON__' + JSON.stringify({ kind: 'submit', site_id: siteId, domain, estimate: true, sitemap: sitemapUrl, steps, urls, keywords: kws }) + '__NEXUS_END__');
+      }
       return;
     }
 
