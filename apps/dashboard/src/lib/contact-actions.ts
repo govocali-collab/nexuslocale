@@ -12,7 +12,7 @@ export interface ContactInput {
   website: string; // honeypot — doit rester vide
 }
 
-const TO = 'contact@nexuslocale.com';
+const TO = process.env['CONTACT_TO'] ?? 'contact@nexuslocale.com';
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const esc = (s: string) => s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]!));
 
