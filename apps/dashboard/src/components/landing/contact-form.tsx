@@ -43,7 +43,7 @@ export function ContactForm() {
       <div className="rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
         <div className="mx-auto mb-4 grid size-12 place-items-center rounded-full text-white text-2xl" style={{ backgroundColor: VIOLET }}>✓</div>
         <h3 className="text-xl font-bold">Message sent!</h3>
-        <p className="mt-2 text-neutral-600">Thanks — we&apos;ll get back to you shortly.</p>
+        <p className="mt-2 text-neutral-600">Thanks, we&apos;ll get back to you shortly.</p>
       </div>
     );
   }
@@ -81,7 +81,7 @@ export function ContactForm() {
         <textarea required value={f.message} onChange={set('message')} rows={5} className={inputCls} style={focusRing} placeholder="Tell us about your business and what you need…" />
       </div>
 
-      {/* Honeypot — caché aux humains, rempli par les bots */}
+      {/* Honeypot - caché aux humains, rempli par les bots */}
       <input type="text" tabIndex={-1} autoComplete="off" value={f.website} onChange={set('website')}
         name="website" className="hidden" aria-hidden="true" />
 
