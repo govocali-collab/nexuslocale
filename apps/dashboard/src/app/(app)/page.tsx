@@ -39,7 +39,7 @@ export default async function OverviewPage() {
     : null;
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6">
       <h1 className="text-lg font-semibold text-[#1C1560]">Vue d'ensemble</h1>
 
       {/* ── KPI row ────────────────────────────────────────────────────────── */}

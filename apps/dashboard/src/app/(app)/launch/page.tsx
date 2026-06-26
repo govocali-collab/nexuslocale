@@ -32,7 +32,7 @@ export default async function LaunchPage({
   ]);
 
   return (
-    <div className="space-y-4 max-w-5xl">
+    <div className="space-y-4">
       <h1 className="text-lg font-semibold text-[#1C1560]">Lanceur d'actions</h1>
 
       {/* ── Files d'attente ─────────────────────────────────────────────────── */}

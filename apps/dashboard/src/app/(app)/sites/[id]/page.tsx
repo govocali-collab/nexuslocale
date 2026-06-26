@@ -69,7 +69,7 @@ export default async function SiteDetailPage({
   const missedCalls = calls.filter(l => !l.duration_sec || l.duration_sec === 0).length;
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>

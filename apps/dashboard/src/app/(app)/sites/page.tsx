@@ -14,7 +14,7 @@ export default async function SitesPage({
   const sites   = await getSitesList(filters);
 
   return (
-    <div className="space-y-4 max-w-7xl">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-[#1C1560]">
           Portefeuille <span className="text-[#9A97C0] text-base font-normal ml-1">({sites.length})</span>
