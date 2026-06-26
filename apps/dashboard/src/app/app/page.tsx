@@ -51,7 +51,7 @@ export default async function OverviewPage() {
             {STATUSES.map(s => (
               <Link
                 key={s}
-                href={`/sites?status=${s}`}
+                href={`/app/sites?status=${s}`}
                 className="flex items-center gap-1.5 rounded-md bg-[#F0EFFC] hover:bg-indigo-50
                            px-2.5 py-1.5 transition-colors"
               >
@@ -89,7 +89,7 @@ export default async function OverviewPage() {
       <div className="card p-4">
         <div className="flex items-center justify-between mb-3">
           <p className="label">Pipeline prospects</p>
-          <Link href="/pipeline" className="text-xs text-indigo-600 hover:text-indigo-800">
+          <Link href="/app/pipeline" className="text-xs text-indigo-600 hover:text-indigo-800">
             Voir tout →
           </Link>
         </div>
@@ -120,7 +120,7 @@ export default async function OverviewPage() {
               {staleSites.map(s => (
                 <li key={s.id} className="flex items-center justify-between">
                   <Link
-                    href={`/sites/${s.id}`}
+                    href={`/app/sites/${s.id}`}
                     className="text-sm mono text-indigo-600 hover:text-indigo-800"
                   >
                     {s.domain ?? s.id}
@@ -145,7 +145,7 @@ export default async function OverviewPage() {
                 <li key={l.id} className="flex items-center gap-3 pt-2 first:pt-0">
                   <Badge value={l.type} />
                   <Link
-                    href={`/sites/${l.site_id}`}
+                    href={`/app/sites/${l.site_id}`}
                     className="text-xs mono text-[#3D3D6B] hover:text-[#1C1560] truncate flex-1"
                   >
                     {l.site_domain ?? l.site_id}

@@ -25,9 +25,10 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
   const isLoginPage = path === '/login';
-  const isPublicSite = path.startsWith('/s/'); // sites « beaux » hébergés publiquement
+  const isAppRoute  = path === '/app' || path.startsWith('/app/'); // le dashboard (protégé)
+  // Tout le reste est public : '/' (landing), '/s/*' (sites hébergés), assets.
 
-  if (!user && !isLoginPage && !isPublicSite) {
+  if (!user && isAppRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
@@ -35,7 +36,7 @@ export async function middleware(request: NextRequest) {
 
   if (user && isLoginPage) {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = '/app';
     return NextResponse.redirect(url);
   }
 

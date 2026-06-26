@@ -9,7 +9,7 @@ async function signIn(formData: FormData) {
   const supabase = await createAuthClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) redirect('/login?error=1');
-  redirect('/');
+  redirect('/app');
 }
 
 export default async function LoginPage({

@@ -7,10 +7,10 @@ import { usePathname } from 'next/navigation';
 import { signOut } from '@/lib/actions';
 
 const NAV = [
-  { href: '/',         label: 'Vue d\'ensemble', icon: '▦' },
-  { href: '/sites',    label: 'Portefeuille',    icon: '◈' },
-  { href: '/pipeline', label: 'Pipeline',         icon: '⇌' },
-  { href: '/launch',   label: 'Lanceur',          icon: '⚡' },
+  { href: '/app',          label: 'Vue d\'ensemble', icon: '▦' },
+  { href: '/app/sites',    label: 'Portefeuille',    icon: '◈' },
+  { href: '/app/pipeline', label: 'Pipeline',         icon: '⇌' },
+  { href: '/app/launch',   label: 'Lanceur',          icon: '⚡' },
 ];
 
 export function Sidebar() {
@@ -18,7 +18,7 @@ export function Sidebar() {
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+    href === '/app' ? pathname === '/app' : pathname.startsWith(href);
 
   const NavLinks = ({ onNavigate = () => {} }: { onNavigate?: () => void }) => (
     <nav className="flex-1 px-2 py-3 space-y-0.5">

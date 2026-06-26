@@ -80,7 +80,7 @@ export function SitesTable({ sites }: { sites: SiteRow[] }) {
                     className="rounded border-[#D9D7F0] text-indigo-600" aria-label={`Sélectionner ${s.domain ?? s.id}`} />
                 </td>
                 <td className="px-4 py-2.5">
-                  <Link href={`/sites/${s.id}`} className="mono text-indigo-600 hover:text-indigo-800">
+                  <Link href={`/app/sites/${s.id}`} className="mono text-indigo-600 hover:text-indigo-800">
                     {s.domain ?? <span className="text-[#9A97C0] italic">sans domaine</span>}
                   </Link>
                 </td>

@@ -1,0 +1,133 @@
+import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'NexusLocale — Local websites that rank. More customers from Google.',
+  description: 'We design and rank websites for local businesses. Your site climbs to the top of Google and the calls come straight to you. No upfront cost — pay only while you rank.',
+};
+
+// Ce qu'on fait, pour le commerce local (rank-and-rent + web design).
+const BENEFITS = [
+  { t: 'Designed for your trade', d: 'A clean, professional website built around your local business — plumbing, electrical, excavation and more.' },
+  { t: 'Built to rank',           d: 'Local SEO is baked in from day one, targeting the exact searches people make in your city.' },
+  { t: 'More calls & leads',      d: 'The people searching for your service on Google find you first — and reach out directly.' },
+  { t: 'No upfront cost',         d: 'Rank-and-rent model: you pay only while your site ranks and brings you business.' },
+  { t: 'Fully managed',           d: 'Domain, hosting, updates, technical work — we handle everything so you don\'t have to.' },
+  { t: 'Real, trackable results', d: 'Follow your Google rankings and incoming leads. You see exactly what you\'re paying for.' },
+];
+
+// Le modèle rank-and-rent en 3 étapes (remplace le « pricing » SaaS).
+const STEPS = [
+  { n: '1', t: 'We build & rank',         d: 'We design a website optimized for your trade and city, engineered to climb to the top of Google.' },
+  { n: '2', t: 'It reaches the top',      d: 'Your site ranks for the local searches that matter — like “plumber in your city”.' },
+  { n: '3', t: 'You rent it, get leads',  d: 'Every call and request comes straight to you. You pay only while the site keeps ranking.' },
+];
+
+const VIOLET = '#5701f3';   // brand-500
+const VIOLET_DARK = '#4801cc'; // brand-600
+const VIOLET_400 = '#a78bfa';  // accent clair sur fond sombre
+const INK = '#0a0a0a';
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-white text-[#0a0a0a] font-sans antialiased">
+      {/* ── Nav ──────────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 backdrop-blur bg-white/80 border-b border-neutral-200/70">
+        <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+          <span className="text-lg font-bold tracking-tight" style={{ color: VIOLET }}>NexusLocale</span>
+          <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-neutral-600">
+            <a href="#how" className="hover:text-[#0a0a0a] transition-colors">How it works</a>
+            <a href="#why" className="hover:text-[#0a0a0a] transition-colors">Why us</a>
+            <Link href="/login" className="hover:text-[#0a0a0a] transition-colors">Sign in</Link>
+            <Link href="/login" className="rounded-lg px-4 py-2 text-white font-semibold shadow-sm hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>Get started</Link>
+          </nav>
+          <Link href="/login" className="md:hidden rounded-lg px-4 py-2 text-white text-sm font-semibold" style={{ backgroundColor: VIOLET }}>Get started</Link>
+        </div>
+      </header>
+
+      {/* ── Hero (sombre, comme nexuslocale.com) ─────────────────────────── */}
+      <section className="relative overflow-hidden text-white" style={{ backgroundColor: INK }}>
+        {/* glow violet flou en haut */}
+        <div aria-hidden className="absolute left-1/2 top-[-10rem] size-[36rem] -translate-x-1/2 rounded-full blur-3xl" style={{ backgroundColor: `${VIOLET}33` }} />
+        <div className="relative mx-auto max-w-6xl px-5 py-24 sm:py-32 text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium" style={{ color: '#ddd0fd' }}>
+            ✦ Local websites that rank on Google
+          </span>
+          <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-extrabold tracking-tight sm:text-7xl">
+            Get found on Google. Get more <span style={{ color: VIOLET_400 }}>customers</span>.
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-neutral-300 sm:text-xl leading-relaxed">
+            We design and rank websites for local businesses. Your site climbs to the top of Google
+            — and the calls come straight to you.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/login" className="inline-flex items-center gap-2 rounded-lg px-6 py-3 font-semibold text-white shadow-lg transition-colors" style={{ backgroundColor: VIOLET }}>
+              Get more customers <span aria-hidden>→</span>
+            </Link>
+            <a href="#how" className="rounded-lg border border-white/20 px-6 py-3 font-semibold text-white hover:bg-white/10 transition-colors">
+              How it works
+            </a>
+          </div>
+          <p className="mt-4 text-xs text-neutral-400">No upfront cost • Pay only while you rank</p>
+        </div>
+      </section>
+
+      {/* ── Why us (bénéfices) ───────────────────────────────────────────── */}
+      <section id="why" className="max-w-6xl mx-auto px-5 py-24">
+        <div className="text-center max-w-xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Websites that bring you business</h2>
+          <p className="mt-3 text-neutral-600">Beautiful design and local SEO, built to turn Google searches into customers.</p>
+        </div>
+        <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {BENEFITS.map((f) => (
+            <div key={f.t} className="rounded-2xl border border-neutral-200 p-6 transition-shadow hover:shadow-md">
+              <div className="grid size-10 place-items-center rounded-xl mb-4 text-lg" style={{ backgroundColor: '#f0ebfe', color: VIOLET_DARK }}>◆</div>
+              <h3 className="font-semibold text-[#0a0a0a]">{f.t}</h3>
+              <p className="mt-1.5 text-sm text-neutral-600 leading-relaxed">{f.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── How it works (rank-and-rent) ─────────────────────────────────── */}
+      <section id="how" className="max-w-6xl mx-auto px-5 py-20">
+        <div className="text-center max-w-2xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">How it works</h2>
+          <p className="mt-3 text-[#0a0a0a]/60">We do the building and the ranking. You get the customers.</p>
+        </div>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
+          {STEPS.map((s) => (
+            <div key={s.n} className="rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm">
+              <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold mb-5" style={{ backgroundColor: VIOLET }}>{s.n}</div>
+              <h3 className="text-lg font-bold">{s.t}</h3>
+              <p className="mt-2 text-sm text-[#0a0a0a]/60 leading-relaxed">{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA final ────────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 pb-20">
+        <div className="rounded-3xl px-8 py-14 text-center text-white" style={{ background: `linear-gradient(135deg, ${VIOLET}, #4801cc)` }}>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Ready to own Google in your city?</h2>
+          <p className="mt-3 text-white/80 max-w-xl mx-auto">No upfront cost, no risk. We rank it first — you only pay while it brings you customers.</p>
+          <Link href="/login" className="mt-7 inline-block rounded-xl bg-white px-7 py-3.5 font-semibold shadow-lg hover:-translate-y-0.5 transition-transform" style={{ color: VIOLET }}>
+            Get started
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────────────────── */}
+      <footer className="border-t border-neutral-200">
+        <div className="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#0a0a0a]/50">
+          <span className="font-bold" style={{ color: VIOLET }}>NexusLocale</span>
+          <div className="flex items-center gap-6">
+            <Link href="/login" className="hover:text-[#0a0a0a]">Terms</Link>
+            <Link href="/login" className="hover:text-[#0a0a0a]">Privacy</Link>
+            <a href="mailto:support@nexuslocale.com" className="hover:text-[#0a0a0a]">support@nexuslocale.com</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

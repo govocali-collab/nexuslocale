@@ -57,7 +57,7 @@ export default async function SitesPage({
         </button>
         {(filters.status || filters.type || filters.q) && (
           <Link
-            href="/sites"
+            href="/app/sites"
             className="rounded-md px-3 py-1.5 text-sm text-[#9A97C0] hover:text-[#1C1560] transition-colors"
           >
             Effacer

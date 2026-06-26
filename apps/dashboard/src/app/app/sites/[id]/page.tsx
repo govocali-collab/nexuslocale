@@ -73,7 +73,7 @@ export default async function SiteDetailPage({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <Link href="/sites" className="text-xs text-[#9A97C0] hover:text-[#1C1560]">
+          <Link href="/app/sites" className="text-xs text-[#9A97C0] hover:text-[#1C1560]">
             ← Portefeuille
           </Link>
           <h1 className="mt-1 text-xl font-semibold mono text-[#1C1560]">
