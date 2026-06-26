@@ -1,19 +1,41 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
+import { ContactForm } from '@/components/landing/contact-form';
+
+const TITLE = 'NexusLocale — Local websites that rank. More customers from Google.';
+const DESC = 'We design and rank websites for local businesses. Your site climbs to the top of Google and the calls come straight to you. No upfront cost — pay only while you rank.';
 
 export const metadata: Metadata = {
-  title: 'NexusLocale — Local websites that rank. More customers from Google.',
-  description: 'We design and rank websites for local businesses. Your site climbs to the top of Google and the calls come straight to you. No upfront cost — pay only while you rank.',
+  metadataBase: new URL('https://nexuslocale.com'),
+  title: TITLE,
+  description: DESC,
+  icons: { icon: '/NexusLocale-fav.png', shortcut: '/NexusLocale-fav.png', apple: '/NexusLocale-fav.png' },
+  openGraph: {
+    title: TITLE,
+    description: DESC,
+    type: 'website',
+    siteName: 'NexusLocale',
+    images: [{ url: '/NexusLocale-logo.png', alt: 'NexusLocale' }],
+  },
+  twitter: { card: 'summary_large_image', title: TITLE, description: DESC, images: ['/NexusLocale-logo.png'] },
 };
 
 // Ce qu'on fait, pour le commerce local (rank-and-rent + web design).
+// icon = chemins SVG lucide (rendus dans un <svg> stroke).
 const BENEFITS = [
-  { t: 'Designed for your trade', d: 'A clean, professional website built around your local business — plumbing, electrical, excavation and more.' },
-  { t: 'Built to rank',           d: 'Local SEO is baked in from day one, targeting the exact searches people make in your city.' },
-  { t: 'More calls & leads',      d: 'The people searching for your service on Google find you first — and reach out directly.' },
-  { t: 'No upfront cost',         d: 'Rank-and-rent model: you pay only while your site ranks and brings you business.' },
-  { t: 'Fully managed',           d: 'Domain, hosting, updates, technical work — we handle everything so you don\'t have to.' },
-  { t: 'Real, trackable results', d: 'Follow your Google rankings and incoming leads. You see exactly what you\'re paying for.' },
+  { t: 'Designed for your trade', d: 'A clean, professional website built around your local business — plumbing, electrical, excavation and more.',
+    icon: <><rect width="18" height="7" x="3" y="3" rx="1" /><rect width="9" height="7" x="3" y="14" rx="1" /><rect width="5" height="7" x="16" y="14" rx="1" /></> },
+  { t: 'Built to rank', d: 'Local SEO is baked in from day one, targeting the exact searches people make in your city.',
+    icon: <><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></> },
+  { t: 'More calls & leads', d: 'The people searching for your service on Google find you first — and reach out directly.',
+    icon: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" /> },
+  { t: 'No upfront cost', d: 'Rank-and-rent model: you pay only while your site ranks and brings you business.',
+    icon: <><line x1="12" x2="12" y1="2" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></> },
+  { t: 'Fully managed', d: 'Domain, hosting, updates, technical work — we handle everything so you don\'t have to.',
+    icon: <><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></> },
+  { t: 'Real, trackable results', d: 'Follow your Google rankings and incoming leads. You see exactly what you\'re paying for.',
+    icon: <><line x1="12" x2="12" y1="20" y2="10" /><line x1="18" x2="18" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="16" /></> },
 ];
 
 // Le modèle rank-and-rent en 3 étapes (remplace le « pricing » SaaS).
@@ -34,10 +56,13 @@ export default function LandingPage() {
       {/* ── Nav ──────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 backdrop-blur bg-white/80 border-b border-neutral-200/70">
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-          <span className="text-lg font-bold tracking-tight" style={{ color: VIOLET }}>NexusLocale</span>
+          <Link href="/" className="flex items-center">
+            <Image src="/NexusLocale-logo.png" alt="NexusLocale" width={161} height={46} priority className="h-8 w-auto" />
+          </Link>
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-neutral-600">
-            <a href="#how" className="hover:text-[#0a0a0a] transition-colors">How it works</a>
             <a href="#why" className="hover:text-[#0a0a0a] transition-colors">Why us</a>
+            <a href="#how" className="hover:text-[#0a0a0a] transition-colors">How it works</a>
+            <a href="#contact" className="hover:text-[#0a0a0a] transition-colors">Contact</a>
             <Link href="/login" className="hover:text-[#0a0a0a] transition-colors">Sign in</Link>
             <Link href="/login" className="rounded-lg px-4 py-2 text-white font-semibold shadow-sm hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>Get started</Link>
           </nav>
@@ -82,7 +107,9 @@ export default function LandingPage() {
           <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {BENEFITS.map((f) => (
               <div key={f.t} className="rounded-2xl border border-neutral-200 bg-white p-6 transition-shadow hover:shadow-md">
-                <div className="grid size-10 place-items-center rounded-xl mb-4 text-lg" style={{ backgroundColor: '#f0ebfe', color: VIOLET_DARK }}>◆</div>
+                <div className="grid size-10 place-items-center rounded-xl mb-4" style={{ backgroundColor: '#f0ebfe', color: VIOLET_DARK }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="size-5">{f.icon}</svg>
+              </div>
                 <h3 className="font-semibold text-[#0a0a0a]">{f.t}</h3>
                 <p className="mt-1.5 text-sm text-neutral-600 leading-relaxed">{f.d}</p>
               </div>
@@ -123,10 +150,21 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer — fond GRIS #f4f4f4 ───────────────────────────────────── */}
-      <footer className="border-t border-neutral-200" style={{ backgroundColor: '#f4f4f4' }}>
+      {/* ── Contact — fond GRIS #f4f4f4 ──────────────────────────────────── */}
+      <section id="contact" className="py-24" style={{ backgroundColor: '#f4f4f4' }}>
+        <div className="max-w-2xl mx-auto px-5">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Let&apos;s get you more customers</h2>
+            <p className="mt-3 text-neutral-600">Tell us about your business — we&apos;ll show you what ranking on Google can do.</p>
+          </div>
+          <ContactForm />
+        </div>
+      </section>
+
+      {/* ── Footer — fond BLANC ──────────────────────────────────────────── */}
+      <footer className="border-t border-neutral-200 bg-white">
         <div className="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#0a0a0a]/50">
-          <span className="font-bold" style={{ color: VIOLET }}>NexusLocale</span>
+          <Image src="/NexusLocale-logo.png" alt="NexusLocale" width={140} height={40} className="h-7 w-auto" />
           <div className="flex items-center gap-6">
             <Link href="/login" className="hover:text-[#0a0a0a]">Terms</Link>
             <Link href="/login" className="hover:text-[#0a0a0a]">Privacy</Link>
