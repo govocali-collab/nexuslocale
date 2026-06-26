@@ -1118,7 +1118,7 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
                 : 'card hover:border-indigo-200 hover:bg-[#F5F4FF]'
             }`}
           >
-            <p className="text-sm font-medium text-[#1C1560]">{t.label}</p>
+            <p className="text-sm font-medium text-[#1C1560] leading-tight min-h-[2.25rem]">{t.label}</p>
             <p className="text-xs text-[#9A97C0] mt-0.5 leading-snug">{t.desc}</p>
           </button>
         ))}
