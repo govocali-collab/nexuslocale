@@ -3,7 +3,7 @@ export type Locale = 'fr' | 'en';
 
 export const DICT = {
   fr: {
-    nav: { why: 'Pourquoi nous', how: 'Comment ça marche', websites: 'Sites web', contact: 'Contact', signIn: 'Connexion', getStarted: 'On commence' },
+    nav: { why: 'Pourquoi nous', how: 'Comment ça marche', websites: 'Sites web', contact: 'Contact', getStarted: 'On commence' },
     hero: {
       badge: '✦ Des sites web locaux qui rankent sur Google',
       titleL1: 'Soyez trouvé sur Google.',
@@ -65,7 +65,7 @@ export const DICT = {
   },
 
   en: {
-    nav: { why: 'Why us', how: 'How it works', websites: 'Websites', contact: 'Contact', signIn: 'Sign in', getStarted: 'Get started' },
+    nav: { why: 'Why us', how: 'How it works', websites: 'Websites', contact: 'Contact', getStarted: 'Get started' },
     hero: {
       badge: '✦ Local websites that rank on Google',
       titleL1: 'Get found on Google.',
