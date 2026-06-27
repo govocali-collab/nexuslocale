@@ -6,7 +6,8 @@ export const DICT = {
     nav: { why: 'Pourquoi nous', how: 'Comment ça marche', websites: 'Sites web', contact: 'Contact', signIn: 'Connexion', getStarted: 'On commence' },
     hero: {
       badge: '✦ Des sites web locaux qui rankent sur Google',
-      titlePre: 'Soyez trouvé sur Google. Plus de ',
+      titleL1: 'Soyez trouvé sur Google.',
+      titleL2Pre: 'Plus de ',
       titleAccent: 'clients',
       subtitle: 'On bâtit et on ranke des sites web locaux. Ils montent dans le top de Google, et on vous envoie les appels et les leads directement.',
       ctaPrimary: 'Avoir plus de clients',
@@ -68,7 +69,8 @@ export const DICT = {
     nav: { why: 'Why us', how: 'How it works', websites: 'Websites', contact: 'Contact', signIn: 'Sign in', getStarted: 'Get started' },
     hero: {
       badge: '✦ Local websites that rank on Google',
-      titlePre: 'Get found on Google. Get more ',
+      titleL1: 'Get found on Google.',
+      titleL2Pre: 'Get more ',
       titleAccent: 'customers',
       subtitle: 'We build and rank local websites. They climb to the top of Google, and we send the calls and leads straight to you.',
       ctaPrimary: 'Get more customers',
