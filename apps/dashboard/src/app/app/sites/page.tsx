@@ -51,7 +51,7 @@ export default async function SitesPage({
 
         <button
           type="submit"
-          className="rounded-md bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 text-sm text-white transition-colors"
+          className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-3 py-1.5 text-sm text-white transition-colors"
         >
           Filtrer
         </button>

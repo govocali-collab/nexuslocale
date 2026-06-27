@@ -470,7 +470,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keyword
 
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={launch} disabled={!ready || pending}
-          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed
+          className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-40 disabled:cursor-not-allowed
                      px-4 py-2 text-sm text-white transition-colors">
           {pending ? 'Scan en cours…' : estimate ? 'Estimer (gratuit)' : 'Lancer le scan réel'}
         </button>
@@ -484,7 +484,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keyword
       {result?.data && result.data.keywords.length > 0 && (
         <div className="flex items-center gap-3 flex-wrap rounded-lg bg-emerald-50 border border-emerald-200 p-3">
           <button onClick={() => onNext(niche.trim(), city.trim(), selectedKws)}
-            className="rounded-md bg-indigo-600 hover:bg-indigo-700 px-4 py-2 text-sm text-white font-medium transition-colors">
+            className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-4 py-2 text-sm text-white font-medium transition-colors">
             Prochaine étape : bâtir le site →
           </button>
           <span className="text-xs text-[#3D6B4A]">
@@ -573,7 +573,7 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
 
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={launch} disabled={!ready || pending}
-          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed
+          className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-40 disabled:cursor-not-allowed
                      px-4 py-2 text-sm text-white transition-colors">
           {pending ? 'Scan en cours…' : simulate ? 'Tester (fixtures)' : 'Lancer le scan réel'}
         </button>
@@ -640,7 +640,7 @@ function GenPanel({ initialName, initialCity, initialKeywords, nicheSite }: { in
       </label>
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={launch} disabled={pending}
-          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 text-sm text-white transition-colors">
+          className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 text-sm text-white transition-colors">
           {pending ? 'Génération…' : simulate ? 'Générer (fictif, gratuit)' : 'Générer le config (IA)'}
         </button>
         <span className="text-xs text-[#a3a3a3]">
@@ -818,7 +818,7 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
       </div>
 
       <button onClick={launch} disabled={pending || !siteId}
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 px-5 py-2
+        className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-50 px-5 py-2
                    text-sm font-medium text-white transition-colors">
         Lancer la soumission
       </button>
@@ -931,7 +931,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
       </div>
 
       <button onClick={launch} disabled={pending || !siteId}
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 px-5 py-2
+        className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-50 px-5 py-2
                    text-sm font-medium text-white transition-colors">
         Tracker les positions
       </button>
@@ -1027,7 +1027,7 @@ function CronPanel() {
 
       <button onClick={launch} disabled={pending}
         className={`rounded-md px-5 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50
-          ${dryRun ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
+          ${dryRun ? 'bg-[#5701f3] hover:bg-[#4801cc]' : 'bg-[#5701f3] hover:bg-[#4801cc]'}`}>
         {dryRun ? 'Simuler le cron' : '🚀 Lancer le cron (réel)'}
       </button>
 

@@ -71,7 +71,7 @@ export default async function LoginPage({
 
             <button
               type="submit"
-              className="w-full rounded-md bg-indigo-600 hover:bg-indigo-700 px-4 py-2
+              className="w-full rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-4 py-2
                          text-sm font-medium text-white transition-colors"
             >
               Se connecter

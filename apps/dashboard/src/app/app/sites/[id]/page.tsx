@@ -122,7 +122,7 @@ export default async function SiteDetailPage({
               </select>
               <button
                 type="submit"
-                className="rounded bg-indigo-600 hover:bg-indigo-700 px-3 text-sm text-white transition-colors"
+                className="rounded bg-[#5701f3] hover:bg-[#4801cc] px-3 text-sm text-white transition-colors"
               >
                 OK
               </button>
