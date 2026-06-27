@@ -52,10 +52,10 @@ export function SitesTable({ sites }: { sites: SiteRow[] }) {
         <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[820px]">
           <thead>
-            <tr className="border-b border-[#D9D7F0] text-left bg-[#F5F4FF]">
+            <tr className="border-b border-[#e5e5e5] text-left bg-[#fafafa]">
               <th className="px-3 py-2.5 w-10">
                 <input type="checkbox" checked={allChecked} onChange={toggleAll}
-                  className="rounded border-[#D9D7F0] text-indigo-600" aria-label="Tout sélectionner" />
+                  className="rounded border-[#e5e5e5] text-indigo-600" aria-label="Tout sélectionner" />
               </th>
               <th className="px-4 py-2.5 label">Domaine</th>
               <th className="px-3 py-2.5 label">Type</th>
@@ -68,48 +68,48 @@ export function SitesTable({ sites }: { sites: SiteRow[] }) {
               <th className="px-3 py-2.5 label text-right">Loyer/mois</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#EAE8F8]">
+          <tbody className="divide-y divide-[#f0f0f0]">
             {sites.length === 0 ? (
-              <tr><td colSpan={10} className="px-4 py-8 text-center text-[#9A97C0]">Aucun site trouvé.</td></tr>
+              <tr><td colSpan={10} className="px-4 py-8 text-center text-[#a3a3a3]">Aucun site trouvé.</td></tr>
             ) : sites.map(s => {
               const checked = sel.has(s.id);
               return (
-              <tr key={s.id} className={`transition-colors ${checked ? 'bg-indigo-50' : 'hover:bg-[#F5F4FF]'}`}>
+              <tr key={s.id} className={`transition-colors ${checked ? 'bg-indigo-50' : 'hover:bg-[#fafafa]'}`}>
                 <td className="px-3 py-2.5">
                   <input type="checkbox" checked={checked} onChange={() => toggle(s.id)}
-                    className="rounded border-[#D9D7F0] text-indigo-600" aria-label={`Sélectionner ${s.domain ?? s.id}`} />
+                    className="rounded border-[#e5e5e5] text-indigo-600" aria-label={`Sélectionner ${s.domain ?? s.id}`} />
                 </td>
                 <td className="px-4 py-2.5">
                   <Link href={`/app/sites/${s.id}`} className="mono text-indigo-600 hover:text-indigo-800">
-                    {s.domain ?? <span className="text-[#9A97C0] italic">sans domaine</span>}
+                    {s.domain ?? <span className="text-[#a3a3a3] italic">sans domaine</span>}
                   </Link>
                 </td>
                 <td className="px-3 py-2.5"><Badge value={s.type} /></td>
-                <td className="px-3 py-2.5 text-[#3D3D6B] text-xs">
+                <td className="px-3 py-2.5 text-[#404040] text-xs">
                   <span className="font-medium">{s.niche}</span>
-                  <span className="text-[#9A97C0] ml-1">· {s.city}</span>
+                  <span className="text-[#a3a3a3] ml-1">· {s.city}</span>
                 </td>
                 <td className="px-3 py-2.5"><Badge value={s.status} /></td>
-                <td className="px-3 py-2.5 text-right mono text-[#3D3D6B]">
+                <td className="px-3 py-2.5 text-right mono text-[#404040]">
                   {s.top_volume != null
-                    ? <>{s.top_volume.toLocaleString('fr-CA')}<span className="text-[#C0BDE0] text-xs"> · {s.keyword_count} mc</span></>
-                    : <span className="text-[#C0BDE0]">—</span>}
+                    ? <>{s.top_volume.toLocaleString('fr-CA')}<span className="text-[#d4d4d4] text-xs"> · {s.keyword_count} mc</span></>
+                    : <span className="text-[#d4d4d4]">—</span>}
                 </td>
                 <td className="px-3 py-2.5 text-right mono">
                   {s.niche_score != null
                     ? <span className="text-indigo-600 font-medium">{Math.round(s.niche_score).toLocaleString('fr-CA')}</span>
-                    : <span className="text-[#C0BDE0]">—</span>}
+                    : <span className="text-[#d4d4d4]">—</span>}
                 </td>
-                <td className="px-3 py-2.5 text-right mono text-[#3D3D6B]">
-                  {s.leads_month > 0 ? s.leads_month : <span className="text-[#C0BDE0]">—</span>}
+                <td className="px-3 py-2.5 text-right mono text-[#404040]">
+                  {s.leads_month > 0 ? s.leads_month : <span className="text-[#d4d4d4]">—</span>}
                 </td>
                 <td className="px-3 py-2.5 text-right mono">
                   {s.best_position != null
                     ? <span className="text-emerald-600 font-medium">#{s.best_position}</span>
-                    : <span className="text-[#C0BDE0]">—</span>}
+                    : <span className="text-[#d4d4d4]">—</span>}
                 </td>
-                <td className="px-3 py-2.5 text-right mono text-[#3D3D6B]">
-                  {s.monthly_rent != null ? `$${s.monthly_rent}/m` : <span className="text-[#C0BDE0]">—</span>}
+                <td className="px-3 py-2.5 text-right mono text-[#404040]">
+                  {s.monthly_rent != null ? `$${s.monthly_rent}/m` : <span className="text-[#d4d4d4]">—</span>}
                 </td>
               </tr>
               );

@@ -10,8 +10,8 @@ const config: Config = {
         mono: ['var(--font-geist-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
-        app: '#f7f7fb',   // fond premium très léger
-        ink: '#18181b',   // texte quasi-noir
+        app: '#fafafa',   // fond neutre (aligné sur la landing)
+        ink: '#0a0a0a',   // texte noir (aligné sur la landing)
         // Palette de marque — violet #5701f3 (style SiteDrop)
         brand: {
           50:  '#f0ebfe',

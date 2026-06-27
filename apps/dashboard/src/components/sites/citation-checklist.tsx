@@ -50,14 +50,14 @@ export function CitationChecklist({ siteId }: { siteId: string }) {
         }`}>{count}/{ALL.length}</span>
       </div>
 
-      <div className="h-1.5 w-full rounded bg-[#EEEDF9] mb-3 overflow-hidden">
+      <div className="h-1.5 w-full rounded bg-[#f5f5f5] mb-3 overflow-hidden">
         <div className="h-full rounded bg-indigo-500 transition-all" style={{ width: `${pct}%` }} />
       </div>
 
       <div className="space-y-3">
         {GROUPS.map(g => (
           <div key={g.group}>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#9A97C0] mb-1">{g.group}</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#a3a3a3] mb-1">{g.group}</p>
             <ul className="space-y-1">
               {g.items.map(i => (
                 <li key={i}>
@@ -66,9 +66,9 @@ export function CitationChecklist({ siteId }: { siteId: string }) {
                       type="checkbox"
                       checked={!!done[i]}
                       onChange={() => toggle(i)}
-                      className="rounded border-[#D9D7F0] text-indigo-600 focus:ring-indigo-500"
+                      className="rounded border-[#e5e5e5] text-indigo-600 focus:ring-indigo-500"
                     />
-                    <span className={done[i] ? 'line-through text-[#9A97C0]' : 'text-[#1C1560]'}>{i}</span>
+                    <span className={done[i] ? 'line-through text-[#a3a3a3]' : 'text-[#0a0a0a]'}>{i}</span>
                   </label>
                 </li>
               ))}
@@ -77,8 +77,8 @@ export function CitationChecklist({ siteId }: { siteId: string }) {
         ))}
       </div>
 
-      <p className="text-[11px] text-[#B0ADCC] mt-3">
-        Règle d'or : <span className="font-medium text-[#9A97C0]">même Nom · Adresse · Téléphone</span> partout.
+      <p className="text-[11px] text-[#a3a3a3] mt-3">
+        Règle d'or : <span className="font-medium text-[#a3a3a3]">même Nom · Adresse · Téléphone</span> partout.
       </p>
     </div>
   );

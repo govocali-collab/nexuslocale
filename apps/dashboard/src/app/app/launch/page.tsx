@@ -22,7 +22,7 @@ export default async function LaunchPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold text-[#1C1560]">Lanceur d'actions</h1>
+      <h1 className="text-lg font-semibold text-[#0a0a0a]">Lanceur d'actions</h1>
 
       {/* ── Files d'attente ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
@@ -36,13 +36,13 @@ export default async function LaunchPage({
             }`}>{queues.toSubmit.length}</span>
           </div>
           {queues.toSubmit.length === 0 ? (
-            <p className="text-xs text-[#9A97C0]">Aucun site en attente. ✓</p>
+            <p className="text-xs text-[#a3a3a3]">Aucun site en attente. ✓</p>
           ) : (
             <ul className="space-y-1.5">
               {queues.toSubmit.map(s => (
                 <li key={s.id} className="flex items-center justify-between">
-                  <span className="text-xs mono text-[#1C1560] truncate">{s.domain ?? s.niche}</span>
-                  <span className="text-xs text-[#9A97C0] ml-2 shrink-0">{s.city}</span>
+                  <span className="text-xs mono text-[#0a0a0a] truncate">{s.domain ?? s.niche}</span>
+                  <span className="text-xs text-[#a3a3a3] ml-2 shrink-0">{s.city}</span>
                 </li>
               ))}
             </ul>
@@ -58,13 +58,13 @@ export default async function LaunchPage({
             }`}>{queues.toRank.length}</span>
           </div>
           {queues.toRank.length === 0 ? (
-            <p className="text-xs text-[#9A97C0]">Tous les sites sont trackés. ✓</p>
+            <p className="text-xs text-[#a3a3a3]">Tous les sites sont trackés. ✓</p>
           ) : (
             <ul className="space-y-1.5">
               {queues.toRank.map(s => (
                 <li key={s.id} className="flex items-center justify-between">
-                  <span className="text-xs mono text-[#1C1560] truncate">{s.domain ?? s.niche}</span>
-                  <span className="text-xs text-[#9A97C0] ml-2 shrink-0">{s.city}</span>
+                  <span className="text-xs mono text-[#0a0a0a] truncate">{s.domain ?? s.niche}</span>
+                  <span className="text-xs text-[#a3a3a3] ml-2 shrink-0">{s.city}</span>
                 </li>
               ))}
             </ul>
@@ -80,12 +80,12 @@ export default async function LaunchPage({
             }`}>{queues.stale.length}</span>
           </div>
           {queues.stale.length === 0 ? (
-            <p className="text-xs text-[#9A97C0]">Aucun site stagnant. ✓</p>
+            <p className="text-xs text-[#a3a3a3]">Aucun site stagnant. ✓</p>
           ) : (
             <ul className="space-y-1.5">
               {queues.stale.map(s => (
                 <li key={s.id} className="flex items-center justify-between">
-                  <span className="text-xs mono text-[#1C1560] truncate">{s.domain ?? s.id.slice(0, 8)}</span>
+                  <span className="text-xs mono text-[#0a0a0a] truncate">{s.domain ?? s.id.slice(0, 8)}</span>
                   <span className="text-xs text-red-500 shrink-0 ml-2">{s.weeksOld} sem</span>
                 </li>
               ))}

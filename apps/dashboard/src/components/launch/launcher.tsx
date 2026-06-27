@@ -24,15 +24,15 @@ type TabId = (typeof TABS)[number]['id'];
 
 function Output({ out, ok, pending }: { out: string; ok: boolean; pending: boolean }) {
   if (pending) return (
-    <div className="mt-4 rounded-lg bg-[#F5F4FF] border border-[#D9D7F0] px-4 py-3 text-sm text-[#6B6B9E] flex items-center gap-2">
+    <div className="mt-4 rounded-lg bg-[#fafafa] border border-[#e5e5e5] px-4 py-3 text-sm text-[#525252] flex items-center gap-2">
       <span className="inline-block w-3 h-3 rounded-full bg-indigo-400 animate-pulse" />
       En cours…
     </div>
   );
   if (!out) return null;
   return (
-    <div className={`mt-4 rounded-lg border px-4 py-3 ${ok ? 'bg-[#F5F4FF] border-[#D9D7F0]' : 'bg-red-50 border-red-200'}`}>
-      <pre className={`text-xs whitespace-pre-wrap font-mono leading-relaxed ${ok ? 'text-[#1C1560]' : 'text-red-700'}`}>
+    <div className={`mt-4 rounded-lg border px-4 py-3 ${ok ? 'bg-[#fafafa] border-[#e5e5e5]' : 'bg-red-50 border-red-200'}`}>
+      <pre className={`text-xs whitespace-pre-wrap font-mono leading-relaxed ${ok ? 'text-[#0a0a0a]' : 'text-red-700'}`}>
         {out}
       </pre>
     </div>
@@ -43,22 +43,22 @@ function Output({ out, ok, pending }: { out: string; ok: boolean; pending: boole
 const fmtNum = (n: number | null) => (n == null ? '—' : n.toLocaleString('fr-CA'));
 const fmtCpc = (n: number | null) => (n == null ? '—' : `$${n.toFixed(2)}`);
 
-const TH = 'px-3 py-2 font-medium text-[#3D3D6B]';
-const TD = 'px-3 py-2 border-t border-[#EEEDF9]';
+const TH = 'px-3 py-2 font-medium text-[#404040]';
+const TD = 'px-3 py-2 border-t border-[#f5f5f5]';
 
 function Badge({ text, cls }: { text: string; cls: string }) {
   return <span className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${cls}`}>{text}</span>;
 }
 
 function kdCls(kd: number | null) {
-  if (kd == null) return 'bg-[#EEEDF9] text-[#9A97C0]';
+  if (kd == null) return 'bg-[#f5f5f5] text-[#a3a3a3]';
   return kd <= 30 ? 'bg-green-100 text-green-700' : kd <= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
 }
 
 // CPC : plus c'est élevé, plus le client vaut cher → vert = vaut la peine.
 function cpcCls(cpc: number | null) {
-  if (cpc == null || cpc <= 0) return 'bg-[#EEEDF9] text-[#9A97C0]';
-  return cpc >= 10 ? 'bg-green-100 text-green-700' : cpc >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-[#EEEDF9] text-[#6B6B9E]';
+  if (cpc == null || cpc <= 0) return 'bg-[#f5f5f5] text-[#a3a3a3]';
+  return cpc >= 10 ? 'bg-green-100 text-green-700' : cpc >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-[#f5f5f5] text-[#525252]';
 }
 
 type KwSortKey = 'keyword' | 'search_volume' | 'cpc' | 'keyword_difficulty' | 'score';
@@ -95,30 +95,30 @@ function KeywordTable({ result, selected, onToggle }: { result: FinderResult; se
   }
   const arrow = (key: KwSortKey) => sort.key === key ? (sort.dir === 'desc' ? ' ↓' : ' ↑') : '';
   const hasFilter = q !== '' || minVol !== '' || maxKd !== '';
-  const inputCls = 'rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-2 py-1 placeholder-[#9A97C0]';
+  const inputCls = 'rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-2 py-1 placeholder-[#a3a3a3]';
 
   return (
     <div className="mt-4 space-y-3">
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-sm font-medium text-[#1C1560]">{rows.length} / {result.keywords.length} mot(s)-clé</span>
+        <span className="text-sm font-medium text-[#0a0a0a]">{rows.length} / {result.keywords.length} mot(s)-clé</span>
         <Badge text={`Niche score ${result.niche_score}`} cls="bg-indigo-100 text-indigo-700" />
         <button
           onClick={() => setShowHelp(h => !h)}
           aria-label="Comprendre les colonnes"
           className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold transition-colors ${
-            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#EEEDF9] text-[#6B6B9E] hover:bg-indigo-100 hover:text-indigo-700'
+            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#f5f5f5] text-[#525252] hover:bg-indigo-100 hover:text-indigo-700'
           }`}
         >?</button>
       </div>
 
       {/* Encadré d'aide */}
       {showHelp && (
-        <div className="rounded-lg border border-[#D9D7F0] bg-[#F5F4FF] p-3 text-sm space-y-1.5">
-          <p><span className="font-semibold text-[#1C1560]">Volume</span> <span className="text-[#6B6B9E]">— combien de fois ce mot-clé est cherché par mois (au Québec). Gros = beaucoup de monde cherche. ⚠️ Peu fiable en local.</span></p>
-          <p><span className="font-semibold text-[#1C1560]">CPC</span> <span className="text-[#6B6B9E]">— ce qu'un annonceur paie par clic. 🟢 Élevé = un client vaut cher. <strong>Ton meilleur indicateur.</strong></span></p>
-          <p><span className="font-semibold text-[#1C1560]">KD</span> <span className="text-[#6B6B9E]">— difficulté à ranker (0-100). 🟢 Bas (≤30) = facile à atteindre le top de Google.</span></p>
-          <p><span className="font-semibold text-[#1C1560]">Score</span> <span className="text-[#6B6B9E]">— note globale = valeur × demande ÷ difficulté. Plus haut = meilleure opportunité.</span></p>
-          <p className="pt-1 text-[#1C1560]">👉 <strong>Le combo gagnant : CPC 🟢 vert + KD 🟢 vert.</strong></p>
+        <div className="rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-3 text-sm space-y-1.5">
+          <p><span className="font-semibold text-[#0a0a0a]">Volume</span> <span className="text-[#525252]">— combien de fois ce mot-clé est cherché par mois (au Québec). Gros = beaucoup de monde cherche. ⚠️ Peu fiable en local.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">CPC</span> <span className="text-[#525252]">— ce qu'un annonceur paie par clic. 🟢 Élevé = un client vaut cher. <strong>Ton meilleur indicateur.</strong></span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">KD</span> <span className="text-[#525252]">— difficulté à ranker (0-100). 🟢 Bas (≤30) = facile à atteindre le top de Google.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Score</span> <span className="text-[#525252]">— note globale = valeur × demande ÷ difficulté. Plus haut = meilleure opportunité.</span></p>
+          <p className="pt-1 text-[#0a0a0a]">👉 <strong>Le combo gagnant : CPC 🟢 vert + KD 🟢 vert.</strong></p>
         </div>
       )}
 
@@ -132,13 +132,13 @@ function KeywordTable({ result, selected, onToggle }: { result: FinderResult; se
           className={`${inputCls} w-24`} />
         {hasFilter && (
           <button onClick={() => { setQ(''); setMinVol(''); setMaxKd(''); }}
-            className="text-xs text-[#9A97C0] hover:text-[#1C1560] underline">Réinitialiser</button>
+            className="text-xs text-[#a3a3a3] hover:text-[#0a0a0a] underline">Réinitialiser</button>
         )}
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+      <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
         <table className="w-full text-sm">
-          <thead className="bg-[#F5F4FF]">
+          <thead className="bg-[#fafafa]">
             <tr>
               <th className={`${TH} w-8`}></th>
               {([
@@ -150,10 +150,10 @@ function KeywordTable({ result, selected, onToggle }: { result: FinderResult; se
               ] as [KwSortKey, string, string][]).map(([key, label, align]) => (
                 <th key={key} className={`${align} ${TH} whitespace-nowrap`}>
                   <button onClick={() => toggleSort(key)}
-                    className="cursor-pointer select-none hover:text-[#1C1560] font-medium">{label}{arrow(key)}</button>
+                    className="cursor-pointer select-none hover:text-[#0a0a0a] font-medium">{label}{arrow(key)}</button>
                   {key !== 'keyword' && (
                     <button onClick={() => setShowHelp(true)} aria-label={`Aide : ${label}`}
-                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#EEEDF9] text-[#9A97C0] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
+                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#f5f5f5] text-[#a3a3a3] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
                   )}
                 </th>
               ))}
@@ -164,20 +164,20 @@ function KeywordTable({ result, selected, onToggle }: { result: FinderResult; se
               const isSel = selected.includes(k.keyword);
               return (
               <tr key={k.keyword + i} onClick={() => onToggle(k.keyword)}
-                className={`cursor-pointer ${isSel ? 'bg-indigo-50' : 'hover:bg-[#FAFAFF]'}`}>
+                className={`cursor-pointer ${isSel ? 'bg-indigo-50' : 'hover:bg-[#fafafa]'}`}>
                 <td className={`${TD} text-center`}>
-                  <span className={`inline-flex items-center justify-center h-4 w-4 rounded border-2 align-middle text-white text-[10px] font-bold ${isSel ? 'border-indigo-600 bg-indigo-600' : 'border-[#C0BDE0]'}`}>{isSel ? '✓' : ''}</span>
+                  <span className={`inline-flex items-center justify-center h-4 w-4 rounded border-2 align-middle text-white text-[10px] font-bold ${isSel ? 'border-indigo-600 bg-indigo-600' : 'border-[#d4d4d4]'}`}>{isSel ? '✓' : ''}</span>
                 </td>
-                <td className={`${TD} text-[#1C1560] ${isSel ? 'font-semibold' : ''}`}>{k.keyword}</td>
-                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{fmtNum(k.search_volume)}</td>
+                <td className={`${TD} text-[#0a0a0a] ${isSel ? 'font-semibold' : ''}`}>{k.keyword}</td>
+                <td className={`${TD} text-right tabular-nums text-[#404040]`}>{fmtNum(k.search_volume)}</td>
                 <td className={`${TD} text-right`}><Badge text={fmtCpc(k.cpc)} cls={cpcCls(k.cpc)} /></td>
                 <td className={`${TD} text-center`}><Badge text={k.keyword_difficulty == null ? '—' : String(k.keyword_difficulty)} cls={kdCls(k.keyword_difficulty)} /></td>
-                <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
+                <td className={`${TD} text-right tabular-nums font-semibold text-[#0a0a0a]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
               </tr>
               );
             })}
             {rows.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-6 text-center text-[#9A97C0]">
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-[#a3a3a3]">
                 {result.keywords.length === 0
                   ? "Le scan n'a trouvé aucun mot-clé — vérifie l'orthographe de la niche (ex. « ostéopathe », pas « ostéoathe »)."
                   : 'Aucun mot-clé ne correspond aux filtres.'}
@@ -194,15 +194,15 @@ function DomainCard({ candidates }: { candidates: FinderDomain[] }) {
   const available = candidates.filter(d => d.available);
   const taken     = candidates.filter(d => !d.available);
   return (
-    <div className="rounded-lg border border-[#D9D7F0] bg-white p-4">
+    <div className="rounded-lg border border-[#e5e5e5] bg-white p-4">
       <p className="label mb-2">🌐 Domaines disponibles ({available.length})</p>
       {available.length === 0 ? (
-        <p className="text-sm text-[#9A97C0]">Aucun domaine exact disponible — essaie une variante de niche/ville.</p>
+        <p className="text-sm text-[#a3a3a3]">Aucun domaine exact disponible — essaie une variante de niche/ville.</p>
       ) : (
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
           {available.map(d => (
-            <li key={d.domain} className="flex items-center justify-between rounded-md bg-[#F5F4FF] px-3 py-1.5">
-              <span className="mono text-sm text-[#1C1560]">{d.domain}</span>
+            <li key={d.domain} className="flex items-center justify-between rounded-md bg-[#fafafa] px-3 py-1.5">
+              <span className="mono text-sm text-[#0a0a0a]">{d.domain}</span>
               <span className="text-xs text-emerald-600 font-medium whitespace-nowrap">
                 {d.price_usd ? `$${d.price_usd.toFixed(2)}/an` : 'dispo'}
               </span>
@@ -211,10 +211,10 @@ function DomainCard({ candidates }: { candidates: FinderDomain[] }) {
         </ul>
       )}
       {taken.length > 0 && (
-        <p className="text-xs text-[#C0BDE0] mt-2">Déjà pris : {taken.map(d => d.domain).join(' · ')}</p>
+        <p className="text-xs text-[#d4d4d4] mt-2">Déjà pris : {taken.map(d => d.domain).join(' · ')}</p>
       )}
       {available.length > 0 && (
-        <p className="text-[11px] text-[#9A97C0] mt-2">
+        <p className="text-[11px] text-[#a3a3a3] mt-2">
           Pour réserver : <span className="mono">finder buy {available[0]?.domain}</span> (achat ~13 $).
         </p>
       )}
@@ -225,7 +225,7 @@ function DomainCard({ candidates }: { candidates: FinderDomain[] }) {
 const PRESENCE: Record<string, { label: string; cls: string }> = {
   none:        { label: 'Aucun site',   cls: 'bg-red-100 text-red-700' },
   social_only: { label: 'Réseaux soc.', cls: 'bg-amber-100 text-amber-700' },
-  has_site:    { label: 'A un site',    cls: 'bg-[#EEEDF9] text-[#3D3D6B]' },
+  has_site:    { label: 'A un site',    cls: 'bg-[#f5f5f5] text-[#404040]' },
 };
 function painCls(s: number) {
   return s >= 50 ? 'bg-red-100 text-red-700' : s >= 20 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
@@ -270,7 +270,7 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
   }
   const arrow = (key: ProSortKey) => sort.key === key ? (sort.dir === 'desc' ? ' ↓' : ' ↑') : '';
   const hasFilter = q !== '' || presence !== '' || minPain !== '' || minReviews !== '';
-  const inputCls = 'rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-2 py-1 placeholder-[#9A97C0]';
+  const inputCls = 'rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-2 py-1 placeholder-[#a3a3a3]';
 
   const HEADERS: { key?: ProSortKey; label: string; align: string; help?: boolean }[] = [
     { key: 'business_name',  label: 'Entreprise',   align: 'text-left' },
@@ -286,23 +286,23 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
   return (
     <div className="mt-4 space-y-3">
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-sm font-medium text-[#1C1560]">{rows.length} / {result.prospects.length} prospect(s)</span>
+        <span className="text-sm font-medium text-[#0a0a0a]">{rows.length} / {result.prospects.length} prospect(s)</span>
         <button
           onClick={() => setShowHelp(h => !h)}
           aria-label="Comprendre les colonnes"
           className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold transition-colors ${
-            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#EEEDF9] text-[#6B6B9E] hover:bg-indigo-100 hover:text-indigo-700'
+            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#f5f5f5] text-[#525252] hover:bg-indigo-100 hover:text-indigo-700'
           }`}
         >?</button>
       </div>
 
       {showHelp && (
-        <div className="rounded-lg border border-[#D9D7F0] bg-[#F5F4FF] p-3 text-sm space-y-1.5">
-          <p><span className="font-semibold text-[#1C1560]">Note / Avis</span> <span className="text-[#6B6B9E]">— sa note Google (étoiles) et son nombre d'avis. Beaucoup d'avis = commerce établi et occupé.</span></p>
-          <p><span className="font-semibold text-[#1C1560]">Présence web</span> <span className="text-[#6B6B9E]">— a-t-il un site? 🔴 « Aucun site » = facile à dépasser sur Google.</span></p>
-          <p><span className="font-semibold text-[#1C1560]">Pain</span> <span className="text-[#6B6B9E]">— à quel point son site est faible/absent (0-100). 🔴 Élevé = mauvais ou pas de site → facile à dépasser ET client affamé.</span></p>
-          <p><span className="font-semibold text-[#1C1560]">Score</span> <span className="text-[#6B6B9E]">— à quel point c'est un <strong>bon prospect à contacter</strong> = commerce réputé (avis + note) <strong>mais</strong> site faible. Plus haut = à appeler en premier.</span></p>
-          <p className="pt-1 text-[#1C1560]">👉 <strong>Le prospect en or : beaucoup d'avis + Pain 🔴 élevé</strong> (un vrai bon commerce sans bon site).</p>
+        <div className="rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-3 text-sm space-y-1.5">
+          <p><span className="font-semibold text-[#0a0a0a]">Note / Avis</span> <span className="text-[#525252]">— sa note Google (étoiles) et son nombre d'avis. Beaucoup d'avis = commerce établi et occupé.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Présence web</span> <span className="text-[#525252]">— a-t-il un site? 🔴 « Aucun site » = facile à dépasser sur Google.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Pain</span> <span className="text-[#525252]">— à quel point son site est faible/absent (0-100). 🔴 Élevé = mauvais ou pas de site → facile à dépasser ET client affamé.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Score</span> <span className="text-[#525252]">— à quel point c'est un <strong>bon prospect à contacter</strong> = commerce réputé (avis + note) <strong>mais</strong> site faible. Plus haut = à appeler en premier.</span></p>
+          <p className="pt-1 text-[#0a0a0a]">👉 <strong>Le prospect en or : beaucoup d'avis + Pain 🔴 élevé</strong> (un vrai bon commerce sans bon site).</p>
         </div>
       )}
 
@@ -322,22 +322,22 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
           className={`${inputCls} w-24`} />
         {hasFilter && (
           <button onClick={() => { setQ(''); setPresence(''); setMinPain(''); setMinReviews(''); }}
-            className="text-xs text-[#9A97C0] hover:text-[#1C1560] underline">Réinitialiser</button>
+            className="text-xs text-[#a3a3a3] hover:text-[#0a0a0a] underline">Réinitialiser</button>
         )}
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+      <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
         <table className="w-full text-sm">
-          <thead className="bg-[#F5F4FF]">
+          <thead className="bg-[#fafafa]">
             <tr>
               {HEADERS.map(h => (
                 <th key={h.label} className={`${h.align} ${TH} whitespace-nowrap`}>
                   {h.key
-                    ? <button onClick={() => toggleSort(h.key as ProSortKey)} className="cursor-pointer select-none hover:text-[#1C1560] font-medium">{h.label}{arrow(h.key)}</button>
+                    ? <button onClick={() => toggleSort(h.key as ProSortKey)} className="cursor-pointer select-none hover:text-[#0a0a0a] font-medium">{h.label}{arrow(h.key)}</button>
                     : <span className="font-medium">{h.label}</span>}
                   {h.help && (
                     <button onClick={() => setShowHelp(true)} aria-label={`Aide : ${h.label}`}
-                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#EEEDF9] text-[#9A97C0] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
+                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#f5f5f5] text-[#a3a3a3] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
                   )}
                 </th>
               ))}
@@ -345,18 +345,18 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
           </thead>
           <tbody>
             {rows.map((p, i) => {
-              const pres = PRESENCE[p.web_presence] ?? { label: p.web_presence, cls: 'bg-[#EEEDF9] text-[#3D3D6B]' };
+              const pres = PRESENCE[p.web_presence] ?? { label: p.web_presence, cls: 'bg-[#f5f5f5] text-[#404040]' };
               return (
-                <tr key={p.business_name + i} className="hover:bg-[#FAFAFF] align-top">
-                  <td className={`${TD} text-[#1C1560] font-medium`}>
+                <tr key={p.business_name + i} className="hover:bg-[#fafafa] align-top">
+                  <td className={`${TD} text-[#0a0a0a] font-medium`}>
                     {p.business_name}
                     {onPick && (
                       <button onClick={() => onPick(p.business_name)}
                         className="block mt-0.5 text-[11px] font-normal text-indigo-600 hover:text-indigo-800">→ Générer le site pour ce commerce</button>
                     )}
                   </td>
-                  <td className={`${TD} text-center text-[#3D3D6B] whitespace-nowrap`}>{p.rating != null ? `⭐ ${p.rating.toFixed(1)}` : '—'}</td>
-                  <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.review_count ?? '—'}</td>
+                  <td className={`${TD} text-center text-[#404040] whitespace-nowrap`}>{p.rating != null ? `⭐ ${p.rating.toFixed(1)}` : '—'}</td>
+                  <td className={`${TD} text-right tabular-nums text-[#404040]`}>{p.review_count ?? '—'}</td>
                   <td className={TD}>
                     <div className="flex items-center gap-1.5">
                       <Badge text={pres.label} cls={pres.cls} />
@@ -381,13 +381,13 @@ function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: 
                     </div>
                   </td>
                   <td className={`${TD} text-center`}><Badge text={`${painEmoji(p.pain_score)} ${p.pain_score}`} cls={painCls(p.pain_score)} /></td>
-                  <td className={`${TD} text-right tabular-nums font-semibold text-[#1C1560]`}>{p.prospect_score}</td>
-                  <td className={`${TD} text-xs text-[#6B6B9E] max-w-[18rem]`}>{p.detected_issues.slice(0, 3).join(', ') || '—'}</td>
-                  <td className={`${TD} text-[#3D3D6B] whitespace-nowrap`}>{p.phone ?? '—'}</td>
+                  <td className={`${TD} text-right tabular-nums font-semibold text-[#0a0a0a]`}>{p.prospect_score}</td>
+                  <td className={`${TD} text-xs text-[#525252] max-w-[18rem]`}>{p.detected_issues.slice(0, 3).join(', ') || '—'}</td>
+                  <td className={`${TD} text-[#404040] whitespace-nowrap`}>{p.phone ?? '—'}</td>
                 </tr>
               );
             })}
-            {rows.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-[#9A97C0]">Aucun prospect ne correspond aux filtres.</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-[#a3a3a3]">Aucun prospect ne correspond aux filtres.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -399,7 +399,7 @@ function RawLogs({ out, ok }: { out: string; ok: boolean }) {
   if (!out) return null;
   return (
     <details className="mt-3">
-      <summary className="text-xs text-[#9A97C0] cursor-pointer hover:text-[#6B6B9E]">Voir les logs bruts</summary>
+      <summary className="text-xs text-[#a3a3a3] cursor-pointer hover:text-[#525252]">Voir les logs bruts</summary>
       <Output out={out} ok={ok} pending={false} />
     </details>
   );
@@ -440,31 +440,31 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keyword
         <div>
           <label className="label block mb-1">Niche</label>
           <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="plombier"
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
-                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
         <div>
           <label className="label block mb-1">Ville</label>
           <input value={city} onChange={e => setCity(e.target.value)} placeholder="Brossard"
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
-                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
       </div>
       <div className="flex items-center gap-4 flex-wrap">
         <div>
           <label className="label block mb-1">Limite mots-clés</label>
           <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} min={10} max={500}
-            className="w-28 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+            className="w-28 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5" />
         </div>
         <div>
           <label className="label block mb-1">KD max</label>
           <input type="number" value={maxKd} onChange={e => setMaxKd(Number(e.target.value))} min={0} max={100}
-            className="w-24 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+            className="w-24 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5" />
         </div>
         <label className="flex items-center gap-2 cursor-pointer mt-4">
           <input type="checkbox" checked={estimate} onChange={e => setEstimate(e.target.checked)}
-            className="rounded border-[#D9D7F0] text-indigo-600" />
-          <span className="text-sm text-[#3D3D6B]">--estimate (données simulées, gratuit)</span>
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">--estimate (données simulées, gratuit)</span>
         </label>
       </div>
 
@@ -474,7 +474,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keyword
                      px-4 py-2 text-sm text-white transition-colors">
           {pending ? 'Scan en cours…' : estimate ? 'Estimer (gratuit)' : 'Lancer le scan réel'}
         </button>
-        <span className="text-xs text-[#9A97C0]">
+        <span className="text-xs text-[#a3a3a3]">
           {estimate
             ? 'Mode simulé — aucun appel API, aucun coût.'
             : 'Appel DataForSEO réel — ~$0.003 en crédits. Crée le site dans Supabase.'}
@@ -538,36 +538,36 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
         <div>
           <label className="label block mb-1">Niche</label>
           <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="dégât d'eau"
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
-                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
         <div>
           <label className="label block mb-1">Ville</label>
           <input value={city} onChange={e => setCity(e.target.value)} placeholder="Brossard QC"
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
-                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
       </div>
       <div className="flex items-center gap-4 flex-wrap">
         <div>
           <label className="label block mb-1">Limite entreprises</label>
           <input type="number" value={limit} onChange={e => setLimit(e.target.value)} min={1} max={200} placeholder="60"
-            className="w-28 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0]" />
+            className="w-28 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3]" />
         </div>
         <div>
           <label className="label block mb-1">Avis min.</label>
           <input type="number" value={minReviews} onChange={e => setMinReviews(e.target.value)} min={0} max={500} placeholder="0"
-            className="w-24 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0]" />
+            className="w-24 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3]" />
         </div>
         <label className="flex items-center gap-2 cursor-pointer mt-4">
           <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
-            className="rounded border-[#D9D7F0] text-indigo-600" />
-          <span className="text-sm text-[#3D3D6B]">--simulate (fixtures, gratuit)</span>
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">--simulate (fixtures, gratuit)</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer mt-4" title="Claude ouvre les sites « a un site » et juge vieux/cassé">
           <input type="checkbox" checked={judge} onChange={e => setJudge(e.target.checked)}
-            className="rounded border-[#D9D7F0] text-indigo-600" />
-          <span className="text-sm text-[#3D3D6B]">🤖 Analyse IA des sites</span>
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">🤖 Analyse IA des sites</span>
         </label>
       </div>
 
@@ -577,7 +577,7 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
                      px-4 py-2 text-sm text-white transition-colors">
           {pending ? 'Scan en cours…' : simulate ? 'Tester (fixtures)' : 'Lancer le scan réel'}
         </button>
-        <span className="text-xs text-[#9A97C0]">
+        <span className="text-xs text-[#a3a3a3]">
           {simulate
             ? 'Mode fixtures — aucun appel API, aucun coût.'
             : `Appel Google Places réel — ~$${estCost} en crédits. Écrit les prospects dans Supabase.`}
@@ -610,40 +610,40 @@ function GenPanel({ initialName, initialCity, initialKeywords, nicheSite }: { in
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-[#6B6B9E]">
-        Génère le <strong className="text-[#1C1560]">config du site</strong> (contenu rédigé par l'IA) pour un commerce.
+      <p className="text-sm text-[#525252]">
+        Génère le <strong className="text-[#0a0a0a]">config du site</strong> (contenu rédigé par l'IA) pour un commerce.
         Le fichier est écrit dans <span className="mono">configs/</span> et sert ensuite au déploiement.
       </p>
       {keywords.length > 0 && (
         <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm">
-          <span className="font-medium text-[#1C1560]">🎯 {keywords.length} mot(s)-clé cible(s)</span>
-          <span className="text-[#6B6B9E]"> → une page de service par mot-clé : </span>
-          <span className="text-[#3D3D6B]">{keywords.join(' · ')}</span>
+          <span className="font-medium text-[#0a0a0a]">🎯 {keywords.length} mot(s)-clé cible(s)</span>
+          <span className="text-[#525252]"> → une page de service par mot-clé : </span>
+          <span className="text-[#404040]">{keywords.join(' · ')}</span>
         </div>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label block mb-1">{isNiche ? 'Niche' : 'Nom du commerce'}</label>
           <input value={name} onChange={e => setName(e.target.value)} placeholder={isNiche ? 'plombier' : 'SAM Plomberie'}
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
         <div>
           <label className="label block mb-1">Ville</label>
           <input value={city} onChange={e => setCity(e.target.value)} placeholder="Longueuil"
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
-          className="rounded border-[#D9D7F0] text-indigo-600" />
-        <span className="text-sm text-[#3D3D6B]">--simulate (contenu fictif, gratuit)</span>
+          className="rounded border-[#e5e5e5] text-indigo-600" />
+        <span className="text-sm text-[#404040]">--simulate (contenu fictif, gratuit)</span>
       </label>
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={launch} disabled={pending}
           className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 text-sm text-white transition-colors">
           {pending ? 'Génération…' : simulate ? 'Générer (fictif, gratuit)' : 'Générer le config (IA)'}
         </button>
-        <span className="text-xs text-[#9A97C0]">
+        <span className="text-xs text-[#a3a3a3]">
           {simulate
             ? 'Mode fictif — gratuit (le contenu IA et les mots-clés ne s\'appliquent qu\'en mode réel).'
             : isNiche
@@ -669,7 +669,7 @@ function GenBeauPanel() {
   const [pubPending,  startPub]       = useTransition();
 
   const ready  = name.trim() !== '' && industry.trim() !== '' && description.trim() !== '';
-  const inCls  = 'w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-ink text-sm px-3 py-1.5 placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500';
+  const inCls  = 'w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-ink text-sm px-3 py-1.5 placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500';
   const mkSlug = (s: string) => s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
   function launch() {
@@ -731,7 +731,7 @@ function GenBeauPanel() {
         <button onClick={launch} disabled={!ready || pending} className="btn-brand">
           {pending ? 'Génération… (~1 min)' : 'Générer le beau site'}
         </button>
-        <span className="text-xs text-[#9A97C0]">Design unique à chaque génération. Pas de SEO multi-pages (c'est l'autre mode).</span>
+        <span className="text-xs text-[#a3a3a3]">Design unique à chaque génération. Pas de SEO multi-pages (c'est l'autre mode).</span>
       </div>
 
       {pending && <Output out="" ok pending />}
@@ -753,7 +753,7 @@ function GenBeauPanel() {
           <div className="flex items-center gap-2 flex-wrap border-t border-zinc-200 pt-3">
             <span className="text-xs text-zinc-500 whitespace-nowrap">Publier à <span className="mono">/s/</span></span>
             <input value={slug} onChange={e => setSlug(mkSlug(e.target.value))} placeholder="studio-lumiere"
-              className="rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-ink text-sm px-2 py-1 w-48" />
+              className="rounded-md bg-[#fafafa] border-[#e5e5e5] text-ink text-sm px-2 py-1 w-48" />
             <button onClick={publish} disabled={pubPending || !slug.trim()} className="btn-brand py-1.5">
               {pubPending ? 'Publication…' : 'Publier'}
             </button>
@@ -793,7 +793,7 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
       <div>
         <label className="label block mb-1">Site</label>
         <select value={siteId} onChange={e => setSiteId(e.target.value)}
-          className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm py-1.5">
+          className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5">
           {sites.map(s => (
             <option key={s.id} value={s.id}>
               {s.domain ?? s.id} — {s.niche}, {s.city}
@@ -811,8 +811,8 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
         ].map(([val, set, label]) => (
           <label key={String(label)} className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={val as boolean} onChange={e => (set as (v: boolean) => void)(e.target.checked)}
-              className="rounded border-[#D9D7F0] text-indigo-600" />
-            <span className="text-sm text-[#3D3D6B]">{String(label)}</span>
+              className="rounded border-[#e5e5e5] text-indigo-600" />
+            <span className="text-sm text-[#404040]">{String(label)}</span>
           </label>
         ))}
       </div>
@@ -840,21 +840,21 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
 function SubmitPlan({ data }: { data: SubmitResult }) {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-sm text-[#3D3D6B]">
-        <span className="font-medium text-[#1C1560]">{data.domain ?? data.site_id}</span>
+      <div className="flex items-center gap-2 text-sm text-[#404040]">
+        <span className="font-medium text-[#0a0a0a]">{data.domain ?? data.site_id}</span>
         {data.estimate && <Badge text="aperçu" cls="bg-amber-100 text-amber-700" />}
-        <span className="text-[#9A97C0]">· {data.urls.length} URLs · {data.keywords.length} mots-clés</span>
+        <span className="text-[#a3a3a3]">· {data.urls.length} URLs · {data.keywords.length} mots-clés</span>
       </div>
 
       <ol className="space-y-2">
         {data.steps.map((s, i) => (
-          <li key={i} className="flex gap-3 rounded-lg border border-[#D9D7F0] bg-white p-3">
+          <li key={i} className="flex gap-3 rounded-lg border border-[#e5e5e5] bg-white p-3">
             <span className="flex-none flex items-center justify-center h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">{i + 1}</span>
             <div className="min-w-0">
-              <div className="text-sm font-medium text-[#1C1560]">{s.title}</div>
+              <div className="text-sm font-medium text-[#0a0a0a]">{s.title}</div>
               <ul className="mt-1 space-y-0.5">
                 {s.details.map((d, j) => (
-                  <li key={j} className="text-xs text-[#6B6B9E] break-all">{d.startsWith('http') ? <span className="mono text-indigo-600">{d}</span> : <>→ {d}</>}</li>
+                  <li key={j} className="text-xs text-[#525252] break-all">{d.startsWith('http') ? <span className="mono text-indigo-600">{d}</span> : <>→ {d}</>}</li>
                 ))}
               </ul>
             </div>
@@ -867,9 +867,9 @@ function SubmitPlan({ data }: { data: SubmitResult }) {
           <div className="label mb-1">Mots-clés qui seront trackés</div>
           <div className="flex flex-wrap gap-1.5">
             {data.keywords.slice(0, 12).map((k, i) => (
-              <span key={i} className="inline-block rounded-md bg-[#F5F4FF] border border-[#D9D7F0] px-2 py-0.5 text-xs text-[#3D3D6B]">{k}</span>
+              <span key={i} className="inline-block rounded-md bg-[#fafafa] border border-[#e5e5e5] px-2 py-0.5 text-xs text-[#404040]">{k}</span>
             ))}
-            {data.keywords.length > 12 && <span className="text-xs text-[#9A97C0] self-center">+{data.keywords.length - 12}</span>}
+            {data.keywords.length > 12 && <span className="text-xs text-[#a3a3a3] self-center">+{data.keywords.length - 12}</span>}
           </div>
         </div>
       )}
@@ -901,7 +901,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
         <div>
           <label className="label block mb-1">Site</label>
           <select value={siteId} onChange={e => setSiteId(e.target.value)}
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm py-1.5">
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5">
             {sites.map(s => (
               <option key={s.id} value={s.id}>
                 {s.domain ?? s.id} — {s.niche}
@@ -913,7 +913,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
         <div>
           <label className="label block mb-1">Top N positions</label>
           <input type="number" value={top} onChange={e => setTop(Number(e.target.value))} min={1} max={100}
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5" />
         </div>
       </div>
 
@@ -924,8 +924,8 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
         ].map(([val, set, label]) => (
           <label key={String(label)} className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={val as boolean} onChange={e => (set as (v: boolean) => void)(e.target.checked)}
-              className="rounded border-[#D9D7F0] text-indigo-600" />
-            <span className="text-sm text-[#3D3D6B]">{String(label)}</span>
+              className="rounded border-[#e5e5e5] text-indigo-600" />
+            <span className="text-sm text-[#404040]">{String(label)}</span>
           </label>
         ))}
       </div>
@@ -952,7 +952,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
 // Table des positions SERP (Tracker) — remplace les logs ASCII bruts.
 function PositionsTable({ data }: { data: RankResult }) {
   const posCls = (p: number | null) =>
-    p == null         ? 'bg-[#EEEDF9] text-[#9A97C0]'
+    p == null         ? 'bg-[#f5f5f5] text-[#a3a3a3]'
     : p <= 3          ? 'bg-emerald-100 text-emerald-700'
     : p <= 10         ? 'bg-lime-100 text-lime-700'
     : p <= 20         ? 'bg-amber-100 text-amber-700'
@@ -962,14 +962,14 @@ function PositionsTable({ data }: { data: RankResult }) {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2 text-sm text-[#3D3D6B]">
-        <span className="font-medium text-[#1C1560]">{data.domain ?? data.site_id}</span>
+      <div className="flex items-center gap-2 text-sm text-[#404040]">
+        <span className="font-medium text-[#0a0a0a]">{data.domain ?? data.site_id}</span>
         {data.estimate && <Badge text="simulé" cls="bg-amber-100 text-amber-700" />}
-        <span className="text-[#9A97C0]">· {ranked}/{data.positions.length} positionnés</span>
+        <span className="text-[#a3a3a3]">· {ranked}/{data.positions.length} positionnés</span>
       </div>
-      <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+      <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
         <table className="w-full text-sm">
-          <thead className="bg-[#F5F4FF]">
+          <thead className="bg-[#fafafa]">
             <tr>
               <th className={`${TH} text-left`}>Mot-clé</th>
               <th className={`${TH} text-center`}>Position</th>
@@ -980,12 +980,12 @@ function PositionsTable({ data }: { data: RankResult }) {
           </thead>
           <tbody>
             {data.positions.map((p, i) => (
-              <tr key={p.keyword + i} className="hover:bg-[#FAFAFF]">
-                <td className={`${TD} text-[#1C1560]`}>{p.keyword}</td>
+              <tr key={p.keyword + i} className="hover:bg-[#fafafa]">
+                <td className={`${TD} text-[#0a0a0a]`}>{p.keyword}</td>
                 <td className={`${TD} text-center`}><Badge text={posLabel(p.position)} cls={posCls(p.position)} /></td>
-                <td className={`${TD} text-[#6B6B9E]`}>{p.position != null ? (p.page ?? '/') : <span className="text-[#9A97C0]">hors top 100</span>}</td>
-                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.clicks ?? '—'}</td>
-                <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{p.impressions ?? '—'}</td>
+                <td className={`${TD} text-[#525252]`}>{p.position != null ? (p.page ?? '/') : <span className="text-[#a3a3a3]">hors top 100</span>}</td>
+                <td className={`${TD} text-right tabular-nums text-[#404040]`}>{p.clicks ?? '—'}</td>
+                <td className={`${TD} text-right tabular-nums text-[#404040]`}>{p.impressions ?? '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -1011,18 +1011,18 @@ function CronPanel() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-[#6B6B9E]">
+      <p className="text-sm text-[#525252]">
         Lance le suivi des positions pour tous les sites avec statut{' '}
-        <span className="mono text-[#1C1560]">indexed</span>,{' '}
-        <span className="mono text-[#1C1560]">ranking</span> ou{' '}
-        <span className="mono text-[#1C1560]">rented</span>.
+        <span className="mono text-[#0a0a0a]">indexed</span>,{' '}
+        <span className="mono text-[#0a0a0a]">ranking</span> ou{' '}
+        <span className="mono text-[#0a0a0a]">rented</span>.
         Alerte les sites sans position après 6 semaines.
       </p>
 
       <label className="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" checked={dryRun} onChange={e => setDryRun(e.target.checked)}
-          className="rounded border-[#D9D7F0] text-indigo-600" />
-        <span className="text-sm text-[#3D3D6B]">--dry-run (simulation, aucune écriture en base)</span>
+          className="rounded border-[#e5e5e5] text-indigo-600" />
+        <span className="text-sm text-[#404040]">--dry-run (simulation, aucune écriture en base)</span>
       </label>
 
       <button onClick={launch} disabled={pending}
@@ -1049,22 +1049,22 @@ function CronTable({ data }: { data: CronResult }) {
   const st = (s: CronResult['results'][number]['status']) =>
     s === 'tracked' ? { label: '✓ traité',  cls: 'bg-emerald-100 text-emerald-700' }
     : s === 'dry-run' ? { label: 'simulé',   cls: 'bg-indigo-100 text-indigo-700' }
-    : s === 'skipped' ? { label: 'ignoré',   cls: 'bg-[#EEEDF9] text-[#9A97C0]' }
+    : s === 'skipped' ? { label: 'ignoré',   cls: 'bg-[#f5f5f5] text-[#a3a3a3]' }
     :                   { label: '✗ erreur', cls: 'bg-red-100 text-red-700' };
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2 text-sm text-[#3D3D6B]">
-        <span className="font-medium text-[#1C1560]">{data.processed}/{data.total} sites traités</span>
+      <div className="flex items-center gap-2 text-sm text-[#404040]">
+        <span className="font-medium text-[#0a0a0a]">{data.processed}/{data.total} sites traités</span>
         {data.dryRun && <Badge text="simulation" cls="bg-amber-100 text-amber-700" />}
-        <span className="text-[#9A97C0]">· {data.date}</span>
+        <span className="text-[#a3a3a3]">· {data.date}</span>
       </div>
       {data.results.length === 0 ? (
-        <p className="text-sm text-[#9A97C0]">Aucun site à suivre (statuts indexed / ranking / rented).</p>
+        <p className="text-sm text-[#a3a3a3]">Aucun site à suivre (statuts indexed / ranking / rented).</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-[#D9D7F0]">
+        <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
           <table className="w-full text-sm">
-            <thead className="bg-[#F5F4FF]">
+            <thead className="bg-[#fafafa]">
               <tr>
                 <th className={`${TH} text-left`}>Site</th>
                 <th className={`${TH} text-center`}>Statut</th>
@@ -1077,12 +1077,12 @@ function CronTable({ data }: { data: CronResult }) {
               {data.results.map((r, i) => {
                 const b = st(r.status);
                 return (
-                  <tr key={r.siteId + i} className="hover:bg-[#FAFAFF]">
-                    <td className={`${TD} mono text-[#1C1560]`}>{r.domain}</td>
+                  <tr key={r.siteId + i} className="hover:bg-[#fafafa]">
+                    <td className={`${TD} mono text-[#0a0a0a]`}>{r.domain}</td>
                     <td className={`${TD} text-center`}><Badge text={b.label} cls={b.cls} /></td>
-                    <td className={`${TD} text-right tabular-nums text-[#3D3D6B]`}>{r.keywordsChecked || '—'}</td>
+                    <td className={`${TD} text-right tabular-nums text-[#404040]`}>{r.keywordsChecked || '—'}</td>
                     <td className={`${TD} text-right tabular-nums`}>{r.top20Count > 0 ? <span className="text-emerald-600 font-medium">{r.top20Count}</span> : '—'}</td>
-                    <td className={`${TD} text-xs text-[#6B6B9E]`}>{r.error ?? r.note ?? (r.statusChanged ? '→ status ranking' : '—')}</td>
+                    <td className={`${TD} text-xs text-[#525252]`}>{r.error ?? r.note ?? (r.statusChanged ? '→ status ranking' : '—')}</td>
                   </tr>
                 );
               })}
@@ -1119,11 +1119,11 @@ export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; 
             className={`flex flex-col rounded-lg border px-3 py-3 text-left transition-all ${
               tab === t.id
                 ? 'border-indigo-400 bg-indigo-50 ring-2 ring-indigo-200'
-                : 'card hover:border-indigo-200 hover:bg-[#F5F4FF]'
+                : 'card hover:border-indigo-200 hover:bg-[#fafafa]'
             }`}
           >
-            <p className="text-sm font-medium text-[#1C1560] leading-tight truncate">{t.label}</p>
-            <p className="text-xs text-[#9A97C0] mt-1.5 leading-snug">{t.desc}</p>
+            <p className="text-sm font-medium text-[#0a0a0a] leading-tight truncate">{t.label}</p>
+            <p className="text-xs text-[#a3a3a3] mt-1.5 leading-snug">{t.desc}</p>
           </button>
         ))}
       </div>

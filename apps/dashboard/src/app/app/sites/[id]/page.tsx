@@ -73,13 +73,13 @@ export default async function SiteDetailPage({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <Link href="/app/sites" className="text-xs text-[#9A97C0] hover:text-[#1C1560]">
+          <Link href="/app/sites" className="text-xs text-[#a3a3a3] hover:text-[#0a0a0a]">
             ← Portefeuille
           </Link>
-          <h1 className="mt-1 text-xl font-semibold mono text-[#1C1560]">
-            {site.domain ?? <span className="text-[#9A97C0] italic">sans domaine</span>}
+          <h1 className="mt-1 text-xl font-semibold mono text-[#0a0a0a]">
+            {site.domain ?? <span className="text-[#a3a3a3] italic">sans domaine</span>}
           </h1>
-          <p className="text-sm text-[#6B6B9E] mt-0.5">{site.niche} · {site.city}</p>
+          <p className="text-sm text-[#525252] mt-0.5">{site.niche} · {site.city}</p>
         </div>
         <Badge value={site.status} />
       </div>
@@ -96,14 +96,14 @@ export default async function SiteDetailPage({
             <dl className="space-y-2 text-sm">
               {[
                 ['Type',    <Badge key="t" value={site.type} />],
-                ['Twilio',  site.twilio_number ?? <span key="tw" className="text-[#9A97C0]">—</span>],
-                ['GSC',     site.gsc_property  ?? <span key="gsc" className="text-[#9A97C0]">—</span>],
-                ['Vercel',  site.vercel_project ?? <span key="v" className="text-[#9A97C0]">—</span>],
+                ['Twilio',  site.twilio_number ?? <span key="tw" className="text-[#a3a3a3]">—</span>],
+                ['GSC',     site.gsc_property  ?? <span key="gsc" className="text-[#a3a3a3]">—</span>],
+                ['Vercel',  site.vercel_project ?? <span key="v" className="text-[#a3a3a3]">—</span>],
                 ['Créé le', fmtDatetime(site.created_at)],
               ].map(([k, v]) => (
                 <div key={String(k)} className="flex items-start justify-between gap-2">
-                  <dt className="text-[#9A97C0] shrink-0">{k}</dt>
-                  <dd className="text-[#1C1560] text-right mono text-xs">{v}</dd>
+                  <dt className="text-[#a3a3a3] shrink-0">{k}</dt>
+                  <dd className="text-[#0a0a0a] text-right mono text-xs">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -116,7 +116,7 @@ export default async function SiteDetailPage({
               <select
                 name="status"
                 defaultValue={site.status}
-                className="flex-1 rounded bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm py-1.5"
+                className="flex-1 rounded bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5"
               >
                 {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
@@ -137,12 +137,12 @@ export default async function SiteDetailPage({
                 name="forward_to"
                 defaultValue={site.forward_to ?? ''}
                 placeholder="+15145550000"
-                className="flex-1 rounded bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm
-                           placeholder-[#9A97C0] py-1.5 px-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="flex-1 rounded bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                           placeholder-[#a3a3a3] py-1.5 px-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
               <button
                 type="submit"
-                className="rounded bg-[#EEEDF8] hover:bg-[#D9D7F0] px-3 text-sm text-[#1C1560] transition-colors"
+                className="rounded bg-[#f4f4f4] hover:bg-[#e5e5e5] px-3 text-sm text-[#0a0a0a] transition-colors"
               >
                 OK
               </button>
@@ -161,8 +161,8 @@ export default async function SiteDetailPage({
                 ['SMS',            leads.filter(l => l.type === 'sms').length],
               ].map(([k, v]) => (
                 <div key={String(k)} className="flex justify-between">
-                  <dt className="text-[#9A97C0]">{k}</dt>
-                  <dd className="mono text-[#1C1560] font-medium">{v}</dd>
+                  <dt className="text-[#a3a3a3]">{k}</dt>
+                  <dd className="mono text-[#0a0a0a] font-medium">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -179,7 +179,7 @@ export default async function SiteDetailPage({
             <p className="label mb-4">Positions dans le temps</p>
             <PositionChart data={chartData} keywords={keywords} />
             {keywords.length > 0 && (
-              <p className="text-xs text-[#B0ADCC] mt-2">
+              <p className="text-xs text-[#a3a3a3] mt-2">
                 {keywords.length} mot(s)-clé · axe Y = position (1 = meilleur)
               </p>
             )}
@@ -187,13 +187,13 @@ export default async function SiteDetailPage({
 
           {/* Leads */}
           <div className="card overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#D9D7F0] bg-[#F5F4FF]">
+            <div className="px-4 py-3 border-b border-[#e5e5e5] bg-[#fafafa]">
               <p className="label">Leads ({leads.length})</p>
             </div>
             <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[520px]">
               <thead>
-                <tr className="border-b border-[#EAE8F8] text-left">
+                <tr className="border-b border-[#f0f0f0] text-left">
                   <th className="px-4 py-2 label">Type</th>
                   <th className="px-3 py-2 label">Numéro</th>
                   <th className="px-3 py-2 label text-right">Durée</th>
@@ -201,23 +201,23 @@ export default async function SiteDetailPage({
                   <th className="px-3 py-2 label"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAE8F8]">
+              <tbody className="divide-y divide-[#f0f0f0]">
                 {leads.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-6 text-center text-[#9A97C0]">
+                    <td colSpan={5} className="px-4 py-6 text-center text-[#a3a3a3]">
                       Aucun lead pour ce site.
                     </td>
                   </tr>
                 ) : leads.map(l => (
-                  <tr key={l.id} className="hover:bg-[#F5F4FF]">
+                  <tr key={l.id} className="hover:bg-[#fafafa]">
                     <td className="px-4 py-2"><Badge value={l.type} /></td>
-                    <td className="px-3 py-2 mono text-xs text-[#3D3D6B]">
+                    <td className="px-3 py-2 mono text-xs text-[#404040]">
                       {l.caller_number ?? '—'}
                     </td>
-                    <td className="px-3 py-2 text-right mono text-xs text-[#6B6B9E]">
+                    <td className="px-3 py-2 text-right mono text-xs text-[#525252]">
                       {fmtDuration(l.duration_sec)}
                     </td>
-                    <td className="px-3 py-2 text-right text-xs text-[#9A97C0]">
+                    <td className="px-3 py-2 text-right text-xs text-[#a3a3a3]">
                       {fmtDatetime(l.created_at)}
                     </td>
                     <td className="px-3 py-2 text-right">

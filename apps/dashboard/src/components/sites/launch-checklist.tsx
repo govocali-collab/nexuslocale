@@ -60,7 +60,7 @@ export function LaunchChecklist({ siteId }: { siteId: string }) {
         }`}>{count}/{ALL.length}</span>
       </div>
 
-      <div className="h-1.5 w-full rounded bg-[#EEEDF9] mb-4 overflow-hidden">
+      <div className="h-1.5 w-full rounded bg-[#f5f5f5] mb-4 overflow-hidden">
         <div className="h-full rounded bg-indigo-500 transition-all" style={{ width: `${pct}%` }} />
       </div>
 
@@ -76,9 +76,9 @@ export function LaunchChecklist({ siteId }: { siteId: string }) {
                       type="checkbox"
                       checked={!!done[i]}
                       onChange={() => toggle(i)}
-                      className="mt-0.5 rounded border-[#D9D7F0] text-indigo-600 focus:ring-indigo-500"
+                      className="mt-0.5 rounded border-[#e5e5e5] text-indigo-600 focus:ring-indigo-500"
                     />
-                    <span className={done[i] ? 'line-through text-[#9A97C0]' : 'text-[#1C1560]'}>{i}</span>
+                    <span className={done[i] ? 'line-through text-[#a3a3a3]' : 'text-[#0a0a0a]'}>{i}</span>
                   </label>
                 </li>
               ))}

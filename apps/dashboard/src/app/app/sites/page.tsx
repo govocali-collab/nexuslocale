@@ -16,8 +16,8 @@ export default async function SitesPage({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-[#1C1560]">
-          Portefeuille <span className="text-[#9A97C0] text-base font-normal ml-1">({sites.length})</span>
+        <h1 className="text-lg font-semibold text-[#0a0a0a]">
+          Portefeuille <span className="text-[#a3a3a3] text-base font-normal ml-1">({sites.length})</span>
         </h1>
       </div>
 
@@ -27,14 +27,14 @@ export default async function SitesPage({
           name="q"
           defaultValue={filters.q}
           placeholder="Domaine ou niche…"
-          className="rounded-md bg-white border-[#D9D7F0] text-[#1C1560] text-sm
-                     placeholder-[#9A97C0] px-3 py-1.5 w-48 focus:ring-indigo-500 focus:border-indigo-500"
+          className="rounded-md bg-white border-[#e5e5e5] text-[#0a0a0a] text-sm
+                     placeholder-[#a3a3a3] px-3 py-1.5 w-48 focus:ring-indigo-500 focus:border-indigo-500"
         />
 
         <select
           name="status"
           defaultValue={filters.status ?? ''}
-          className="rounded-md bg-white border-[#D9D7F0] text-[#1C1560] text-sm py-1.5"
+          className="rounded-md bg-white border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5"
         >
           <option value="">Tous les statuts</option>
           {STATUS_ORDER.map(s => <option key={s} value={s}>{s}</option>)}
@@ -43,7 +43,7 @@ export default async function SitesPage({
         <select
           name="type"
           defaultValue={filters.type ?? ''}
-          className="rounded-md bg-white border-[#D9D7F0] text-[#1C1560] text-sm py-1.5"
+          className="rounded-md bg-white border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5"
         >
           <option value="">Tous les types</option>
           {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -58,7 +58,7 @@ export default async function SitesPage({
         {(filters.status || filters.type || filters.q) && (
           <Link
             href="/app/sites"
-            className="rounded-md px-3 py-1.5 text-sm text-[#9A97C0] hover:text-[#1C1560] transition-colors"
+            className="rounded-md px-3 py-1.5 text-sm text-[#a3a3a3] hover:text-[#0a0a0a] transition-colors"
           >
             Effacer
           </Link>

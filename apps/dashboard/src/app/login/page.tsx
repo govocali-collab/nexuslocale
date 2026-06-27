@@ -20,7 +20,7 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#EEEDF8]">
+    <div className="min-h-screen flex items-center justify-center bg-[#f4f4f4]">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
@@ -50,8 +50,8 @@ export default async function LoginPage({
                 type="email"
                 autoComplete="email"
                 required
-                className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560]
-                           placeholder-[#9A97C0] text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a]
+                           placeholder-[#a3a3a3] text-sm focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="admin@nexuslocale.com"
               />
             </div>
@@ -64,8 +64,8 @@ export default async function LoginPage({
                 type="password"
                 autoComplete="current-password"
                 required
-                className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560]
-                           placeholder-[#9A97C0] text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a]
+                           placeholder-[#a3a3a3] text-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
 
