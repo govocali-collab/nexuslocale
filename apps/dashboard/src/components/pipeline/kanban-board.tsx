@@ -68,27 +68,27 @@ function ProspectCard({
       className={`bg-white border rounded-lg p-3 cursor-pointer
                   hover:shadow-sm hover:border-indigo-200 transition-all space-y-1.5 select-none
                   ${isDragging   ? 'opacity-40 scale-95' : ''}
-                  ${isDropTarget ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-[#D9D7F0]'}`}
+                  ${isDropTarget ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-[#e5e5e5]'}`}
     >
       <div className="flex items-start justify-between gap-1">
-        <span className="font-medium text-[#1C1560] text-sm leading-snug">{p.business_name}</span>
+        <span className="font-medium text-[#0a0a0a] text-sm leading-snug">{p.business_name}</span>
         {p.prospect_score != null && <ScorePill score={p.prospect_score} />}
       </div>
-      <div className="text-xs text-[#9A97C0]">{p.niche} · {p.city}</div>
+      <div className="text-xs text-[#a3a3a3]">{p.niche} · {p.city}</div>
       {p.rating != null && (
         <div className="text-xs text-amber-600">
           ⭐ {p.rating}
           {p.review_count != null && (
-            <span className="text-[#B0ADCC] ml-1">({p.review_count})</span>
+            <span className="text-[#a3a3a3] ml-1">({p.review_count})</span>
           )}
         </div>
       )}
       <div className="flex items-center justify-between pt-0.5">
         {p.phone
-          ? <span className="text-xs mono text-[#6B6B9E]">{p.phone}</span>
+          ? <span className="text-xs mono text-[#525252]">{p.phone}</span>
           : <span />}
         <div className="flex items-center gap-2">
-          {p.notes && <span className="text-xs text-[#9A97C0]" title="A des notes">📝</span>}
+          {p.notes && <span className="text-xs text-[#a3a3a3]" title="A des notes">📝</span>}
           {p.demo_url && (
             <a href={p.demo_url} target="_blank" rel="noopener noreferrer"
                className="text-xs text-indigo-600 hover:text-indigo-800"
@@ -197,8 +197,8 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
             >
               {/* Header */}
               <div className={`card border-t-4 ${COLUMN_ACCENT[col]} px-3 py-2 mb-2 flex items-center justify-between`}>
-                <span className="text-sm font-medium text-[#1C1560]">{COLUMN_LABELS[col]}</span>
-                <span className="text-xs mono text-[#9A97C0] bg-[#EEEDF8] rounded px-1.5 py-0.5">
+                <span className="text-sm font-medium text-[#0a0a0a]">{COLUMN_LABELS[col]}</span>
+                <span className="text-xs mono text-[#a3a3a3] bg-[#f4f4f4] rounded px-1.5 py-0.5">
                   {cards.length}
                 </span>
               </div>
@@ -233,7 +233,7 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
                 )}
 
                 {cards.length === 0 && !isOver && (
-                  <div className="flex items-center justify-center h-16 text-xs text-[#C0BDE0]">
+                  <div className="flex items-center justify-center h-16 text-xs text-[#d4d4d4]">
                     Vide
                   </div>
                 )}

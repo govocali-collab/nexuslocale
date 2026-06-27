@@ -67,15 +67,15 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <aside className="fixed right-0 top-0 h-full w-96 bg-white border-l border-[#D9D7F0]
+      <aside className="fixed right-0 top-0 h-full w-96 max-w-[88%] bg-white border-l border-[#e5e5e5]
                         shadow-xl z-50 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-start justify-between px-5 py-4 border-b border-[#D9D7F0] bg-[#F5F4FF]">
+        <div className="flex items-start justify-between px-5 py-4 border-b border-[#e5e5e5] bg-[#fafafa]">
           <div className="min-w-0">
-            <h2 className="font-semibold text-[#1C1560] truncate">{prospect.business_name}</h2>
-            <p className="text-xs text-[#9A97C0] mt-0.5">{prospect.niche} · {prospect.city}</p>
+            <h2 className="font-semibold text-[#0a0a0a] truncate">{prospect.business_name}</h2>
+            <p className="text-xs text-[#a3a3a3] mt-0.5">{prospect.niche} · {prospect.city}</p>
           </div>
-          <button onClick={onClose} className="ml-3 shrink-0 text-[#9A97C0] hover:text-[#1C1560] text-lg leading-none">
+          <button onClick={onClose} className="ml-3 shrink-0 text-[#a3a3a3] hover:text-[#0a0a0a] text-lg leading-none">
             ✕
           </button>
         </div>
@@ -94,13 +94,13 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
                 ['Web',         prospect.web_presence],
               ].map(([k, v]) => (
                 <div key={String(k)} className="flex justify-between">
-                  <dt className="text-[#9A97C0]">{k}</dt>
-                  <dd className="text-[#1C1560] font-medium mono text-xs">{String(v)}</dd>
+                  <dt className="text-[#a3a3a3]">{k}</dt>
+                  <dd className="text-[#0a0a0a] font-medium mono text-xs">{String(v)}</dd>
                 </div>
               ))}
               {prospect.website && (
                 <div className="flex justify-between">
-                  <dt className="text-[#9A97C0]">Site actuel</dt>
+                  <dt className="text-[#a3a3a3]">Site actuel</dt>
                   <dd>
                     <a href={prospect.website} target="_blank" rel="noopener noreferrer"
                        className="text-xs text-indigo-600 hover:text-indigo-800 mono">↗ visiter</a>
@@ -114,7 +114,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
           <div className="space-y-1.5">
             <label className="label">Statut</label>
             <select value={status} onChange={e => setStatus(e.target.value)}
-              className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm py-1.5">
+              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5">
               {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
             </select>
           </div>
@@ -124,8 +124,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
             <label className="label">Téléphone</label>
             <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
               placeholder="+15145550000"
-              className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm
-                         placeholder-[#9A97C0] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                         placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
           </div>
 
           {/* Démo URL */}
@@ -133,8 +133,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
             <label className="label">URL de démo</label>
             <input type="url" value={demoUrl} onChange={e => setDemoUrl(e.target.value)}
               placeholder="https://…"
-              className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm
-                         placeholder-[#9A97C0] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                         placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
           </div>
 
           {/* Notes */}
@@ -142,8 +142,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
             <label className="label">Notes</label>
             <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={7}
               placeholder="Intéressé par le SEO local… rappeler jeudi… budget ~300$/mois…"
-              className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm
-                         placeholder-[#9A97C0] px-3 py-2 resize-none
+              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                         placeholder-[#a3a3a3] px-3 py-2 resize-none
                          focus:ring-indigo-500 focus:border-indigo-500" />
           </div>
 
@@ -155,9 +155,9 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-[#D9D7F0] flex items-center gap-3">
+        <div className="px-5 py-3 border-t border-[#e5e5e5] flex items-center gap-3">
           <button onClick={handleSave} disabled={isPending}
-            className="flex-1 rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50
+            className="flex-1 rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70
                        px-4 py-2 text-sm font-medium text-white transition-colors">
             {isPending ? 'Sauvegarde…' : 'Sauvegarder'}
           </button>

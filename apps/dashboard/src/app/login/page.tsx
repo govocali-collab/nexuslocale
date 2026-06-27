@@ -9,7 +9,7 @@ async function signIn(formData: FormData) {
   const supabase = await createAuthClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) redirect('/login?error=1');
-  redirect('/');
+  redirect('/app');
 }
 
 export default async function LoginPage({
@@ -20,15 +20,15 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#EEEDF8]">
+    <div className="min-h-screen flex items-center justify-center bg-[#f4f4f4]">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
           <Image
             src="/NexusLocale-logo.png"
             alt="NexusLocale"
-            width={180}
-            height={52}
+            width={216}
+            height={62}
             className="object-contain"
             priority
           />
@@ -50,8 +50,8 @@ export default async function LoginPage({
                 type="email"
                 autoComplete="email"
                 required
-                className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560]
-                           placeholder-[#9A97C0] text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a]
+                           placeholder-[#a3a3a3] text-sm focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="admin@nexuslocale.com"
               />
             </div>
@@ -64,14 +64,14 @@ export default async function LoginPage({
                 type="password"
                 autoComplete="current-password"
                 required
-                className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560]
-                           placeholder-[#9A97C0] text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a]
+                           placeholder-[#a3a3a3] text-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full rounded-md bg-indigo-600 hover:bg-indigo-700 px-4 py-2
+              className="w-full rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-4 py-2
                          text-sm font-medium text-white transition-colors"
             >
               Se connecter

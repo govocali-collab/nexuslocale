@@ -11,12 +11,18 @@ async function getSites() {
   return (data ?? []) as { id: string; domain: string | null; niche: string; city: string }[];
 }
 
-export default async function LaunchPage() {
-  const [sites, queues] = await Promise.all([getSites(), getActionQueues()]);
+export default async function LaunchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const [{ tab: initialTab }, sites, queues] = await Promise.all([
+    searchParams, getSites(), getActionQueues(),
+  ]);
 
   return (
-    <div className="space-y-4 max-w-5xl">
-      <h1 className="text-lg font-semibold text-[#1C1560]">Lanceur d'actions</h1>
+    <div className="space-y-4">
+      <h1 className="text-lg font-semibold text-[#0a0a0a]">Lanceur d'actions</h1>
 
       {/* ── Files d'attente ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
@@ -30,13 +36,13 @@ export default async function LaunchPage() {
             }`}>{queues.toSubmit.length}</span>
           </div>
           {queues.toSubmit.length === 0 ? (
-            <p className="text-xs text-[#9A97C0]">Aucun site en attente. ✓</p>
+            <p className="text-xs text-[#a3a3a3]">Aucun site en attente. ✓</p>
           ) : (
             <ul className="space-y-1.5">
               {queues.toSubmit.map(s => (
                 <li key={s.id} className="flex items-center justify-between">
-                  <span className="text-xs mono text-[#1C1560] truncate">{s.domain ?? s.niche}</span>
-                  <span className="text-xs text-[#9A97C0] ml-2 shrink-0">{s.city}</span>
+                  <span className="text-xs mono text-[#0a0a0a] truncate">{s.domain ?? s.niche}</span>
+                  <span className="text-xs text-[#a3a3a3] ml-2 shrink-0">{s.city}</span>
                 </li>
               ))}
             </ul>
@@ -52,13 +58,13 @@ export default async function LaunchPage() {
             }`}>{queues.toRank.length}</span>
           </div>
           {queues.toRank.length === 0 ? (
-            <p className="text-xs text-[#9A97C0]">Tous les sites sont trackés. ✓</p>
+            <p className="text-xs text-[#a3a3a3]">Tous les sites sont trackés. ✓</p>
           ) : (
             <ul className="space-y-1.5">
               {queues.toRank.map(s => (
                 <li key={s.id} className="flex items-center justify-between">
-                  <span className="text-xs mono text-[#1C1560] truncate">{s.domain ?? s.niche}</span>
-                  <span className="text-xs text-[#9A97C0] ml-2 shrink-0">{s.city}</span>
+                  <span className="text-xs mono text-[#0a0a0a] truncate">{s.domain ?? s.niche}</span>
+                  <span className="text-xs text-[#a3a3a3] ml-2 shrink-0">{s.city}</span>
                 </li>
               ))}
             </ul>
@@ -74,12 +80,12 @@ export default async function LaunchPage() {
             }`}>{queues.stale.length}</span>
           </div>
           {queues.stale.length === 0 ? (
-            <p className="text-xs text-[#9A97C0]">Aucun site stagnant. ✓</p>
+            <p className="text-xs text-[#a3a3a3]">Aucun site stagnant. ✓</p>
           ) : (
             <ul className="space-y-1.5">
               {queues.stale.map(s => (
                 <li key={s.id} className="flex items-center justify-between">
-                  <span className="text-xs mono text-[#1C1560] truncate">{s.domain ?? s.id.slice(0, 8)}</span>
+                  <span className="text-xs mono text-[#0a0a0a] truncate">{s.domain ?? s.id.slice(0, 8)}</span>
                   <span className="text-xs text-red-500 shrink-0 ml-2">{s.weeksOld} sem</span>
                 </li>
               ))}
@@ -88,38 +94,10 @@ export default async function LaunchPage() {
         </div>
       </div>
 
-      {/* ── Workflow reminder ───────────────────────────────────────────────── */}
-      <div className="card p-4">
-        <p className="label mb-3">Workflow d'un site</p>
-        <div className="flex items-center gap-1 flex-wrap text-xs">
-          {[
-            ['research', 'Finder scan'],
-            ['built',    'GSC submit'],
-            ['indexed',  'Rank tracker'],
-            ['ranking',  'Louer'],
-            ['rented',   'Cron hebdo'],
-          ].map(([status, action], i, arr) => (
-            <div key={status} className="flex items-center gap-1">
-              <div className="flex flex-col items-center">
-                <span className={`rounded px-2 py-0.5 font-medium ${
-                  status === 'research' ? 'bg-slate-100 text-slate-600' :
-                  status === 'built'    ? 'bg-sky-100 text-sky-700' :
-                  status === 'indexed'  ? 'bg-amber-100 text-amber-700' :
-                  status === 'ranking'  ? 'bg-orange-100 text-orange-700' :
-                                         'bg-emerald-100 text-emerald-700'
-                }`}>{status}</span>
-                <span className="text-[#9A97C0] mt-0.5">{action}</span>
-              </div>
-              {i < arr.length - 1 && <span className="text-[#C0BDE0] mx-1">→</span>}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── Lanceur ─────────────────────────────────────────────────────────── */}
       <div>
         <p className="label mb-3">Lancer une action</p>
-        <Launcher sites={sites} initialQueues={queues} />
+        <Launcher sites={sites} initialQueues={queues} initialTab={initialTab} />
       </div>
     </div>
   );

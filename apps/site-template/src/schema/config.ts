@@ -70,6 +70,7 @@ const ServicePageSchema = z.object({
   meta_description: z.string().min(1).max(160, 'meta_description trop long (max 160 car.)'),
   sections:         z.array(ContentSectionSchema).min(1),
   local_data:       RequiredLocalDataSchema,
+  image_url:        z.string().url().optional(),  // photo réelle (Pexels) — sinon fallback par slug
 });
 
 // ─── Page de zone desservie ───────────────────────────────────────────────────

@@ -10,7 +10,8 @@ const config: Config = {
         secondary: 'var(--color-secondary)',
       },
       fontFamily: {
-        sans: ['system-ui', 'sans-serif'],
+        sans:    ['var(--font-body)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'var(--font-body)', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -5,6 +5,7 @@ import { enrichFromPlaces } from './enrich.js';
 import { generateContent } from './generator.js';
 import { generateMockContent, MOCK_PROSPECT } from './mock.js';
 import { assembleAndWrite } from './assembler.js';
+import { searchPexelsPhotos, nicheToQuery, type PexelsPhoto } from './pexels.js';
 import { ANTHROPIC_COST, type ProspectFull } from './types.js';
 
 // ─── Coût estimé ─────────────────────────────────────────────────────────────
@@ -31,7 +32,7 @@ function askConfirmation(): Promise<boolean> {
     process.stdout.write('\nContinuer? [o/N] ');
     process.stdin.setEncoding('utf8');
     process.stdin.once('data', (chunk) => {
-      resolve((chunk as string).trim().toLowerCase() === 'o');
+      resolve(String(chunk).trim().toLowerCase() === 'o');
     });
   });
 }
@@ -40,9 +41,9 @@ function askConfirmation(): Promise<boolean> {
 
 async function genOne(
   prospect: ProspectFull,
-  opts: { simulate: boolean; apiKey?: string; placesKey?: string },
+  opts: { simulate: boolean; apiKey?: string | undefined; placesKey?: string | undefined; targetKeywords?: string[] | undefined },
 ): Promise<void> {
-  const { simulate, apiKey, placesKey } = opts;
+  const { simulate, apiKey, placesKey, targetKeywords } = opts;
 
   // Enrichissement Places (optionnel)
   let enriched = prospect;
@@ -64,16 +65,37 @@ async function genOne(
     }
     process.stdout.write(`[gen] Génération via claude-sonnet-4-6…\n`);
     try {
-      generated = await generateContent(enriched, apiKey);
+      generated = await generateContent(enriched, apiKey, { targetKeywords });
     } catch (err) {
       const msg = (err as Error).message;
       process.stderr.write(`[gen] Échec : ${msg}\n[gen] Nouvelle tentative…\n`);
-      generated = await generateContent(enriched, apiKey, `Précédente tentative invalide : ${msg}`);
+      generated = await generateContent(enriched, apiKey, { targetKeywords, hintOnRetry: `Précédente tentative invalide : ${msg}` });
     }
   }
 
+  // Photos réelles (Pexels) — requête EN par niche, photos variées (hero + une par service)
+  let photos: { hero?: PexelsPhoto | null; services?: Record<string, PexelsPhoto> } | undefined;
+  const pexelsKey = process.env['PEXELS_API_KEY'];
+  if (!simulate && pexelsKey) {
+    const svcList = generated.pages.services;
+    process.stdout.write('[pexels] Recherche de photos par service…\n');
+    // Hero : photo générale du métier ; chaque service : sa requête anglaise spécifique.
+    const heroPics = await searchPexelsPhotos(nicheToQuery(enriched.niche), pexelsKey, 3);
+    const svcResults = await Promise.all(svcList.map(async (s) => {
+      const q = s.image_query?.trim() ? s.image_query : nicheToQuery(enriched.niche);
+      const pics = await searchPexelsPhotos(q, pexelsKey, 2);
+      return [s.slug, q, pics[0] ?? null] as const;
+    }));
+    const services: Record<string, PexelsPhoto> = {};
+    for (const [slug, q, p] of svcResults) {
+      if (p) { services[slug] = p; process.stdout.write(`[pexels]   ${slug} ← « ${q} »\n`); }
+    }
+    photos = { hero: heroPics[0] ?? null, services };
+    process.stdout.write(`[pexels] ✓ hero + ${Object.keys(services).length} photos de service\n`);
+  }
+
   // Assemblage + validation + écriture
-  const result = assembleAndWrite(enriched, generated);
+  const result = assembleAndWrite(enriched, generated, photos);
 
   console.log(`
 ✅ ${prospect.business_name}
@@ -97,19 +119,42 @@ program
   .option('--top <n>',   'Prendre les N meilleurs prospects (status=new)', parseInt)
   .option('--estimate',  'Afficher le coût API estimé avant de lancer')
   .option('--simulate',  'Générer sans API (contenu fictif, pour tester)')
+  .option('--keywords <list>', 'Mots-clés cibles séparés par des virgules — une page de service par mot-clé')
+  .option('--niche-site', 'Site de niche générique : synthétise une marque (sans prospect Supabase). <nom> = la niche.')
   .action(async (name?: string, city?: string, options?: {
     top?: number;
     estimate?: boolean;
     simulate?: boolean;
+    keywords?: string;
+    nicheSite?: boolean;
   }) => {
     const simulate = options?.simulate ?? false;
     const apiKey   = process.env['ANTHROPIC_API_KEY'] || undefined;
     const placesKey = process.env['GOOGLE_PLACES_API_KEY'] || undefined;
+    const targetKeywords = options?.keywords
+      ? options.keywords.split(',').map(k => k.trim()).filter(Boolean)
+      : undefined;
 
     // Résolution des prospects
     let prospects: ProspectFull[] = [];
 
-    if (simulate && !name && !options?.top) {
+    if (options?.nicheSite && name && city) {
+      // Site de niche générique : on synthétise une marque, aucun prospect Supabase requis.
+      const niche = name;
+      const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+      prospects = [{
+        business_name:  `${cap(niche)} ${cap(city)}`,
+        niche,
+        city,
+        phone:          null,
+        rating:         null,
+        review_count:   null,
+        web_presence:   'none',
+        pain_score:     null,
+        prospect_score: null,
+        status:         'research',
+      }];
+    } else if (simulate && !name && !options?.top) {
       // Mode démo pure sans aucun arg → prospect fictif intégré
       prospects = [MOCK_PROSPECT];
     } else if (options?.top) {
@@ -135,7 +180,7 @@ program
     let success = 0;
     for (const p of prospects) {
       try {
-        await genOne(p, { simulate, apiKey, placesKey });
+        await genOne(p, { simulate, apiKey, placesKey, targetKeywords });
         success++;
       } catch (err) {
         console.error(`\n❌ ${p.business_name} : ${(err as Error).message}`);

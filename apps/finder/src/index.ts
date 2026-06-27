@@ -3,6 +3,7 @@ import { program }                               from 'commander';
 import * as readline                             from 'readline';
 import { runKeywordScan, ESTIMATED_COST_USD }   from './dataforseo.js';
 import { filterKeywords, clusterKeywords }      from './keywords.js';
+import { filterByCity }                          from './geo.js';
 import { generateCandidates }                   from './domains.js';
 import { checkDomains, purchaseDomain,
          setVercelNameservers }                 from './namecheap.js';
@@ -86,15 +87,17 @@ program
   .description('Keyword research DataForSEO + domaines Namecheap')
   .option('--country <code>',       'Code pays (défaut: CA)', 'CA')
   .option('--lang <code>',          'Langue (fr|en, défaut: fr)', 'fr')
-  .option('--max-difficulty <n>',   'KD maximum (0-100)', parseInt)
-  .option('--limit <n>',            'Nb max de mots-clés retournés', parseInt, 100)
+  .option('--max-difficulty <n>',   'KD maximum (0-100)', v => parseInt(v, 10))
+  .option('--limit <n>',            'Nb max de mots-clés retournés', v => parseInt(v, 10), 100)
   .option('--sandbox',              'Namecheap sandbox (aucun achat réel)')
   .option('--estimate',             'Estime les coûts sans appeler les API')
+  .option('--yes',                  'Confirme automatiquement le coût (non-interactif)')
+  .option('--json',                 'Émet aussi le résultat en JSON (pour le dashboard)')
   .option('--no-db',                'Ne pas écrire dans Supabase')
   .action(async (
     niche: string,
     city:  string,
-    opts: { country: string; lang: string; maxDifficulty?: number; limit: number; sandbox: boolean; estimate: boolean; db: boolean },
+    opts: { country: string; lang: string; maxDifficulty?: number; limit: number; sandbox: boolean; estimate: boolean; yes: boolean; json: boolean; db: boolean },
   ) => {
     console.log(`\n🔍 finder scan "${niche}" / "${city}"`);
     console.log(`   Pays: ${opts.country}  Langue: ${opts.lang}  KD max: ${opts.maxDifficulty ?? 'illimité'}  Limit: ${opts.limit}`);
@@ -125,6 +128,7 @@ program
         console.log(`  → finder buy ${bd.domain}`);
       }
       console.log('\n  ℹ  Données simulées. Retirez --estimate pour les vraies métriques.');
+      if (opts.json) console.log('__NEXUS_JSON__' + JSON.stringify(mock) + '__NEXUS_END__');
       return;
     }
 
@@ -137,7 +141,8 @@ program
     }
 
     // ── Confirmation coût ─────────────────────────────────────────────────────
-    const ok = await confirm(`Cette opération coûte ~$${ESTIMATED_COST_USD.toFixed(4)} USD en crédits DataForSEO. Continuer?`);
+    const ok = opts.yes
+      || await confirm(`Cette opération coûte ~$${ESTIMATED_COST_USD.toFixed(4)} USD en crédits DataForSEO. Continuer?`);
     if (!ok) { console.log('Annulé.'); return; }
 
     // ── DataForSEO ────────────────────────────────────────────────────────────
@@ -152,8 +157,14 @@ program
     });
 
     const filterOpts = opts.maxDifficulty !== undefined ? { maxDifficulty: opts.maxDifficulty } : {};
-    const keywords = filterKeywords(rawKeywords, filterOpts);
-    console.log(`[keywords] ${keywords.length} / ${rawKeywords.length} retenus après filtrage`);
+    const kdFiltered = filterKeywords(rawKeywords, filterOpts);
+    // Filtre géo : ne garde que les mots-clés pertinents à la ville cible + sa région.
+    const geo      = filterByCity(kdFiltered, city);
+    const keywords = geo.kept.length > 0 ? geo.kept : kdFiltered; // repli si tout filtré
+    console.log(
+      `[keywords] ${kdFiltered.length} retenus (KD) · ${keywords.length} après filtre ville "${city}"` +
+      (geo.dropped > 0 ? ` (${geo.dropped} autres villes écartées)` : ''),
+    );
     const clusters = clusterKeywords(keywords);
 
     // ── Domaines ──────────────────────────────────────────────────────────────
@@ -185,6 +196,11 @@ program
       best_domain: best,
       scanned_at:  new Date().toISOString(),
     };
+
+    // ── Sortie JSON (consommée par le dashboard) ────────────────────────────────
+    if (opts.json) {
+      console.log('__NEXUS_JSON__' + JSON.stringify(result) + '__NEXUS_END__');
+    }
 
     // ── Affichage ─────────────────────────────────────────────────────────────
     printKeywordsTable(keywords);

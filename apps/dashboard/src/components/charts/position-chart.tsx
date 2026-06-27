@@ -27,7 +27,7 @@ function shortDate(d: string): string {
 export function PositionChart({ data, keywords }: Props) {
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-sm text-[#9A97C0]">
+      <div className="flex items-center justify-center h-48 text-sm text-[#a3a3a3]">
         Aucune donnée de positionnement encore.
       </div>
     );
@@ -36,32 +36,32 @@ export function PositionChart({ data, keywords }: Props) {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={data} margin={{ top: 4, right: 16, bottom: 4, left: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#EAE8F8" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis
           dataKey="date"
           tickFormatter={shortDate}
-          tick={{ fill: '#9A97C0', fontSize: 11 }}
-          axisLine={{ stroke: '#D9D7F0' }}
+          tick={{ fill: '#a3a3a3', fontSize: 11 }}
+          axisLine={{ stroke: '#e5e5e5' }}
           tickLine={false}
         />
         <YAxis
           reversed
           domain={[1, 100]}
-          tick={{ fill: '#9A97C0', fontSize: 11 }}
-          axisLine={{ stroke: '#D9D7F0' }}
+          tick={{ fill: '#a3a3a3', fontSize: 11 }}
+          axisLine={{ stroke: '#e5e5e5' }}
           tickLine={false}
-          label={{ value: 'Position', angle: -90, position: 'insideLeft', fill: '#9A97C0', fontSize: 11 }}
+          label={{ value: 'Position', angle: -90, position: 'insideLeft', fill: '#a3a3a3', fontSize: 11 }}
         />
         <Tooltip
-          contentStyle={{ background: '#FFFFFF', border: '1px solid #D9D7F0', borderRadius: 6, fontSize: 12 }}
-          labelStyle={{ color: '#6B6B9E' }}
+          contentStyle={{ background: '#FFFFFF', border: '1px solid #e5e5e5', borderRadius: 6, fontSize: 12 }}
+          labelStyle={{ color: '#525252' }}
           labelFormatter={shortDate}
           formatter={(value: unknown) => [
             typeof value === 'number' ? `#${value}` : '—',
           ]}
         />
         <Legend
-          wrapperStyle={{ fontSize: 12, color: '#6B6B9E', paddingTop: 8 }}
+          wrapperStyle={{ fontSize: 12, color: '#525252', paddingTop: 8 }}
         />
         {keywords.slice(0, 6).map((kw, i) => (
           <Line
