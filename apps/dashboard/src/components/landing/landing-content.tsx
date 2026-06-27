@@ -97,7 +97,7 @@ export function LandingContent() {
           <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium" style={{ color: '#ddd0fd' }}>
             {t.hero.badge}
           </span>
-          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-6xl md:text-7xl">
+          <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
             {t.hero.titleL1}<br />{t.hero.titleL2Pre}<span style={{ color: VIOLET_400 }}>{t.hero.titleAccent}</span>.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-neutral-300 sm:text-xl leading-relaxed">{t.hero.subtitle}</p>
