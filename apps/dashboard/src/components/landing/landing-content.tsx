@@ -107,7 +107,6 @@ export function LandingContent() {
             </Link>
             <a href="#how" className="rounded-lg border border-white/20 px-6 py-3 font-semibold text-white hover:bg-white/10 transition-colors">{t.hero.ctaSecondary}</a>
           </div>
-          <p className="mt-4 text-xs text-neutral-400">{t.hero.micro}</p>
         </div>
       </section>
 

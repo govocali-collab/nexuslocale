@@ -12,7 +12,6 @@ export const DICT = {
       subtitle: 'On bâtit et on ranke des sites web locaux. Ils montent dans le top de Google, et on vous envoie les appels et les leads directement.',
       ctaPrimary: 'Avoir plus de clients',
       ctaSecondary: 'Comment ça marche',
-      micro: "Aucuns frais d'avance • Vous payez juste quand vous êtes dans le top",
     },
     why: {
       heading: 'Des sites web qui vous ramènent des clients',
@@ -75,7 +74,6 @@ export const DICT = {
       subtitle: 'We build and rank local websites. They climb to the top of Google, and we send the calls and leads straight to you.',
       ctaPrimary: 'Get more customers',
       ctaSecondary: 'How it works',
-      micro: 'No upfront cost • Pay only while you rank',
     },
     why: {
       heading: 'Websites that bring you business',
