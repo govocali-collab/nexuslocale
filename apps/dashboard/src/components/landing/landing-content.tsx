@@ -57,7 +57,7 @@ export function LandingContent() {
       <header className="sticky top-0 z-50 backdrop-blur bg-white/80 border-b border-neutral-200/70">
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Image src="/NexusLocale-logo.png" alt="NexusLocale" width={161} height={46} priority className="h-8 w-auto" />
+            <Image src="/NexusLocale-logo.png" alt="NexusLocale" width={161} height={46} priority className="h-[37px] w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-neutral-600">
             <a href="#why" className="hover:text-[#0a0a0a] transition-colors">{t.nav.why}</a>
