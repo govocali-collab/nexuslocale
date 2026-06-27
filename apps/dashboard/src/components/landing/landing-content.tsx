@@ -46,6 +46,9 @@ export function LandingContent() {
     document.documentElement.lang = l;
   }
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
+
   const t = DICT[locale];
 
   return (
@@ -67,19 +70,34 @@ export function LandingContent() {
           </nav>
           <div className="md:hidden flex items-center gap-3">
             <LangToggle locale={locale} onChange={switchLocale} />
-            <Link href="#contact" className="rounded-lg px-4 py-2 text-white text-sm font-semibold" style={{ backgroundColor: VIOLET }}>{t.nav.getStarted}</Link>
+            <button type="button" onClick={() => setMenuOpen((o) => !o)} aria-label="Menu" aria-expanded={menuOpen}
+              className="p-1.5 text-2xl leading-none text-[#0a0a0a]">{menuOpen ? '✕' : '☰'}</button>
           </div>
         </div>
+
+        {/* Menu mobile */}
+        {menuOpen && (
+          <div className="md:hidden border-t border-neutral-200 bg-white">
+            <nav className="max-w-6xl mx-auto px-5 py-3 flex flex-col text-sm font-medium text-neutral-700">
+              <a href="#why" onClick={closeMenu} className="py-2.5 border-b border-neutral-100">{t.nav.why}</a>
+              <a href="#how" onClick={closeMenu} className="py-2.5 border-b border-neutral-100">{t.nav.how}</a>
+              <a href="#websites" onClick={closeMenu} className="py-2.5 border-b border-neutral-100">{t.nav.websites}</a>
+              <a href="#contact" onClick={closeMenu} className="py-2.5 border-b border-neutral-100">{t.nav.contact}</a>
+              <Link href="/login" onClick={closeMenu} className="py-2.5">{t.nav.signIn}</Link>
+              <Link href="#contact" onClick={closeMenu} className="mt-2 rounded-lg px-4 py-3 text-center text-white font-semibold" style={{ backgroundColor: VIOLET }}>{t.nav.getStarted}</Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero */}
       <section className="relative overflow-hidden text-white" style={{ backgroundColor: INK }}>
         <div aria-hidden className="absolute left-1/2 top-[-10rem] size-[36rem] -translate-x-1/2 rounded-full blur-3xl" style={{ backgroundColor: `${VIOLET}33` }} />
-        <div className="relative mx-auto max-w-6xl px-5 py-24 sm:py-32 text-center">
+        <div className="relative mx-auto max-w-6xl px-5 py-20 sm:py-32 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium" style={{ color: '#ddd0fd' }}>
             {t.hero.badge}
           </span>
-          <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-extrabold tracking-tight sm:text-7xl">
+          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-6xl md:text-7xl">
             {t.hero.titlePre}<span style={{ color: VIOLET_400 }}>{t.hero.titleAccent}</span>.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-neutral-300 sm:text-xl leading-relaxed">{t.hero.subtitle}</p>
@@ -94,7 +112,7 @@ export function LandingContent() {
       </section>
 
       {/* Why us - blanc */}
-      <section id="why" className="bg-white py-24">
+      <section id="why" className="bg-white py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center max-w-xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">{t.why.heading}</h2>
@@ -115,7 +133,7 @@ export function LandingContent() {
       </section>
 
       {/* How it works - gris */}
-      <section id="how" className="py-24" style={{ backgroundColor: '#f4f4f4' }}>
+      <section id="how" className="py-16 sm:py-24" style={{ backgroundColor: '#f4f4f4' }}>
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center max-w-2xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">{t.how.heading}</h2>
@@ -134,7 +152,7 @@ export function LandingContent() {
       </section>
 
       {/* Websites - blanc */}
-      <section id="websites" className="bg-white py-24">
+      <section id="websites" className="bg-white py-16 sm:py-24">
         <div className="max-w-5xl mx-auto px-5">
           <div className="rounded-3xl border border-neutral-200 p-8 sm:p-12" style={{ backgroundColor: '#faf9ff' }}>
             <div className="grid md:grid-cols-2 gap-10 items-center">
@@ -173,7 +191,7 @@ export function LandingContent() {
       </section>
 
       {/* Contact - blanc */}
-      <section id="contact" className="bg-white py-24">
+      <section id="contact" className="bg-white py-16 sm:py-24">
         <div className="max-w-2xl mx-auto px-5">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">{t.contact.heading}</h2>
