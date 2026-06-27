@@ -28,6 +28,14 @@ export async function middleware(request: NextRequest) {
   const isAppRoute  = path === '/app' || path.startsWith('/app/'); // le dashboard (protégé)
   // Tout le reste est public : '/' (landing), '/s/*' (sites hébergés), assets.
 
+  // Sous-domaine app.nexuslocale.com → on amène la racine vers le dashboard.
+  const host = request.headers.get('host') ?? '';
+  if (host.startsWith('app.') && path === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/app';
+    return NextResponse.redirect(url);
+  }
+
   if (!user && isAppRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
