@@ -484,7 +484,7 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keyword
       {result?.data && result.data.keywords.length > 0 && (
         <div className="flex items-center gap-3 flex-wrap rounded-lg bg-emerald-50 border border-emerald-200 p-3">
           <button onClick={() => onNext(niche.trim(), city.trim(), selectedKws)}
-            className="rounded-md bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm text-white font-medium transition-colors">
+            className="rounded-md bg-indigo-600 hover:bg-indigo-700 px-4 py-2 text-sm text-white font-medium transition-colors">
             Prochaine étape : bâtir le site →
           </button>
           <span className="text-xs text-[#3D6B4A]">
@@ -1027,7 +1027,7 @@ function CronPanel() {
 
       <button onClick={launch} disabled={pending}
         className={`rounded-md px-5 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50
-          ${dryRun ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
+          ${dryRun ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
         {dryRun ? 'Simuler le cron' : '🚀 Lancer le cron (réel)'}
       </button>
 
