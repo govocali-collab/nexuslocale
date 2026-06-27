@@ -40,7 +40,7 @@ export function SitesTable({ sites }: { sites: SiteRow[] }) {
         <div className="flex items-center gap-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2">
           <span className="text-sm text-red-700 font-medium">{sel.size} sélectionné(s)</span>
           <button onClick={remove} disabled={pending}
-            className="rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-90 px-3 py-1 text-sm text-white transition-colors">
+            className="rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-100 px-3 py-1 text-sm text-white transition-colors">
             {pending ? 'Suppression…' : '🗑 Supprimer'}
           </button>
           <button onClick={() => setSel(new Set())} className="text-xs text-red-500 hover:text-red-700 underline">Annuler</button>
