@@ -118,7 +118,7 @@ export function ContactForm({ locale }: { locale: Locale }) {
         {err && <p className="text-sm text-red-600">{err}</p>}
 
         <button type="submit" disabled={pending}
-          className="w-full rounded-lg px-6 py-3 font-semibold text-white shadow-lg hover:opacity-90 disabled:opacity-100 transition-opacity"
+          className="w-full rounded-lg px-6 py-3 font-semibold text-white shadow-lg hover:opacity-90 disabled:opacity-70 transition-opacity"
           style={{ backgroundColor: VIOLET }}>
           {pending ? t.sending : t.send}
         </button>
