@@ -64,7 +64,6 @@ export function LandingContent() {
             <a href="#how" className="hover:text-[#0a0a0a] transition-colors">{t.nav.how}</a>
             <a href="#websites" className="hover:text-[#0a0a0a] transition-colors">{t.nav.websites}</a>
             <a href="#contact" className="hover:text-[#0a0a0a] transition-colors">{t.nav.contact}</a>
-            <Link href="/login" className="hover:text-[#0a0a0a] transition-colors">{t.nav.signIn}</Link>
             <LangToggle locale={locale} onChange={switchLocale} />
             <Link href="#contact" className="rounded-lg px-4 py-2 text-white font-semibold shadow-sm hover:opacity-90 transition-opacity" style={{ backgroundColor: VIOLET }}>{t.nav.getStarted}</Link>
           </nav>
@@ -83,7 +82,6 @@ export function LandingContent() {
               <a href="#how" onClick={closeMenu} className="py-2.5 border-b border-neutral-100">{t.nav.how}</a>
               <a href="#websites" onClick={closeMenu} className="py-2.5 border-b border-neutral-100">{t.nav.websites}</a>
               <a href="#contact" onClick={closeMenu} className="py-2.5 border-b border-neutral-100">{t.nav.contact}</a>
-              <Link href="/login" onClick={closeMenu} className="py-2.5">{t.nav.signIn}</Link>
               <Link href="#contact" onClick={closeMenu} className="mt-2 rounded-lg px-4 py-3 text-center text-white font-semibold" style={{ backgroundColor: VIOLET }}>{t.nav.getStarted}</Link>
             </nav>
           </div>
