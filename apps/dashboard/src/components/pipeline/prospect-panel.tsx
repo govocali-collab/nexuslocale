@@ -157,7 +157,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
         {/* Footer */}
         <div className="px-5 py-3 border-t border-[#e5e5e5] flex items-center gap-3">
           <button onClick={handleSave} disabled={isPending}
-            className="flex-1 rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-80
+            className="flex-1 rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-90
                        px-4 py-2 text-sm font-medium text-white transition-colors">
             {isPending ? 'Sauvegarde…' : 'Sauvegarder'}
           </button>
