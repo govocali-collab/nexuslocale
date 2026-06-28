@@ -93,7 +93,9 @@ export async function createSubscription(input: {
   if (!(amount > 0))   return { ok: false, error: 'Montant mensuel (> 0) requis.' };
   try {
     const customer = await findOrCreateCustomer(name, email);
-    const product  = await stripe.products.create({ name: desc });
+    // Mention de récurrence dans le nom du produit → visible sur la ligne de CHAQUE
+    // facture mensuelle (le client voit clairement que c'est récurrent).
+    const product  = await stripe.products.create({ name: `${desc} (récurrent · chaque mois)` });
     const sub = await stripe.subscriptions.create({
       customer: customer.id,
       items: [{ price_data: {
@@ -110,9 +112,10 @@ export async function createSubscription(input: {
     // l'envoie pas tout seul, tu la prévisualises et l'envoies depuis l'historique.
     // Les factures des mois suivants gardent l'auto_advance par défaut → Stripe les
     // finalise ET les envoie automatiquement chaque mois (aucune action de ta part).
+    const recurringFooter = `Montant récurrent — ${amount.toFixed(2)} $ CA facturés automatiquement chaque mois jusqu'à annulation.`;
     const inv = sub.latest_invoice;
     if (inv && typeof inv !== 'string' && inv.id && inv.status === 'draft') {
-      await stripe.invoices.update(inv.id, { metadata: { emailed: 'no' } });
+      await stripe.invoices.update(inv.id, { metadata: { emailed: 'no' }, footer: recurringFooter });
       await stripe.invoices.finalizeInvoice(inv.id, { auto_advance: false });
     }
     return { ok: true };
