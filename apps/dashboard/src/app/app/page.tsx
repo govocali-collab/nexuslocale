@@ -5,9 +5,11 @@ import {
   getRecentLeads,
   getStaleSites,
 } from '@/lib/queries';
+import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
 
 const STATUSES = ['research', 'built', 'indexed', 'ranking', 'rented', 'sold'];
-const PIPELINE = ['new', 'demo_booked', 'demo_sent', 'negotiating', 'won', 'lost'];
+// Reflète toujours le pipeline (source unique @/lib/pipeline).
+const PIPELINE = PIPELINE_STATUSES;
 
 function fmtDuration(sec: number | null): string {
   if (!sec) return '—';
@@ -108,7 +110,7 @@ export default async function OverviewPage() {
               <p className="text-2xl font-bold mono text-[#0a0a0a]">
                 {stats.prospectsByStatus[s] ?? 0}
               </p>
-              <Badge value={s} />
+              <p className="text-xs text-[#525252] mt-1 leading-tight">{PIPELINE_LABELS[s] ?? s}</p>
             </div>
           ))}
         </div>

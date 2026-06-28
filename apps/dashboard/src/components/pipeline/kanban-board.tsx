@@ -5,18 +5,12 @@ import { useRouter } from 'next/navigation';
 import type { Prospect } from '@/lib/queries';
 import { updateProspectStatus, deleteProspects } from '@/lib/actions';
 import { ProspectPanel } from './prospect-panel';
+import { PIPELINE_STATUSES, PIPELINE_LABELS, PIPELINE_ACCENT } from '@/lib/pipeline';
 
-const COLUMNS = ['new', 'demo_booked', 'demo_sent', 'negotiating', 'won', 'lost'] as const;
-
-const COLUMN_LABELS: Record<string, string> = {
-  new: 'Nouveaux', demo_booked: 'RDV démo Zoom', demo_sent: 'Démo envoyée',
-  negotiating: 'Négociation', won: 'Gagnés', lost: 'Perdus',
-};
-
-const COLUMN_ACCENT: Record<string, string> = {
-  new: 'border-t-slate-400', demo_booked: 'border-t-violet-500', demo_sent: 'border-t-sky-500',
-  negotiating: 'border-t-amber-500', won: 'border-t-emerald-500', lost: 'border-t-red-400',
-};
+// Étapes du pipeline = source unique partagée (cf. @/lib/pipeline).
+const COLUMNS       = PIPELINE_STATUSES;
+const COLUMN_LABELS = PIPELINE_LABELS;
+const COLUMN_ACCENT = PIPELINE_ACCENT;
 
 type Board = Record<string, Prospect[]>;
 
