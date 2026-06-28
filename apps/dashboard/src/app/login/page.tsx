@@ -27,8 +27,8 @@ export default async function LoginPage({
           <Image
             src="/NexusLocale-logo.png"
             alt="NexusLocale"
-            width={842}
-            height={181}
+            width={863}
+            height={191}
             className="h-[46px] w-auto"
             priority
           />

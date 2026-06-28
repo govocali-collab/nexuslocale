@@ -58,8 +58,8 @@ export function Sidebar() {
     <Image
       src="/NexusLocale-logo.png"
       alt="NexusLocale"
-      width={842}
-      height={181}
+      width={863}
+      height={191}
       className="object-contain h-8 w-auto md:h-auto"
       priority
     />
