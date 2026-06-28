@@ -1,7 +1,5 @@
 import { listInvoices, listSubscriptions } from '@/lib/billing-actions';
-import { CreateInvoiceForm } from '@/components/billing/create-invoice-form';
-import { InvoicesTable } from '@/components/billing/invoices-table';
-import { Subscriptions } from '@/components/billing/subscriptions';
+import { BillingTabs } from '@/components/billing/billing-tabs';
 
 const fmtMoney = (n: number) => '$' + n.toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -28,15 +26,7 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      {/* ── Montants récurrents (hébergement / rank-and-rent) ────────────── */}
-      <h2 className="text-base font-semibold text-[#0a0a0a] pt-1">Montants récurrents</h2>
-      <Subscriptions subs={subs} />
-
-      {/* ── Factures à l'unité (sites web, etc.) ─────────────────────────── */}
-      <h2 className="text-base font-semibold text-[#0a0a0a] pt-2">Factures à l&apos;unité</h2>
-      <CreateInvoiceForm />
-
-      <InvoicesTable invoices={invoices} />
+      <BillingTabs invoices={invoices} subs={subs} />
     </div>
   );
 }
