@@ -4,7 +4,7 @@ import {
   getOverviewStats,
   getRecentLeads,
   getStaleSites,
-  getWonDeals,
+  getSalesDeals,
 } from '@/lib/queries';
 import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
 import { SalesByMonth } from '@/components/overview/sales-by-month';
@@ -36,7 +36,7 @@ export default async function OverviewPage() {
     getOverviewStats(),
     getRecentLeads(10),
     getStaleSites(6),
-    getWonDeals(),
+    getSalesDeals(),
   ]);
 
   const leadsDelta = stats.leadsPrevMonth > 0

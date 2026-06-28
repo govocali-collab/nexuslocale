@@ -5,16 +5,8 @@ import { redirect } from 'next/navigation';
 import { createAuthClient } from './supabase/server';
 import { createAdminClient } from './admin';
 
-// Fixe won_at = maintenant la 1re fois qu'un prospect passe à « won » (sans l'écraser ensuite).
-async function wonPatch(db: ReturnType<typeof createAdminClient>, id: string, status?: string): Promise<Record<string, unknown>> {
-  if (status !== 'won') return {};
-  const { data } = await db.from('prospects').select('won_at').eq('id', id).single();
-  return (data as { won_at: string | null } | null)?.won_at ? {} : { won_at: new Date().toISOString() };
-}
-
 export async function updateProspectStatus(id: string, status: string): Promise<void> {
-  const db = createAdminClient();
-  await db.from('prospects').update({ status, ...(await wonPatch(db, id, status)) } as never).eq('id', id);
+  await createAdminClient().from('prospects').update({ status }).eq('id', id);
   revalidatePath('/app/pipeline');
   revalidatePath('/app');
 }
@@ -57,8 +49,7 @@ export async function updateProspect(
   id: string,
   fields: { notes?: string; phone?: string; demo_url?: string; status?: string; email?: string | null; sale_value?: number | null; monthly_value?: number | null },
 ): Promise<{ error?: string }> {
-  const db = createAdminClient();
-  const { error } = await db.from('prospects').update({ ...fields, ...(await wonPatch(db, id, fields.status)) } as never).eq('id', id);
+  const { error } = await createAdminClient().from('prospects').update(fields).eq('id', id);
   if (error) return { error: error.message };
   revalidatePath('/app/pipeline');
   revalidatePath('/app');
