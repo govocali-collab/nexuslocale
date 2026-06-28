@@ -6,7 +6,7 @@ import {
   getStaleSites,
   getSalesDeals,
 } from '@/lib/queries';
-import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
+import { PIPELINE_STATUSES, PIPELINE_LABELS, PIPELINE_ACCENT } from '@/lib/pipeline';
 import { SalesByMonth } from '@/components/overview/sales-by-month';
 
 const STATUSES = ['research', 'built', 'indexed', 'ranking', 'rented', 'sold'];
@@ -101,9 +101,9 @@ export default async function OverviewPage() {
             Voir tout →
           </Link>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {PIPELINE.map(s => (
-            <div key={s} className="flex-1 text-center">
+            <div key={s} className={`flex-1 text-center rounded-lg border border-neutral-200 border-t-4 ${PIPELINE_ACCENT[s]} bg-white py-3 px-1`}>
               <p className="text-2xl font-bold mono text-[#0a0a0a]">
                 {stats.prospectsByStatus[s] ?? 0}
               </p>
