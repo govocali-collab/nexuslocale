@@ -7,7 +7,7 @@ export const DICT = {
     hero: {
       badge: '✦ Des sites web locaux qui rankent sur Google',
       titleL1: 'Plus de clients,',
-      titleL2Pre: 'direct de ',
+      titleL2Pre: 'directement de ',
       titleAccent: 'Google',
       subtitle: 'On bâtit et on ranke des sites web locaux. Ils montent dans le top de Google, et on vous envoie les appels et les leads directement.',
       ctaPrimary: 'Avoir plus de clients',
