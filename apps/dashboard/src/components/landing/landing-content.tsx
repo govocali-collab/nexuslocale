@@ -57,7 +57,7 @@ export function LandingContent() {
       <header className="sticky top-0 z-50 backdrop-blur bg-white/80 border-b border-neutral-200/70">
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Image src="/NexusLocale-logo.png" alt="NexusLocale" width={863} height={191} priority className="h-[37px] w-auto" />
+            <Image src="/NexusLocale-logo-v2.png" alt="NexusLocale" width={863} height={191} priority className="h-[37px] w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-neutral-600">
             <a href="#why" className="hover:text-[#0a0a0a] transition-colors">{t.nav.why}</a>
@@ -201,7 +201,7 @@ export function LandingContent() {
       {/* Footer - gris */}
       <footer className="border-t border-neutral-200" style={{ backgroundColor: '#f4f4f4' }}>
         <div className="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#0a0a0a]/50">
-          <Image src="/NexusLocale-logo.png" alt="NexusLocale" width={863} height={191} className="h-7 w-auto" />
+          <Image src="/NexusLocale-logo-v2.png" alt="NexusLocale" width={863} height={191} className="h-7 w-auto" />
           <div className="flex items-center gap-6">
             <Link href="/terms" className="hover:text-[#0a0a0a]">{t.footer.terms}</Link>
             <Link href="/privacy" className="hover:text-[#0a0a0a]">{t.footer.privacy}</Link>

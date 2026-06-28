@@ -25,7 +25,7 @@ export default async function LoginPage({
         {/* Logo */}
         <div className="mb-8 flex justify-center">
           <Image
-            src="/NexusLocale-logo.png"
+            src="/NexusLocale-logo-v2.png"
             alt="NexusLocale"
             width={863}
             height={191}

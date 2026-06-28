@@ -56,7 +56,7 @@ export function Sidebar() {
 
   const Logo = () => (
     <Image
-      src="/NexusLocale-logo.png"
+      src="/NexusLocale-logo-v2.png"
       alt="NexusLocale"
       width={863}
       height={191}

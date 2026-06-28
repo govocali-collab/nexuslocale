@@ -14,9 +14,9 @@ export const metadata: Metadata = {
     description: DESC,
     type: 'website',
     siteName: 'NexusLocale',
-    images: [{ url: '/NexusLocale-logo.png', alt: 'NexusLocale' }],
+    images: [{ url: '/NexusLocale-logo-v2.png', alt: 'NexusLocale' }],
   },
-  twitter: { card: 'summary_large_image', title: TITLE, description: DESC, images: ['/NexusLocale-logo.png'] },
+  twitter: { card: 'summary_large_image', title: TITLE, description: DESC, images: ['/NexusLocale-logo-v2.png'] },
 };
 
 export default function LandingPage() {
