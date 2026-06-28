@@ -28,8 +28,8 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      {/* ── Abonnements récurrents (hébergement / rank-and-rent) ─────────── */}
-      <h2 className="text-base font-semibold text-[#0a0a0a] pt-1">Abonnements récurrents</h2>
+      {/* ── Montants récurrents (hébergement / rank-and-rent) ────────────── */}
+      <h2 className="text-base font-semibold text-[#0a0a0a] pt-1">Montants récurrents</h2>
       <Subscriptions subs={subs} />
 
       {/* ── Factures à l'unité (sites web, etc.) ─────────────────────────── */}

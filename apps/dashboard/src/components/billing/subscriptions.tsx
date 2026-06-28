@@ -44,7 +44,7 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
   }
 
   function cancel(id: string) {
-    if (!confirm('Annuler cet abonnement ? Le client ne sera plus chargé.')) return;
+    if (!confirm('Arrêter ce montant récurrent ? Le client ne sera plus facturé.')) return;
     start(async () => { await cancelSubscription(id); router.refresh(); });
   }
 
@@ -54,7 +54,7 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
     <div className="space-y-4">
       {/* Créer un abonnement */}
       <form onSubmit={create} className="card p-5 space-y-4">
-        <p className="label">Nouvel abonnement (récurrent mensuel)</p>
+        <p className="label">Nouveau montant récurrent (mensuel)</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="label block mb-1">Nom du client *</label>
@@ -76,10 +76,10 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
 
         <div className="flex items-center justify-between gap-3">
           {sent
-            ? <span className="text-sm text-emerald-700 font-medium">✓ Abonnement créé — chaque facture mensuelle apparaît « À envoyer » dans l&apos;historique pour que tu la consultes avant de l&apos;envoyer.</span>
+            ? <span className="text-sm text-emerald-700 font-medium">✓ Montant récurrent créé — chaque facture mensuelle apparaît « À envoyer » dans l&apos;historique pour que tu la consultes avant de l&apos;envoyer.</span>
             : <span className="text-xs text-[#a3a3a3]">Chaque facture mensuelle est à prévisualiser, puis à envoyer manuellement.</span>}
           <button type="submit" disabled={pending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2 text-sm font-medium text-white whitespace-nowrap">
-            {pending ? '…' : 'Créer l\'abonnement'}
+            {pending ? '…' : 'Créer le montant récurrent'}
           </button>
         </div>
         {err && <p className="text-sm text-red-600">{err}</p>}
@@ -88,7 +88,7 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
       {/* Liste des abonnements */}
       <div className="card overflow-hidden">
         <div className="px-4 py-3 border-b border-neutral-200 flex items-center justify-between">
-          <p className="label">Abonnements actifs</p>
+          <p className="label">Montants récurrents actifs</p>
           <p className="text-xs text-[#525252]">MRR : <span className="font-bold text-[#0a0a0a]">{fmtMoney(mrr)}</span>/mois</p>
         </div>
         <div className="overflow-x-auto">
@@ -104,7 +104,7 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
             </thead>
             <tbody className="divide-y divide-[#f0f0f0]">
               {subs.length === 0 ? (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-[#a3a3a3]">Aucun abonnement pour l&apos;instant.</td></tr>
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-[#a3a3a3]">Aucun montant récurrent pour l&apos;instant.</td></tr>
               ) : subs.map((s) => {
                 const st = SUB_STATUS[s.status] ?? { label: s.status, cls: 'bg-[#f5f5f5] text-[#525252]' };
                 const cancellable = s.status === 'active' || s.status === 'trialing' || s.status === 'past_due';
