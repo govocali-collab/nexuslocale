@@ -27,11 +27,13 @@ export async function GET(req: Request) {
   }
 
   const from = process.env['TWILIO_FROM_NUMBER'];
+  const mgSid = process.env['TWILIO_MESSAGING_SERVICE_SID'];
   const sid = process.env['TWILIO_ACCOUNT_SID'];
   const token = process.env['TWILIO_AUTH_TOKEN'];
-  if (!from || !sid || !token) {
-    return Response.json({ ok: false, error: 'TWILIO_FROM_NUMBER / clés Twilio manquantes' });
+  if ((!from && !mgSid) || !sid || !token) {
+    return Response.json({ ok: false, error: 'TWILIO_MESSAGING_SERVICE_SID ou TWILIO_FROM_NUMBER (+ clés Twilio) manquant' });
   }
+  const sender = mgSid ? { messagingServiceSid: mgSid } : { from: from! };
 
   const db = createAdminClient();
   const now = Date.now();
@@ -60,7 +62,7 @@ export async function GET(req: Request) {
     const heure = new Date(a.starts_at).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' });
     const body = `Rappel : votre démo Zoom avec NexusLocale est aujourd'hui à ${heure}.${a.zoom_url ? ` Lien : ${a.zoom_url}` : ''} À tantôt !`;
     try {
-      await client.messages.create({ to, from, body });
+      await client.messages.create({ to, body, ...sender });
       await db.from('appointments').update({ reminder_sent_at: new Date().toISOString() }).eq('id', a.id);
       sent++;
     } catch (e) {

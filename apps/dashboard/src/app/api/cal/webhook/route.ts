@@ -1,9 +1,11 @@
 import crypto from 'node:crypto';
+import Twilio from 'twilio';
 import { createAdminClient } from '@/lib/admin';
 
 // Webhook Cal.com : reçoit les évènements de réservation.
-// - BOOKING_CREATED / RESCHEDULED → stocke le RDV + passe le prospect en « demo_booked »
-// - BOOKING_CANCELLED → marque le RDV annulé
+// - BOOKING_CREATED / RESCHEDULED → stocke le RDV, passe le prospect en « demo_booked »,
+//   et PROGRAMME un SMS de rappel ~2h avant via Twilio (aucun cron externe requis).
+// - BOOKING_CANCELLED → annule le RDV + le SMS programmé.
 // Configurer dans Cal.com → Settings → Webhooks, URL = https://app.nexuslocale.com/api/cal/webhook
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +22,6 @@ function verify(rawBody: string, signature: string | null): boolean {
   }
 }
 
-// Cal.com place le lien Zoom à divers endroits selon la version — on essaie tout.
 function extractZoomUrl(p: Record<string, unknown>): string | null {
   const meta = (p['metadata'] ?? {}) as Record<string, unknown>;
   const vcd = (p['videoCallData'] ?? {}) as Record<string, unknown>;
@@ -39,19 +40,61 @@ function extractPhone(p: Record<string, unknown>): string | null {
   return typeof ph === 'string' && ph ? ph : null;
 }
 
+// Format E.164 (Twilio). Suppose Canada/US si 10 chiffres.
+function toE164(raw: string): string | null {
+  const d = raw.replace(/[^\d+]/g, '');
+  if (d.startsWith('+')) return d;
+  const digits = d.replace(/\D/g, '');
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
+  return null;
+}
+
+function twilioClient() {
+  const sid = process.env['TWILIO_ACCOUNT_SID'];
+  const token = process.env['TWILIO_AUTH_TOKEN'];
+  return sid && token ? Twilio(sid, token) : null;
+}
+
+// Programme un SMS de rappel ~2h avant le RDV. Retourne le SID (pour annulation) ou null.
+async function scheduleReminder(phone: string | null, startsAt: string, zoomUrl: string | null): Promise<string | null> {
+  const mgSid = process.env['TWILIO_MESSAGING_SERVICE_SID'];
+  const client = twilioClient();
+  if (!mgSid || !client || !phone) return null;
+  const to = toE164(phone);
+  if (!to) return null;
+
+  const startMs = new Date(startsAt).getTime();
+  const nowMs = Date.now();
+  const minMs = nowMs + 16 * 60 * 1000;      // Twilio : min 15 min dans le futur
+  const maxMs = nowMs + 7 * 24 * 3600 * 1000; // Twilio : max 7 jours
+  let sendAtMs = startMs - 2 * 60 * 60 * 1000; // 2h avant
+  if (sendAtMs < minMs) sendAtMs = minMs;      // RDV proche → on envoie dans 16 min
+  if (sendAtMs >= startMs || sendAtMs > maxMs) return null; // déjà passé, ou >7j (non planifiable)
+
+  const heure = new Date(startsAt).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Toronto' });
+  const body = `Rappel : votre démo Zoom avec NexusLocale est aujourd'hui à ${heure}.${zoomUrl ? ` Lien : ${zoomUrl}` : ''} À tantôt !`;
+  try {
+    const msg = await client.messages.create({ messagingServiceSid: mgSid, to, body, scheduleType: 'fixed', sendAt: new Date(sendAtMs) });
+    return msg.sid;
+  } catch {
+    return null;
+  }
+}
+
+async function cancelReminder(sid: string | null | undefined) {
+  const client = twilioClient();
+  if (!sid || !client) return;
+  try { await client.messages(sid).update({ status: 'canceled' }); } catch { /* déjà parti/annulé */ }
+}
+
 export async function POST(req: Request) {
   const raw = await req.text();
   const sig = req.headers.get('x-cal-signature-256');
-  if (!verify(raw, sig)) {
-    return new Response('Invalid signature', { status: 401 });
-  }
+  if (!verify(raw, sig)) return new Response('Invalid signature', { status: 401 });
 
   let body: { triggerEvent?: string; payload?: Record<string, unknown> };
-  try {
-    body = JSON.parse(raw);
-  } catch {
-    return new Response('Bad JSON', { status: 400 });
-  }
+  try { body = JSON.parse(raw); } catch { return new Response('Bad JSON', { status: 400 }); }
 
   const event = body.triggerEvent ?? '';
   const p = body.payload ?? {};
@@ -61,6 +104,8 @@ export async function POST(req: Request) {
   const db = createAdminClient();
 
   if (event === 'BOOKING_CANCELLED') {
+    const { data: existing } = await db.from('appointments').select('sms_sid').eq('cal_uid', uid).maybeSingle();
+    await cancelReminder(existing?.sms_sid as string | undefined);
     await db.from('appointments').update({ status: 'cancelled' }).eq('cal_uid', uid);
     return Response.json({ ok: true, event });
   }
@@ -76,14 +121,14 @@ export async function POST(req: Request) {
     const endsAt = (p['endTime'] as string) ?? null;
     if (!startsAt) return new Response('No startTime', { status: 200 });
 
-    // Tente de relier au prospect existant (par courriel) et le passe en « demo_booked ».
+    // Si reprogrammation : annule l'ancien SMS programmé.
+    const { data: existing } = await db.from('appointments').select('sms_sid').eq('cal_uid', uid).maybeSingle();
+    await cancelReminder(existing?.sms_sid as string | undefined);
+
+    // Relie au prospect (par courriel) et le passe en « demo_booked ».
     let prospectId: string | null = null;
     if (email) {
-      const { data: prospect } = await db
-        .from('prospects')
-        .select('id')
-        .ilike('email', email)
-        .maybeSingle();
+      const { data: prospect } = await db.from('prospects').select('id').ilike('email', email).maybeSingle();
       if (prospect?.id) {
         prospectId = prospect.id as string;
         const patch: Record<string, unknown> = { status: 'demo_booked' };
@@ -92,23 +137,19 @@ export async function POST(req: Request) {
       }
     }
 
+    // Programme le SMS de rappel via Twilio.
+    const smsSid = await scheduleReminder(phone, startsAt, zoom);
+
     await db.from('appointments').upsert(
       {
-        cal_uid: uid,
-        prospect_id: prospectId,
-        name,
-        email,
-        phone,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        zoom_url: zoom,
-        status: 'booked',
-        reminder_sent_at: null,
+        cal_uid: uid, prospect_id: prospectId, name, email, phone,
+        starts_at: startsAt, ends_at: endsAt, zoom_url: zoom,
+        status: 'booked', sms_sid: smsSid, reminder_sent_at: null,
       },
       { onConflict: 'cal_uid' },
     );
 
-    return Response.json({ ok: true, event, prospectId });
+    return Response.json({ ok: true, event, prospectId, smsScheduled: Boolean(smsSid) });
   }
 
   return Response.json({ ok: true, ignored: event });
