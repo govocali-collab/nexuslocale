@@ -10,6 +10,30 @@ export async function updateProspectStatus(id: string, status: string): Promise<
   revalidatePath('/pipeline');
 }
 
+export async function createProspect(fields: {
+  business_name: string; niche: string; city: string; phone?: string; notes?: string;
+}): Promise<{ error?: string }> {
+  const business_name = fields.business_name.trim();
+  const niche = fields.niche.trim();
+  const city = fields.city.trim();
+  if (!business_name || !niche || !city) {
+    return { error: 'Nom du commerce, niche et ville sont requis.' };
+  }
+  const { error } = await createAdminClient().from('prospects').insert({
+    business_name, niche, city,
+    phone: fields.phone?.trim() || null,
+    notes: fields.notes?.trim() || null,
+    web_presence: 'none',
+    status: 'new',
+  } as never);
+  if (error) {
+    if (error.code === '23505') return { error: 'Ce prospect existe déjà (même nom + ville).' };
+    return { error: error.message };
+  }
+  revalidatePath('/app/pipeline');
+  return {};
+}
+
 export async function deleteProspects(ids: string[]): Promise<{ error?: string }> {
   const list = ids.filter(Boolean);
   if (list.length === 0) return {};
