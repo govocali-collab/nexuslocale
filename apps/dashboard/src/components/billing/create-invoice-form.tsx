@@ -101,9 +101,10 @@ export function CreateInvoiceForm() {
               </div>
               <button type="button" onClick={() => rmLine(i)} className="text-[#a3a3a3] hover:text-red-600 px-1" aria-label="Retirer">✕</button>
             </div>
-            <input value={l.detail} onChange={(e) => setLine(i, 'detail', e.target.value)}
-              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-xs font-normal text-[#525252] placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Description détaillée (optionnel) — ex. Refonte 5 pages, optimisé SEO" />
+            <textarea value={l.detail} onChange={(e) => setLine(i, 'detail', e.target.value)} rows={2}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) e.preventDefault(); }}
+              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-xs font-normal text-[#525252] placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+              placeholder="Description détaillée (optionnel) — Shift+Entrée pour une nouvelle ligne" />
           </div>
         ))}
         <button type="button" onClick={addLine} className="text-xs text-indigo-600 hover:text-indigo-800">+ Ajouter une ligne</button>
