@@ -93,12 +93,14 @@ export async function createSubscription(input: {
       days_until_due: 14,
       expand: ['latest_invoice'],
     });
-    // Finalise la 1re facture (PDF + numéro) mais NE l'envoie PAS → tu la prévisualises
-    // et l'envoies depuis l'historique. Les mois suivants sont envoyés par Stripe auto.
+    // 1re facture : finalisée SANS auto-progression (auto_advance:false) → Stripe ne
+    // l'envoie pas tout seul, tu la prévisualises et l'envoies depuis l'historique.
+    // Les factures des mois suivants gardent l'auto_advance par défaut → Stripe les
+    // finalise ET les envoie automatiquement chaque mois (aucune action de ta part).
     const inv = sub.latest_invoice;
     if (inv && typeof inv !== 'string' && inv.id && inv.status === 'draft') {
       await stripe.invoices.update(inv.id, { metadata: { emailed: 'no' } });
-      await stripe.invoices.finalizeInvoice(inv.id);
+      await stripe.invoices.finalizeInvoice(inv.id, { auto_advance: false });
     }
     return { ok: true };
   } catch (e) {
@@ -167,10 +169,10 @@ export async function listInvoices(): Promise<InvoiceRow[]> {
       created:       i.created,
       hostedUrl:     i.hosted_invoice_url ?? null,
       pdfUrl:        i.invoice_pdf ?? null,
-      // « À envoyer » = finalisée (open) et pas encore envoyée par nous.
-      // Couvre les factures d'abonnement générées par Stripe (sans nos métadonnées),
-      // à condition que l'envoi auto de Stripe soit désactivé (réglage Stripe).
-      needsSend:     i.status === 'open' && i.metadata?.['emailed'] !== 'yes',
+      // « À envoyer » = UNIQUEMENT les factures qu'on retient pour révision (1re facture
+      // d'un montant récurrent + factures à l'unité). Les mensuelles suivantes, envoyées
+      // automatiquement par Stripe, n'ont pas cette métadonnée → elles s'affichent « Envoyée ».
+      needsSend:     i.metadata?.['emailed'] === 'no' && i.status === 'open',
     }));
   } catch {
     return [];
