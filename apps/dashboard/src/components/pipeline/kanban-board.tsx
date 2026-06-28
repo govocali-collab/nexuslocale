@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Prospect } from '@/lib/queries';
-import { updateProspectStatus } from '@/lib/actions';
+import { updateProspectStatus, deleteProspects } from '@/lib/actions';
 import { ProspectPanel } from './prospect-panel';
 
 const COLUMNS = ['new', 'demo_sent', 'negotiating', 'won', 'lost'] as const;
@@ -49,15 +49,17 @@ interface DragState {
 }
 
 function ProspectCard({
-  p, isDragging, isDropTarget,
-  onDragStart, onDragEnter, onClick,
+  p, isDragging, isDropTarget, selected,
+  onDragStart, onDragEnter, onClick, onToggleSelect,
 }: {
   p: Prospect;
   isDragging: boolean;
   isDropTarget: boolean;
+  selected: boolean;
   onDragStart: () => void;
   onDragEnter: () => void;
   onClick: () => void;
+  onToggleSelect: () => void;
 }) {
   return (
     <div
@@ -68,10 +70,21 @@ function ProspectCard({
       className={`bg-white border rounded-lg p-3 cursor-pointer
                   hover:shadow-sm hover:border-indigo-200 transition-all space-y-1.5 select-none
                   ${isDragging   ? 'opacity-40 scale-95' : ''}
-                  ${isDropTarget ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-[#e5e5e5]'}`}
+                  ${selected ? 'border-indigo-400 ring-2 ring-indigo-300 bg-indigo-50'
+                    : isDropTarget ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-[#e5e5e5]'}`}
     >
       <div className="flex items-start justify-between gap-1">
-        <span className="font-medium text-[#0a0a0a] text-sm leading-snug">{p.business_name}</span>
+        <div className="flex items-start gap-2 min-w-0">
+          <input
+            type="checkbox"
+            checked={selected}
+            onClick={e => e.stopPropagation()}
+            onChange={onToggleSelect}
+            className="mt-0.5 rounded border-[#d4d4d4] text-indigo-600 cursor-pointer flex-none"
+            aria-label={`Sélectionner ${p.business_name}`}
+          />
+          <span className="font-medium text-[#0a0a0a] text-sm leading-snug">{p.business_name}</span>
+        </div>
         {p.prospect_score != null && <ScorePill score={p.prospect_score} />}
       </div>
       <div className="text-xs text-[#a3a3a3]">{p.niche} · {p.city}</div>
@@ -108,8 +121,31 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
   const [overCol, setOverCol]           = useState<string | null>(null);
   const [overIndex, setOverIndex]       = useState<number | null>(null);
   const [selected, setSelected]         = useState<Prospect | null>(null);
+  const [sel, setSel]                   = useState<Set<string>>(new Set());
+  const [deleting, startDelete]         = useTransition();
   const [, startTransition]             = useTransition();
   const router                          = useRouter();
+
+  function toggleSelect(id: string) {
+    setSel(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  }
+
+  function deleteSelected() {
+    const ids = [...sel];
+    if (ids.length === 0) return;
+    if (!confirm(`Supprimer ${ids.length} prospect(s) du pipeline ? Cette action est définitive.`)) return;
+    startDelete(async () => {
+      const r = await deleteProspects(ids);
+      if (r.error) { alert('Échec de la suppression : ' + r.error); return; }
+      setBoard(prev => {
+        const next: Board = {};
+        for (const col of Object.keys(prev)) next[col] = prev[col]!.filter(p => !sel.has(p.id));
+        return next;
+      });
+      setSel(new Set());
+      router.refresh();
+    });
+  }
 
   function handleDragStart(p: Prospect, col: string, index: number) {
     setDrag({ id: p.id, col, index });
@@ -174,6 +210,16 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
 
   return (
     <>
+      {sel.size > 0 && (
+        <div className="sticky top-0 z-20 mb-2 flex items-center gap-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2">
+          <span className="text-sm font-medium text-red-700">{sel.size} sélectionné(s)</span>
+          <button onClick={deleteSelected} disabled={deleting}
+            className="rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 px-3 py-1 text-sm text-white transition-colors">
+            {deleting ? 'Suppression…' : '🗑 Supprimer'}
+          </button>
+          <button onClick={() => setSel(new Set())} className="text-xs text-red-500 hover:text-red-700 underline">Annuler</button>
+        </div>
+      )}
       <div
         className="flex gap-3 overflow-x-auto pb-4"
         style={{ minHeight: 'calc(100vh - 140px)' }}
@@ -220,9 +266,11 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
                       p={p}
                       isDragging={drag?.id === p.id}
                       isDropTarget={false}
+                      selected={sel.has(p.id)}
                       onDragStart={() => handleDragStart(p, col, i)}
                       onDragEnter={() => { setOverCol(col); setOverIndex(i); }}
                       onClick={() => handleCardClick(p)}
+                      onToggleSelect={() => toggleSelect(p.id)}
                     />
                   </div>
                 ))}

@@ -10,6 +10,15 @@ export async function updateProspectStatus(id: string, status: string): Promise<
   revalidatePath('/pipeline');
 }
 
+export async function deleteProspects(ids: string[]): Promise<{ error?: string }> {
+  const list = ids.filter(Boolean);
+  if (list.length === 0) return {};
+  const { error } = await createAdminClient().from('prospects').delete().in('id', list);
+  if (error) return { error: error.message };
+  revalidatePath('/app/pipeline');
+  return {};
+}
+
 export async function updateProspect(
   id: string,
   fields: { notes?: string; phone?: string; demo_url?: string; status?: string },
