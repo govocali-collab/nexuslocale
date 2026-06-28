@@ -17,7 +17,7 @@ export function CreateInvoiceForm() {
   const [name, setName]   = useState('');
   const [email, setEmail] = useState('');
   const [memo, setMemo]   = useState('');
-  const [lines, setLines] = useState<{ description: string; amount: string }[]>([{ description: '', amount: '' }]);
+  const [lines, setLines] = useState<{ description: string; amount: string; detail: string }[]>([{ description: '', amount: '', detail: '' }]);
   const [pending, start]  = useTransition();
   const [sending, startSend] = useTransition();
   const [err, setErr]     = useState('');
@@ -26,21 +26,21 @@ export function CreateInvoiceForm() {
 
   const total = lines.reduce((n, l) => n + (Number(l.amount) || 0), 0);
 
-  function setLine(i: number, k: 'description' | 'amount', v: string) {
+  function setLine(i: number, k: 'description' | 'amount' | 'detail', v: string) {
     setLines((p) => p.map((l, j) => (j === i ? { ...l, [k]: v } : l)));
   }
-  const addLine = () => setLines((p) => [...p, { description: '', amount: '' }]);
+  const addLine = () => setLines((p) => [...p, { description: '', amount: '', detail: '' }]);
   const rmLine  = (i: number) => setLines((p) => (p.length > 1 ? p.filter((_, j) => j !== i) : p));
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setErr(''); setDone(null); setSent(false);
-    const payloadLines: InvoiceLine[] = lines.map((l) => ({ description: l.description, amount: Number(l.amount) }));
+    const payloadLines: InvoiceLine[] = lines.map((l) => ({ description: l.description, amount: Number(l.amount), detail: l.detail }));
     start(async () => {
       const r = await createInvoice({ clientName: name, clientEmail: email, lines: payloadLines, memo });
       if (!r.ok) { setErr(r.error ?? 'Erreur.'); return; }
       setDone({ number: r.number, pdfUrl: r.pdfUrl, hostedUrl: r.hostedUrl, invoiceId: r.invoiceId });
-      setName(''); setEmail(''); setMemo(''); setLines([{ description: '', amount: '' }]);
+      setName(''); setEmail(''); setMemo(''); setLines([{ description: '', amount: '', detail: '' }]);
       router.refresh();
     });
   }
@@ -92,13 +92,18 @@ export function CreateInvoiceForm() {
       <div className="space-y-2">
         <label className="label block">Lignes</label>
         {lines.map((l, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <input value={l.description} onChange={(e) => setLine(i, 'description', e.target.value)} className={`${inputCls} flex-1`} placeholder="Site web — Plomberie Tremblay" />
-            <div className="relative w-32">
-              <span className="absolute left-3 top-2 text-sm text-[#a3a3a3]">$</span>
-              <input type="number" min={0} step="0.01" value={l.amount} onChange={(e) => setLine(i, 'amount', e.target.value)} className={`${inputCls} pl-6`} placeholder="0.00" />
+          <div key={i} className="rounded-md border border-[#f0f0f0] p-2 space-y-1.5">
+            <div className="flex items-center gap-2">
+              <input value={l.description} onChange={(e) => setLine(i, 'description', e.target.value)} className={`${inputCls} flex-1`} placeholder="Site web" />
+              <div className="relative w-32">
+                <span className="absolute left-3 top-2 text-sm text-[#a3a3a3]">$</span>
+                <input type="number" min={0} step="0.01" value={l.amount} onChange={(e) => setLine(i, 'amount', e.target.value)} className={`${inputCls} pl-6`} placeholder="0.00" />
+              </div>
+              <button type="button" onClick={() => rmLine(i)} className="text-[#a3a3a3] hover:text-red-600 px-1" aria-label="Retirer">✕</button>
             </div>
-            <button type="button" onClick={() => rmLine(i)} className="text-[#a3a3a3] hover:text-red-600 px-1" aria-label="Retirer">✕</button>
+            <input value={l.detail} onChange={(e) => setLine(i, 'detail', e.target.value)}
+              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-xs font-normal text-[#525252] placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Description détaillée (optionnel) — ex. Refonte 5 pages, optimisé SEO" />
           </div>
         ))}
         <button type="button" onClick={addLine} className="text-xs text-indigo-600 hover:text-indigo-800">+ Ajouter une ligne</button>

@@ -2,7 +2,7 @@
 
 import { stripe, dollarsToCents, centsToDollars } from './stripe';
 
-export interface InvoiceLine { description: string; amount: number } // amount en dollars
+export interface InvoiceLine { description: string; amount: number; detail?: string } // amount en dollars
 
 // Réutilise le client Stripe existant (par courriel) MAIS remet son nom à jour
 // avec celui saisi — sinon un ancien client garderait son ancien nom sur la facture.
@@ -41,12 +41,15 @@ export async function createInvoice(input: {
     const invoiceId = invoice.id as string;
 
     for (const l of lines) {
+      // L'item sur la 1re ligne, la description détaillée optionnelle en dessous.
+      const detail = l.detail?.trim();
+      const description = detail ? `${l.description.trim()}\n${detail}` : l.description.trim();
       await stripe.invoiceItems.create({
         customer: customer.id,
         invoice: invoiceId,
         amount: dollarsToCents(Number(l.amount)),
         currency: 'cad',
-        description: l.description.trim(),
+        description,
       });
     }
 
