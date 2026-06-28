@@ -65,9 +65,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
         setErrMsg(result.error);
         return;
       }
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
       onSaved({ id: prospect.id, notes, phone, demo_url: demoUrl, status, email: email.trim() || null, sale_value: saleNum, monthly_value: monthlyNum });
+      onClose();
     });
   }
 
