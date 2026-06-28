@@ -4,6 +4,17 @@ import { stripe, dollarsToCents, centsToDollars } from './stripe';
 
 export interface InvoiceLine { description: string; amount: number } // amount en dollars
 
+// Réutilise le client Stripe existant (par courriel) MAIS remet son nom à jour
+// avec celui saisi — sinon un ancien client garderait son ancien nom sur la facture.
+async function findOrCreateCustomer(name: string, email: string) {
+  const existing = await stripe.customers.list({ email, limit: 1 });
+  const found = existing.data[0];
+  if (found) {
+    return found.name === name ? found : await stripe.customers.update(found.id, { name });
+  }
+  return stripe.customers.create({ name, email });
+}
+
 // Crée une facture FINALISÉE mais NON envoyée → on peut la prévisualiser (PDF)
 // avant de cliquer « Envoyer ». L'envoi se fait ensuite via sendInvoiceNow().
 export async function createInvoice(input: {
@@ -16,8 +27,7 @@ export async function createInvoice(input: {
   if (lines.length === 0) return { ok: false, error: 'Ajoutez au moins une ligne avec un montant > 0.' };
 
   try {
-    const existing = await stripe.customers.list({ email, limit: 1 });
-    const customer = existing.data[0] ?? (await stripe.customers.create({ name, email }));
+    const customer = await findOrCreateCustomer(name, email);
 
     const invoice = await stripe.invoices.create({
       customer: customer.id,
@@ -78,8 +88,7 @@ export async function createSubscription(input: {
   if (!name || !email) return { ok: false, error: 'Nom et courriel du client requis.' };
   if (!(amount > 0))   return { ok: false, error: 'Montant mensuel (> 0) requis.' };
   try {
-    const existing = await stripe.customers.list({ email, limit: 1 });
-    const customer = existing.data[0] ?? (await stripe.customers.create({ name, email }));
+    const customer = await findOrCreateCustomer(name, email);
     const product  = await stripe.products.create({ name: desc });
     const sub = await stripe.subscriptions.create({
       customer: customer.id,
