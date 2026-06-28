@@ -6,7 +6,7 @@ export type SiteStatus = 'research' | 'built' | 'indexed' | 'ranking' | 'rented'
 export type LeadType = 'call' | 'sms' | 'form';
 
 export type WebPresence = 'none' | 'social_only' | 'has_site';
-export type ProspectStatus = 'new' | 'demo_sent' | 'negotiating' | 'won' | 'lost';
+export type ProspectStatus = 'new' | 'demo_booked' | 'demo_sent' | 'negotiating' | 'won' | 'lost';
 
 export type UpsellProduct = 'call_tracking' | 'sms_automation' | 'ai_chatbot' | 'voice_receptionist';
 export type UpsellStatus = 'active' | 'paused' | 'cancelled';

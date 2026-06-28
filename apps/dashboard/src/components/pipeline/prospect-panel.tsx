@@ -4,9 +4,9 @@ import { useState, useEffect, useTransition } from 'react';
 import type { Prospect } from '@/lib/queries';
 import { updateProspect } from '@/lib/actions';
 
-const STATUSES = ['new', 'demo_sent', 'negotiating', 'won', 'lost'];
+const STATUSES = ['new', 'demo_booked', 'demo_sent', 'negotiating', 'won', 'lost'];
 const STATUS_LABELS: Record<string, string> = {
-  new: 'Nouveau', demo_sent: 'Démo envoyée',
+  new: 'Nouveau', demo_booked: 'RDV démo Zoom', demo_sent: 'Démo envoyée',
   negotiating: 'Négociation', won: 'Gagné', lost: 'Perdu',
 };
 

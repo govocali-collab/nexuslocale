@@ -7,7 +7,7 @@ import {
 } from '@/lib/queries';
 
 const STATUSES = ['research', 'built', 'indexed', 'ranking', 'rented', 'sold'];
-const PIPELINE = ['new', 'demo_sent', 'negotiating', 'won', 'lost'];
+const PIPELINE = ['new', 'demo_booked', 'demo_sent', 'negotiating', 'won', 'lost'];
 
 function fmtDuration(sec: number | null): string {
   if (!sec) return '—';
