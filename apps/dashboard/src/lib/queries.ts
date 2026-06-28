@@ -308,6 +308,22 @@ export async function getProspects(): Promise<Prospect[]> {
   return (data ?? []) as unknown as Prospect[];
 }
 
+export interface WonDeal { date: string; sale_value: number; monthly_value: number }
+
+// Prospects « gagnés », pour le suivi des ventes par mois (date = won_at, sinon created_at).
+export async function getWonDeals(): Promise<WonDeal[]> {
+  const db = createAdminClient();
+  const { data } = await db
+    .from('prospects')
+    .select('won_at, created_at, sale_value, monthly_value')
+    .eq('status', 'won');
+  return (data ?? []).map((d) => ({
+    date:          ((d.won_at as string | null) ?? (d.created_at as string)),
+    sale_value:    (d.sale_value    as number | null) ?? 0,
+    monthly_value: (d.monthly_value as number | null) ?? 0,
+  }));
+}
+
 // ─── Lanceur : files d'attente ────────────────────────────────────────────────
 
 export interface ActionQueue {

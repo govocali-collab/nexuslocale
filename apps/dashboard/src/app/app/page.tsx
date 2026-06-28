@@ -4,8 +4,10 @@ import {
   getOverviewStats,
   getRecentLeads,
   getStaleSites,
+  getWonDeals,
 } from '@/lib/queries';
 import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
+import { SalesByMonth } from '@/components/overview/sales-by-month';
 
 const STATUSES = ['research', 'built', 'indexed', 'ranking', 'rented', 'sold'];
 // Reflète toujours le pipeline (source unique @/lib/pipeline).
@@ -30,10 +32,11 @@ function weeksAgo(iso: string): number {
 }
 
 export default async function OverviewPage() {
-  const [stats, recentLeads, staleSites] = await Promise.all([
+  const [stats, recentLeads, staleSites, wonDeals] = await Promise.all([
     getOverviewStats(),
     getRecentLeads(10),
     getStaleSites(6),
+    getWonDeals(),
   ]);
 
   const leadsDelta = stats.leadsPrevMonth > 0
@@ -86,14 +89,8 @@ export default async function OverviewPage() {
           <p className="text-xs mt-1 text-[#a3a3a3]">hébergement récurrent (prospects gagnés + clients)</p>
         </div>
 
-        {/* Ventes de sites (one-time) */}
-        <div className="card p-4">
-          <p className="label mb-1">Ventes de sites (total)</p>
-          <p className="text-3xl font-bold mono text-[#0a0a0a]">
-            ${Math.round(stats.salesTotal).toLocaleString('fr-CA')}
-          </p>
-          <p className="text-xs mt-1 text-[#a3a3a3]">sites web vendus (prospects gagnés)</p>
-        </div>
+        {/* Ventes de sites — par mois + total */}
+        <SalesByMonth deals={wonDeals} />
       </div>
 
       {/* ── Pipeline prospects ─────────────────────────────────────────────── */}
