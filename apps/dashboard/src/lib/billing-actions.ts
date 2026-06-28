@@ -5,8 +5,8 @@ import { stripe, dollarsToCents, centsToDollars } from './stripe';
 export interface InvoiceLine { description: string; amount: number } // amount en dollars
 
 export async function createInvoice(input: {
-  clientName: string; clientEmail: string; lines: InvoiceLine[]; memo?: string;
-}): Promise<{ ok: boolean; error?: string | undefined; url?: string | undefined; number?: string | undefined }> {
+  clientName: string; clientEmail: string; lines: InvoiceLine[]; memo?: string; send?: boolean;
+}): Promise<{ ok: boolean; error?: string | undefined; url?: string | undefined; number?: string | undefined; sent?: boolean }> {
   const name  = input.clientName.trim();
   const email = input.clientEmail.trim();
   const lines = input.lines.filter((l) => l.description.trim() && Number(l.amount) > 0);
@@ -40,9 +40,14 @@ export async function createInvoice(input: {
       });
     }
 
+    // Brouillon : on s'arrête ici (rien d'envoyé, modifiable/supprimable dans Stripe).
+    if (!input.send) {
+      return { ok: true, sent: false, number: invoice.number ?? undefined, url: undefined };
+    }
+    // Sinon : on finalise et on envoie le courriel au client.
     const finalized = await stripe.invoices.finalizeInvoice(invoiceId);
-    await stripe.invoices.sendInvoice(invoiceId); // envoie le courriel au client
-    return { ok: true, url: finalized.hosted_invoice_url ?? undefined, number: finalized.number ?? undefined };
+    await stripe.invoices.sendInvoice(invoiceId);
+    return { ok: true, sent: true, url: finalized.hosted_invoice_url ?? undefined, number: finalized.number ?? undefined };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Erreur Stripe.' };
   }
