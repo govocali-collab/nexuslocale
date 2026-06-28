@@ -1,11 +1,11 @@
 {
-  "domain": "demo-le-groupe-ultra.nexuslocale.com",
+  "domain": "demo-sam-plomberie.nexuslocale.com",
   "mode": "demo",
   "type": "demo",
   "business": {
-    "name": "Le Groupe Ultra",
-    "phone": "(450) 378-9600",
-    "address": "Granby, QC, Canada",
+    "name": "SAM Plomberie",
+    "phone": "(514) 659-6979",
+    "address": "longueuil, QC, Canada",
     "hours": "Lun–Ven : 7h–17h | Sam : 8h–12h | Dim : Fermé",
     "service_areas": [
       "Granby",
@@ -15,13 +15,13 @@
     ]
   },
   "branding": {
-    "hero_image_url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&h=900&q=80&auto=format&fit=crop&crop=center",
+    "hero_image_url": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1600&h=900&q=80&auto=format&fit=crop&crop=center",
     "primary_color": "#1a3a5c",
     "secondary_color": "#e87c22",
     "tagline": "Travaux d'excavation et terrassement — fiables, région de Granby"
   },
-  "niche": "excavation",
-  "city": "Granby",
+  "niche": "plombier",
+  "city": "longueuil",
   "pages": {
     "home": {
       "hero_title": "Excavation et terrassement à Granby et région",

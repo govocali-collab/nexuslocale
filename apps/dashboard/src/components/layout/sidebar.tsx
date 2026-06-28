@@ -10,6 +10,7 @@ const NAV = [
   { href: '/app',          label: 'Vue d\'ensemble', icon: '▦' },
   { href: '/app/sites',    label: 'Portefeuille',    icon: '◈' },
   { href: '/app/pipeline', label: 'Pipeline',         icon: '⇌' },
+  { href: '/app/rdv',      label: 'Rendez-vous',      icon: '📅' },
   { href: '/app/billing',  label: 'Facturation',      icon: '$' },
   { href: '/app/launch',   label: 'Lanceur',          icon: '⚡' },
 ];

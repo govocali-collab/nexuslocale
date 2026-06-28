@@ -1,0 +1,442 @@
+{
+  "domain": "demo-plombier-longueuil.nexuslocale.com",
+  "mode": "demo",
+  "type": "demo",
+  "business": {
+    "name": "Plombier Longueuil",
+    "phone": "N/A",
+    "address": "longueuil, QC, Canada",
+    "hours": "Lun–Ven : 7h–17h | Sam : 8h–12h | Dim : Fermé",
+    "service_areas": [
+      "Longueuil",
+      "Brossard",
+      "Saint-Lambert",
+      "Boucherville",
+      "Saint-Bruno-de-Montarville"
+    ]
+  },
+  "branding": {
+    "hero_image_url": "https://images.pexels.com/photos/7859953/pexels-photo-7859953.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+    "primary_color": "#1B3A5C",
+    "secondary_color": "#E8A020",
+    "tagline": "Plomberie fiable et rapide pour les résidents de Longueuil"
+  },
+  "niche": "plombier",
+  "city": "longueuil",
+  "pages": {
+    "home": {
+      "hero_title": "Plombier professionnel à Longueuil et environs",
+      "hero_subtitle": "Service de plomberie résidentielle, débouchage de drain, installation de chauffe-eau et interventions urgentes sur la Rive-Sud de Montréal.",
+      "intro": "Longueuil et ses quartiers comme Saint-Hubert, Greenfield Park et Le Vieux-Longueuil ont leurs propres réalités en matière de plomberie : maisons de différentes époques, systèmes de chauffage variés et contraintes hivernales importantes. Notre équipe connaît bien ce territoire et intervient rapidement pour répondre aux besoins des propriétaires et des locataires de la région.",
+      "sections": [
+        {
+          "type": "services_grid",
+          "heading": "Nos services"
+        },
+        {
+          "type": "content",
+          "heading": "Une plomberie adaptée aux maisons de la Rive-Sud",
+          "body": "Les résidences de Longueuil et des municipalités environnantes comme Brossard, Saint-Lambert et Boucherville présentent des configurations diverses — des bungalows des années 1960 aux constructions récentes. Cette diversité demande une expertise qui tient compte des matériaux d'époque, des codes du bâtiment en vigueur au Québec et des hivers qui mettent les installations à rude épreuve."
+        },
+        {
+          "type": "faq",
+          "heading": "Questions fréquentes"
+        },
+        {
+          "type": "service_areas",
+          "heading": "Zones desservies"
+        },
+        {
+          "type": "cta",
+          "heading": "Besoin d'un plombier à Longueuil?",
+          "subtitle": "Contactez-nous pour décrire votre situation et obtenir une réponse rapide."
+        }
+      ]
+    },
+    "services": [
+      {
+        "slug": "urgence-plombier",
+        "nav_label": "Urgence plombier",
+        "h1": "Urgence plombier à Longueuil — Intervention rapide 24h",
+        "meta_title": "Urgence plombier Longueuil | Intervention rapide",
+        "meta_description": "Dégât d'eau, tuyau brisé ou fuite soudaine à Longueuil? Plombier disponible pour urgences résidentielles sur la Rive-Sud. Appelez dès maintenant.",
+        "sections": [
+          {
+            "heading": "Quand la plomberie ne peut pas attendre",
+            "body": "Une fuite majeure, un tuyau qui éclate par grand froid ou un refoulement d'égout sont des situations qui nécessitent une réponse immédiate. À Longueuil, les hivers rigoureux peuvent fragiliser les conduites extérieures et les espaces non chauffés comme les vides sanitaires ou les garages attenants. Chaque minute compte pour limiter les dommages à votre propriété."
+          },
+          {
+            "heading": "Ce qu'on fait lors d'une intervention d'urgence",
+            "body": "À l'arrivée, le plombier identifie rapidement la source du problème, isole la section défectueuse et effectue les réparations nécessaires pour sécuriser votre installation. Selon la nature du bris, une solution temporaire peut être mise en place dans l'attente d'une réparation définitive, toujours dans le respect des normes du Code de plomberie du Québec."
+          },
+          {
+            "heading": "Situations courantes traitées en urgence",
+            "body": "Parmi les appels les plus fréquents : robinet ou joint qui cède, conduite d'eau principale percée, chauffe-eau qui fuit abondamment, ou encore toilette qui déborde et inonde la salle de bain. Ces situations surviennent souvent au pire moment — en soirée, la fin de semaine ou lors des grands froids de janvier et février."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Le Vieux-Longueuil",
+            "Saint-Hubert",
+            "Greenfield Park",
+            "Brossard"
+          ],
+          "price_context": "Les interventions d'urgence comportent généralement un tarif de déplacement hors heures ouvrables, en plus du coût de la main-d'œuvre et des pièces. Demandez un estimé clair avant le début des travaux.",
+          "faqs": [
+            {
+              "q": "Que faire en attendant le plombier lors d'une urgence?",
+              "a": "Fermez l'arrivée d'eau principale de votre logement dès que possible pour limiter les dégâts. L'arrêt général se trouve habituellement au sous-sol près du compteur d'eau ou dans la cave mécanique. Éloignez les meubles et les appareils électroniques de la zone touchée."
+            },
+            {
+              "q": "Les frais d'urgence sont-ils couverts par mon assurance habitation?",
+              "a": "Selon votre police d'assurance, certains dégâts d'eau causés par un bris soudain peuvent être couverts. Documentez les dommages avec des photos avant toute intervention et contactez votre assureur rapidement pour connaître vos protections."
+            }
+          ],
+          "local_landmarks": [
+            "Pont Jacques-Cartier (accès Rive-Sud)",
+            "Hôpital Charles-Le Moyne",
+            "Gare de Longueuil–Saint-Hubert"
+          ]
+        },
+        "image_url": "https://images.pexels.com/photos/18274115/pexels-photo-18274115.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"
+      },
+      {
+        "slug": "plombier-residentiel",
+        "nav_label": "Plomberie résidentielle",
+        "h1": "Plombier résidentiel à Longueuil — Travaux complets pour maisons et condos",
+        "meta_title": "Plombier résidentiel Longueuil | Maisons et condos",
+        "meta_description": "Plomberie résidentielle à Longueuil : rénovation, remplacement de tuyauterie, installation de robinetterie et plus. Service professionnel sur la Rive-Sud.",
+        "sections": [
+          {
+            "heading": "Des travaux de plomberie pour chaque étape de vie de votre maison",
+            "body": "Qu'il s'agisse d'une rénovation de salle de bain, du remplacement d'une vieille tuyauterie en fonte ou en cuivre, de l'ajout d'un robinet dans la cuisine ou de l'installation d'un lave-vaisselle, la plomberie résidentielle couvre un large éventail de travaux. À Longueuil, de nombreuses maisons construites entre les années 1950 et 1980 nécessitent des mises à jour de leurs systèmes de plomberie pour répondre aux standards actuels."
+          },
+          {
+            "heading": "Rénovation et mise aux normes",
+            "body": "Les travaux de plomberie au Québec doivent respecter le Code de construction et, selon leur nature, être déclarés à la Régie du bâtiment (RBQ). Un plombier licencié peut effectuer les travaux conformément à ces exigences et vous remettre la documentation nécessaire, ce qui est particulièrement important lors de la vente d'une propriété ou d'une réclamation d'assurance."
+          },
+          {
+            "heading": "Installations courantes en plomberie résidentielle",
+            "body": "Parmi les travaux les plus demandés dans les foyers de la région : remplacement de robinets et de pommes de douche, installation de toilettes à faible débit, raccordement d'électroménagers, remplacement de siphons sous les éviers, et réfection complète de la plomberie lors de travaux de rénovation majeurs."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Le Vieux-Longueuil",
+            "Greenfield Park",
+            "Saint-Hubert",
+            "Saint-Lambert",
+            "Boucherville"
+          ],
+          "price_context": "Le coût des travaux résidentiels varie selon la complexité, les matériaux choisis et l'accessibilité des installations. Un estimé écrit vous permettra de comparer les options avant d'aller de l'avant.",
+          "faqs": [
+            {
+              "q": "Dois-je obtenir un permis pour des travaux de plomberie dans ma maison à Longueuil?",
+              "a": "Certains travaux nécessitent un permis délivré par la Ville de Longueuil, notamment les modifications importantes au réseau de plomberie. Votre plombier licencié peut vous guider dans les démarches à effectuer auprès de la municipalité."
+            },
+            {
+              "q": "Comment savoir si ma tuyauterie doit être remplacée?",
+              "a": "Des signes comme une eau décolorée, une pression irrégulière, des fuites récurrentes ou la présence de tuyaux en plomb ou en polybutylène sont des indicateurs qu'une inspection et possiblement un remplacement s'imposent. Un plombier peut effectuer une évaluation de l'état de votre installation."
+            }
+          ],
+          "local_landmarks": [
+            "Parc Michel-Chartrand",
+            "Quartier DIX30 (Brossard)",
+            "Vieux-Longueuil"
+          ]
+        },
+        "image_url": "https://images.pexels.com/photos/16752780/pexels-photo-16752780.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"
+      },
+      {
+        "slug": "debouchage-de-drain",
+        "nav_label": "Débouchage de drain",
+        "h1": "Débouchage de drain à Longueuil — Drains bouchés, éviers et égouts",
+        "meta_title": "Débouchage drain Longueuil | Éviers et égouts",
+        "meta_description": "Drain bouché à Longueuil? Débouchage d'évier, de bain, de plancher ou d'égout principal. Intervention efficace sur la Rive-Sud par un plombier qualifié.",
+        "sections": [
+          {
+            "heading": "Un drain bouché, ça arrive vite",
+            "body": "Accumulation de gras dans la cuisine, cheveux dans le bain, résidus de savon dans le lavabo ou racines d'arbres qui s'infiltrent dans le drain de fondation — les causes de blocage sont nombreuses. À Longueuil comme dans l'ensemble de la Rive-Sud, les maisons avec cours arborées sont particulièrement exposées aux problèmes de drains envahis par les racines, surtout dans les quartiers plus anciens."
+          },
+          {
+            "heading": "Les outils et méthodes utilisés",
+            "body": "Selon la nature et la localisation du bouchon, différentes techniques peuvent être employées : furet mécanique pour les blocages proches du siphon, jet d'eau sous pression (hydrojetting) pour les conduites plus profondes, ou inspection par caméra pour localiser précisément un problème dans le drain principal. L'inspection caméra est particulièrement utile pour les blocages récurrents ou les vieilles conduites en terre cuite."
+          },
+          {
+            "heading": "Prévenir les bouchons récurrents",
+            "body": "Certains gestes simples aident à prolonger la durée de vie de vos drains : éviter de jeter les huiles de cuisson dans l'évier, utiliser des crépines dans les bains et douches, et faire nettoyer périodiquement le drain de plancher au sous-sol, surtout si votre maison est équipée d'un clapet anti-refoulement."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Le Vieux-Longueuil",
+            "Greenfield Park",
+            "Saint-Hubert",
+            "Brossard",
+            "Boucherville"
+          ],
+          "price_context": "Le prix d'un débouchage dépend de la méthode utilisée et de l'accessibilité du drain. Un débouchage standard d'évier ou de bain est généralement moins coûteux qu'une intervention sur le drain principal ou qu'une inspection caméra.",
+          "faqs": [
+            {
+              "q": "Mon drain de sous-sol refoule lors des fortes pluies — est-ce un problème de plomberie ou de réseau municipal?",
+              "a": "Ce type de refoulement peut être causé par une surcharge du réseau d'égout municipal ou par un clapet anti-refoulement défectueux dans votre propre installation. Un plombier peut inspecter votre système pour déterminer l'origine du problème et proposer la solution appropriée."
+            },
+            {
+              "q": "Peut-on utiliser des produits chimiques pour déboucher un drain?",
+              "a": "Les produits chimiques vendus en quincaillerie peuvent dégager des bouchons légers, mais ils peuvent aussi endommager les vieilles conduites et ne règlent pas les causes profondes du problème. Pour un blocage persistant ou complet, l'intervention d'un plombier avec les outils appropriés est recommandée."
+            }
+          ],
+          "local_landmarks": [
+            "Rivière Saint-Jacques (secteur Longueuil)",
+            "Parc de la Cité (Saint-Hubert)",
+            "Boulevard Taschereau"
+          ]
+        },
+        "image_url": "https://images.pexels.com/photos/4239115/pexels-photo-4239115.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"
+      },
+      {
+        "slug": "chauffe-eau",
+        "nav_label": "Chauffe-eau",
+        "h1": "Chauffe-eau à Longueuil — Installation, remplacement et réparation",
+        "meta_title": "Chauffe-eau Longueuil | Installation et remplacement",
+        "meta_description": "Installation ou remplacement de chauffe-eau à Longueuil. Chauffe-eau électrique, au gaz ou sans réservoir. Service professionnel sur la Rive-Sud.",
+        "sections": [
+          {
+            "heading": "Votre chauffe-eau : un équipement essentiel à entretenir",
+            "body": "Un chauffe-eau en fin de vie ou mal entretenu peut entraîner une panne d'eau chaude au pire moment, ou pire encore, une fuite qui endommage le sous-sol. La durée de vie moyenne d'un chauffe-eau électrique standard se situe autour de dix à quinze ans selon les conditions d'utilisation et la qualité de l'entretien. Après cet horizon, le remplacement préventif est souvent plus économique que les réparations répétées."
+          },
+          {
+            "heading": "Les types de chauffe-eau disponibles",
+            "body": "On distingue principalement les chauffe-eau à réservoir électriques (les plus répandus au Québec, compte tenu du coût avantageux de l'électricité d'Hydro-Québec), les modèles au gaz naturel, et les chauffe-eau sans réservoir (aussi appelés chauffe-eau instantanés ou sur demande). Chaque option a ses avantages selon la taille du logement, le nombre d'occupants et la configuration de la mécanique."
+          },
+          {
+            "heading": "Installation conforme et en toute sécurité",
+            "body": "L'installation d'un chauffe-eau doit être réalisée par un plombier licencié et, selon le type d'appareil, peut nécessiter l'intervention d'un électricien ou d'un technicien en gaz. À Longueuil, le retrait de l'ancien appareil doit aussi respecter les règles de disposition en vigueur. Un travail bien exécuté garantit la conformité de votre installation et la validité de la garantie du fabricant."
+          }
+        ],
+        "local_data": {
+          "neighborhoods": [
+            "Saint-Hubert",
+            "Greenfield Park",
+            "Le Vieux-Longueuil",
+            "Brossard",
+            "Boucherville"
+          ],
+          "price_context": "Le coût d'un chauffe-eau varie selon la capacité (en litres), le type d'énergie et la marque. La main-d'œuvre d'installation s'ajoute au prix de l'appareil. Il est préférable d'obtenir un estimé qui inclut la fourniture, l'installation et le retrait de l'ancien appareil.",
+          "faqs": [
+            {
+              "q": "À quel moment dois-je envisager de remplacer mon chauffe-eau?",
+              "a": "Si votre chauffe-eau a plus de dix ans, produit de l'eau rouillée ou tiède malgré les réglages, fait entendre des bruits de claquement ou montre des signes de corrosion sur la cuve, il est temps de planifier son remplacement avant une panne ou une fuite majeure."
+            },
+            {
+              "q": "Est-il possible de louer un chauffe-eau plutôt que d'en acheter un?",
+              "a": "Oui, certains fournisseurs offrent des contrats de location avec entretien inclus. Cela réduit le coût initial mais représente une dépense mensuelle à long terme. Comparez le coût total sur plusieurs années avant de décider, et vérifiez les conditions du contrat, notamment en cas de vente de la propriété."
+            },
+            {
+              "q": "Mon chauffe-eau au gaz nécessite-t-il un entretien particulier?",
+              "a": "Oui, les chauffe-eau au gaz naturel doivent être entretenus régulièrement et inspectés par un technicien certifié pour s'assurer du bon fonctionnement du brûleur, de la ventilation et des raccords. Évitez d'obstruer la zone autour de l'appareil et assurez-vous que les détecteurs de monoxyde de carbone de votre domicile sont fonctionnels."
+            }
+          ],
+          "local_landmarks": [
+            "Hydro-Québec (bureau de la Rive-Sud)",
+            "IKEA Boucherville",
+            "Quartier des Coopérants (Saint-Hubert)"
+          ]
+        },
+        "image_url": "https://images.pexels.com/photos/9551366/pexels-photo-9551366.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"
+      }
+    ],
+    "service_areas": [
+      {
+        "city": "Longueuil",
+        "nav_label": "Longueuil",
+        "neighborhoods": [
+          "Le Vieux-Longueuil",
+          "Saint-Hubert",
+          "Greenfield Park",
+          "Saint-Jean-Baptiste",
+          "Fatima"
+        ],
+        "local_context": "Longueuil regroupe des quartiers aux typologies résidentielles variées, des maisons de ville du Vieux-Longueuil aux bungalows de Saint-Hubert, ce qui demande une adaptation constante aux différentes configurations de plomberie rencontrées sur le terrain.",
+        "faqs": [
+          {
+            "q": "Intervenez-vous dans tous les quartiers de Longueuil?",
+            "a": "Oui, nous desservons l'ensemble des arrondissements de Longueuil, incluant Le Vieux-Longueuil, Saint-Hubert et Greenfield Park."
+          }
+        ],
+        "local_landmarks": [
+          "Parc Michel-Chartrand",
+          "Hôpital Charles-Le Moyne",
+          "Vieux-Longueuil",
+          "Gare Longueuil–Saint-Hubert"
+        ]
+      },
+      {
+        "city": "Brossard",
+        "nav_label": "Brossard",
+        "neighborhoods": [
+          "Secteur A",
+          "Secteur M",
+          "Secteur N",
+          "Quartier DIX30"
+        ],
+        "local_context": "Brossard est une ville en forte croissance avec de nombreuses copropriétés et maisons de ville récentes, où les installations de plomberie modernes côtoient des résidences des années 1970 qui approchent de l'âge où une mise à jour de la tuyauterie devient pertinente.",
+        "faqs": [
+          {
+            "q": "Offrez-vous vos services dans les condos et les immeubles de Brossard?",
+            "a": "Oui, nous intervenons dans les unités de condominiums et les immeubles résidentiels de Brossard, dans le respect des règlements de copropriété en vigueur."
+          }
+        ],
+        "local_landmarks": [
+          "Quartier DIX30",
+          "Pont Samuel-De Champlain (accès)",
+          "Mail Champlain"
+        ]
+      },
+      {
+        "city": "Saint-Lambert",
+        "nav_label": "Saint-Lambert",
+        "neighborhoods": [
+          "Vieux-Saint-Lambert",
+          "Secteur Riverside"
+        ],
+        "local_context": "Saint-Lambert est une municipalité caractérisée par un parc immobilier mature avec de nombreuses maisons de style traditionnel. Les vieilles conduites en cuivre ou en fonte que l'on retrouve dans ces résidences nécessitent parfois une attention particulière lors des inspections et des travaux de plomberie.",
+        "faqs": [
+          {
+            "q": "Peut-on remplacer les vieilles conduites en fonte dans une maison de Saint-Lambert?",
+            "a": "Oui, le remplacement des conduites en fonte par des matériaux modernes comme le PVC est une intervention courante dans les maisons plus anciennes. Un plombier peut évaluer l'état de vos conduites et vous proposer un plan de travail adapté."
+          }
+        ],
+        "local_landmarks": [
+          "Parc Lebrun",
+          "Voie maritime du Saint-Laurent",
+          "Bibliothèque de Saint-Lambert"
+        ]
+      },
+      {
+        "city": "Boucherville",
+        "nav_label": "Boucherville",
+        "neighborhoods": [
+          "Vieux-Boucherville",
+          "Îles-de-Boucherville",
+          "Secteur industriel"
+        ],
+        "local_context": "Boucherville combine des secteurs résidentiels établis avec des développements récents. La proximité du fleuve Saint-Laurent et la présence d'un sol argileux dans certains secteurs peuvent influencer le comportement des fondations et, par conséquent, l'état des drains de fondation et des systèmes de plomberie extérieure.",
+        "faqs": [
+          {
+            "q": "Y a-t-il des particularités à considérer pour la plomberie à Boucherville?",
+            "a": "La nature du sol et la proximité du fleuve peuvent avoir un impact sur les drains de fondation. Une inspection périodique par caméra est une bonne pratique préventive pour les propriétaires de maisons situées près de zones humides ou sur des terrains argileux."
+          }
+        ],
+        "local_landmarks": [
+          "Parc national des Îles-de-Boucherville",
+          "Vieux-Boucherville",
+          "Autoroute 20"
+        ]
+      },
+      {
+        "city": "Saint-Bruno-de-Montarville",
+        "nav_label": "Saint-Bruno",
+        "neighborhoods": [
+          "Centre-ville de Saint-Bruno",
+          "Secteur Montarville",
+          "Secteur du lac"
+        ],
+        "local_context": "Saint-Bruno-de-Montarville est une ville à caractère résidentiel avec une forte proportion de maisons unifamiliales. Les propriétés situées près du mont Saint-Bruno et du lac des Atocas peuvent présenter des particularités liées au terrain et à la gestion des eaux de surface qui influencent les systèmes de drainage.",
+        "faqs": [
+          {
+            "q": "Intervenez-vous à Saint-Bruno-de-Montarville pour les urgences de plomberie?",
+            "a": "Oui, nous couvrons Saint-Bruno-de-Montarville pour les urgences comme pour les travaux planifiés de plomberie résidentielle."
+          }
+        ],
+        "local_landmarks": [
+          "Mont Saint-Bruno",
+          "Parc national du Mont-Saint-Bruno",
+          "Centre commercial Mail Champlain (proche)"
+        ]
+      }
+    ],
+    "contact": {
+      "intro": "Décrivez-nous votre situation et nous vous répondrons dans les meilleurs délais. Pour une urgence, privilégiez le contact téléphonique.",
+      "form_fields": [
+        {
+          "name": "name",
+          "label": "Nom complet",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "phone",
+          "label": "Téléphone",
+          "type": "tel",
+          "required": true
+        },
+        {
+          "name": "email",
+          "label": "Courriel",
+          "type": "email",
+          "required": false
+        },
+        {
+          "name": "city",
+          "label": "Ville / Municipalité",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "service",
+          "label": "Type de travaux",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Urgence plomberie",
+            "Plomberie résidentielle",
+            "Débouchage de drain",
+            "Chauffe-eau",
+            "Autre"
+          ]
+        },
+        {
+          "name": "message",
+          "label": "Description du projet",
+          "type": "textarea",
+          "required": false
+        }
+      ]
+    }
+  },
+  "local_data": {
+    "neighborhoods": [
+      "Le Vieux-Longueuil",
+      "Saint-Hubert",
+      "Greenfield Park",
+      "Brossard",
+      "Saint-Lambert",
+      "Boucherville",
+      "Saint-Bruno-de-Montarville"
+    ],
+    "price_context": "Les tarifs en plomberie sur la Rive-Sud varient selon le type de travaux, l'heure d'intervention et la complexité du chantier. Exigez toujours un estimé écrit détaillé avant d'autoriser les travaux.",
+    "faqs": [
+      {
+        "q": "Votre plombier est-il licencié par la RBQ?",
+        "a": "Oui, au Québec, les travaux de plomberie doivent être effectués par un entrepreneur détenant une licence de la Régie du bâtiment du Québec (RBQ). Vous pouvez vérifier la validité d'une licence sur le site de la RBQ avant de confier vos travaux."
+      },
+      {
+        "q": "Quelle est la différence entre un plombier et un maître plombier?",
+        "a": "Au Québec, le titre de maître plombier désigne un professionnel ayant complété sa formation technique et son apprentissage, et détenant les accréditations requises pour superviser des travaux et signer des documents officiels. Pour des travaux résidentiels, assurez-vous que l'entreprise détient la licence appropriée de la RBQ."
+      },
+      {
+        "q": "Offrez-vous des garanties sur les travaux effectués?",
+        "a": "Les travaux de plomberie sont encadrés par les garanties légales prévues au Code civil du Québec. Selon la nature des travaux, des garanties supplémentaires sur les pièces et la main-d'œuvre peuvent également être offertes — renseignez-vous au moment de la soumission."
+      }
+    ],
+    "competitor_context": "Le marché de la plomberie résidentielle sur la Rive-Sud de Montréal est actif, avec plusieurs entreprises établies à Longueuil et dans les villes environnantes. La disponibilité pour les urgences, la transparence des prix et la détention d'une licence RBQ en règle sont des critères essentiels pour choisir son plombier.",
+    "local_landmarks": [
+      "Pont Jacques-Cartier",
+      "Pont Samuel-De Champlain",
+      "Hôpital Charles-Le Moyne",
+      "Parc Michel-Chartrand",
+      "Mont Saint-Bruno"
+    ]
+  }
+}

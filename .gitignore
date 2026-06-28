@@ -49,3 +49,4 @@ apps/finder/finder-*.json
 
 # Prospector scan exports (generated)
 apps/prospector/prospects-*.csv
+.vercel
