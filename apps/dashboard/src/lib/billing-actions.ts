@@ -41,9 +41,10 @@ export async function createInvoice(input: {
     const invoiceId = invoice.id as string;
 
     for (const l of lines) {
-      // L'item sur la 1re ligne, la description détaillée optionnelle en dessous.
-      const detail = l.detail?.trim();
-      const description = detail ? `${l.description.trim()}\n${detail}` : l.description.trim();
+      // Stripe affiche la description sur une seule ligne (il ignore les sauts de ligne),
+      // donc on colle item + détail avec un séparateur lisible : « Item — détail ».
+      const detail = l.detail?.trim().replace(/\s*\n\s*/g, ' ');
+      const description = detail ? `${l.description.trim()} — ${detail}` : l.description.trim();
       await stripe.invoiceItems.create({
         customer: customer.id,
         invoice: invoiceId,
