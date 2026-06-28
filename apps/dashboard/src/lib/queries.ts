@@ -311,15 +311,18 @@ export async function getProspects(): Promise<Prospect[]> {
 export interface WonDeal { date: string; sale_value: number; monthly_value: number }
 
 // Prospects « Gagnés » pour le suivi des ventes par mois.
-// Mois attribué à la date de création de la fiche (created_at).
+// Mois attribué à won_at (date de conversion) ; repli sur created_at si la colonne
+// won_at n'existe pas encore (migration 016 non lancée).
 export async function getSalesDeals(): Promise<WonDeal[]> {
   const db = createAdminClient();
-  const { data } = await db
-    .from('prospects')
-    .select('created_at, sale_value, monthly_value')
-    .eq('status', 'won');
-  return (data ?? []).map((d) => ({
-    date:          (d.created_at as string),
+  let res = await db.from('prospects')
+    .select('won_at, created_at, sale_value, monthly_value').eq('status', 'won');
+  if (res.error && /won_at/i.test(res.error.message)) {
+    res = await db.from('prospects')
+      .select('created_at, sale_value, monthly_value').eq('status', 'won');
+  }
+  return (res.data ?? []).map((d) => ({
+    date:          ((d as { won_at?: string | null }).won_at ?? (d.created_at as string)),
     sale_value:    (d.sale_value    as number | null) ?? 0,
     monthly_value: (d.monthly_value as number | null) ?? 0,
   }));
