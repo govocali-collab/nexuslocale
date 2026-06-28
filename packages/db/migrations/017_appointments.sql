@@ -13,6 +13,7 @@ create table if not exists public.appointments (
   cal_uid          text unique,           -- identifiant Cal.com (idempotence + annulation)
   status           text not null default 'booked', -- booked | cancelled
   reminder_sent_at timestamptz,           -- null tant que le SMS de rappel n'est pas envoyé
+  sms_sid          text,                  -- SID du SMS Twilio programmé (pour l'annuler au besoin)
   created_at       timestamptz not null default now()
 );
 
@@ -27,3 +28,6 @@ create policy "service role full access"
   to service_role
   using (true)
   with check (true);
+
+-- Grants explicites (sinon, selon l'état de la session, le service_role peut être privé d'accès).
+grant all on table public.appointments to service_role, anon, authenticated;
