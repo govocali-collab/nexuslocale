@@ -53,13 +53,12 @@ export async function createInvoice(input: {
   }
 }
 
-const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.nexuslocale.com';
-
-// Crée une session Checkout en mode abonnement → renvoie un lien que le client ouvre
-// pour entrer sa carte ; Stripe le charge ensuite automatiquement chaque mois.
-export async function createSubscriptionCheckout(input: {
+// Crée un abonnement mensuel en mode « facture envoyée » : Stripe finalise et
+// ENVOIE une vraie facture par courriel au client chaque mois (ton branding, INV-),
+// payable via la page Stripe — et ça se répète automatiquement.
+export async function createSubscription(input: {
   clientName: string; clientEmail: string; monthlyAmount: number; description: string;
-}): Promise<{ ok: boolean; error?: string | undefined; url?: string | undefined }> {
+}): Promise<{ ok: boolean; error?: string | undefined }> {
   const name   = input.clientName.trim();
   const email  = input.clientEmail.trim();
   const amount = Number(input.monthlyAmount);
@@ -69,22 +68,27 @@ export async function createSubscriptionCheckout(input: {
   try {
     const existing = await stripe.customers.list({ email, limit: 1 });
     const customer = existing.data[0] ?? (await stripe.customers.create({ name, email }));
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
+    const product  = await stripe.products.create({ name: desc });
+    const sub = await stripe.subscriptions.create({
       customer: customer.id,
-      line_items: [{
-        price_data: {
-          currency: 'cad',
-          product_data: { name: desc },
-          unit_amount: dollarsToCents(amount),
-          recurring: { interval: 'month' },
-        },
-        quantity: 1,
-      }],
-      success_url: `${APP_URL}/app/billing?sub=ok`,
-      cancel_url:  `${APP_URL}/app/billing?sub=annule`,
+      items: [{ price_data: {
+        currency: 'cad',
+        product: product.id,
+        unit_amount: dollarsToCents(amount),
+        recurring: { interval: 'month' },
+      } }],
+      collection_method: 'send_invoice',
+      days_until_due: 14,
+      expand: ['latest_invoice'],
     });
-    return { ok: true, url: session.url ?? undefined };
+    // Envoie la 1re facture tout de suite (sinon Stripe attendrait ~1h).
+    // Les factures des mois suivants sont finalisées + envoyées par Stripe automatiquement.
+    const inv = sub.latest_invoice;
+    if (inv && typeof inv !== 'string' && inv.id && inv.status === 'draft') {
+      await stripe.invoices.finalizeInvoice(inv.id);
+      await stripe.invoices.sendInvoice(inv.id);
+    }
+    return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Erreur Stripe.' };
   }

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { createSubscriptionCheckout, cancelSubscription, type SubRow } from '@/lib/billing-actions';
+import { createSubscription, cancelSubscription, type SubRow } from '@/lib/billing-actions';
 
 const inputCls =
   'w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm ' +
@@ -28,16 +28,18 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
   const [desc, setDesc]     = useState('Hébergement mensuel');
   const [pending, start]    = useTransition();
   const [err, setErr]       = useState('');
-  const [link, setLink]     = useState('');
-  const [copied, setCopied] = useState(false);
+  const [sent, setSent]     = useState(false);
 
   function create(e: React.FormEvent) {
     e.preventDefault();
-    setErr(''); setLink('');
+    setErr(''); setSent(false);
     start(async () => {
-      const r = await createSubscriptionCheckout({ clientName: name, clientEmail: email, monthlyAmount: Number(amount), description: desc });
-      if (!r.ok || !r.url) { setErr(r.error ?? 'Erreur.'); return; }
-      setLink(r.url);
+      const r = await createSubscription({ clientName: name, clientEmail: email, monthlyAmount: Number(amount), description: desc });
+      if (!r.ok) { setErr(r.error ?? 'Erreur.'); return; }
+      setSent(true);
+      setName(''); setEmail(''); setAmount(''); setDesc('Hébergement mensuel');
+      setTimeout(() => setSent(false), 6000);
+      router.refresh();
     });
   }
 
@@ -72,23 +74,14 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
           </div>
         </div>
 
-        {link ? (
-          <div className="rounded-md bg-emerald-50 border border-emerald-200 p-3 space-y-2">
-            <p className="text-sm text-emerald-800 font-medium">Lien d&apos;abonnement créé — envoie-le au client pour qu&apos;il entre sa carte :</p>
-            <div className="flex items-center gap-2">
-              <input readOnly value={link} className="flex-1 rounded-md bg-white border-emerald-200 text-xs px-2 py-1.5 text-[#404040]" />
-              <button type="button" onClick={() => { navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-                className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-3 py-1.5 text-xs text-white whitespace-nowrap">{copied ? 'Copié ✓' : 'Copier'}</button>
-              <a href={link} target="_blank" rel="noopener noreferrer" className="rounded-md border border-emerald-300 px-3 py-1.5 text-xs text-emerald-800 whitespace-nowrap">Ouvrir</a>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-end">
-            <button type="submit" disabled={pending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2 text-sm font-medium text-white">
-              {pending ? '…' : 'Créer le lien d\'abonnement'}
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-between gap-3">
+          {sent
+            ? <span className="text-sm text-emerald-700 font-medium">✓ Abonnement créé — première facture envoyée au client par courriel.</span>
+            : <span className="text-xs text-[#a3a3a3]">Stripe envoie une facture chaque mois, automatiquement.</span>}
+          <button type="submit" disabled={pending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2 text-sm font-medium text-white whitespace-nowrap">
+            {pending ? '…' : 'Créer et envoyer'}
+          </button>
+        </div>
         {err && <p className="text-sm text-red-600">{err}</p>}
       </form>
 
