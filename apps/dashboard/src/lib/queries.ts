@@ -315,16 +315,18 @@ export interface WonDeal { date: string; sale_value: number; monthly_value: numb
 // won_at n'existe pas encore (migration 016 non lancée).
 export async function getSalesDeals(): Promise<WonDeal[]> {
   const db = createAdminClient();
-  let res = await db.from('prospects')
-    .select('won_at, created_at, sale_value, monthly_value').eq('status', 'won');
+  type Row = { won_at?: string | null; created_at: string; sale_value: number | null; monthly_value: number | null };
+  type Res = { data: Row[] | null; error: { message: string } | null };
+  let res = (await db.from('prospects')
+    .select('won_at, created_at, sale_value, monthly_value').eq('status', 'won')) as unknown as Res;
   if (res.error && /won_at/i.test(res.error.message)) {
-    res = await db.from('prospects')
-      .select('created_at, sale_value, monthly_value').eq('status', 'won');
+    res = (await db.from('prospects')
+      .select('created_at, sale_value, monthly_value').eq('status', 'won')) as unknown as Res;
   }
   return (res.data ?? []).map((d) => ({
-    date:          ((d as { won_at?: string | null }).won_at ?? (d.created_at as string)),
-    sale_value:    (d.sale_value    as number | null) ?? 0,
-    monthly_value: (d.monthly_value as number | null) ?? 0,
+    date:          (d.won_at ?? d.created_at),
+    sale_value:    d.sale_value    ?? 0,
+    monthly_value: d.monthly_value ?? 0,
   }));
 }
 
