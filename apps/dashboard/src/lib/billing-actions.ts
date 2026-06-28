@@ -53,6 +53,78 @@ export async function createInvoice(input: {
   }
 }
 
+const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.nexuslocale.com';
+
+// Crée une session Checkout en mode abonnement → renvoie un lien que le client ouvre
+// pour entrer sa carte ; Stripe le charge ensuite automatiquement chaque mois.
+export async function createSubscriptionCheckout(input: {
+  clientName: string; clientEmail: string; monthlyAmount: number; description: string;
+}): Promise<{ ok: boolean; error?: string | undefined; url?: string | undefined }> {
+  const name   = input.clientName.trim();
+  const email  = input.clientEmail.trim();
+  const amount = Number(input.monthlyAmount);
+  const desc   = input.description.trim() || 'Abonnement mensuel';
+  if (!name || !email) return { ok: false, error: 'Nom et courriel du client requis.' };
+  if (!(amount > 0))   return { ok: false, error: 'Montant mensuel (> 0) requis.' };
+  try {
+    const existing = await stripe.customers.list({ email, limit: 1 });
+    const customer = existing.data[0] ?? (await stripe.customers.create({ name, email }));
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      customer: customer.id,
+      line_items: [{
+        price_data: {
+          currency: 'cad',
+          product_data: { name: desc },
+          unit_amount: dollarsToCents(amount),
+          recurring: { interval: 'month' },
+        },
+        quantity: 1,
+      }],
+      success_url: `${APP_URL}/app/billing?sub=ok`,
+      cancel_url:  `${APP_URL}/app/billing?sub=annule`,
+    });
+    return { ok: true, url: session.url ?? undefined };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Erreur Stripe.' };
+  }
+}
+
+export interface SubRow {
+  id: string; customerName: string | null; customerEmail: string | null;
+  amount: number; status: string; periodEnd: number | null; cancelAtEnd: boolean;
+}
+
+export async function listSubscriptions(): Promise<SubRow[]> {
+  try {
+    const res = await stripe.subscriptions.list({ status: 'all', limit: 50, expand: ['data.customer'] });
+    return res.data.map((s) => {
+      const cust = s.customer as { name?: string | null; email?: string | null } | string;
+      const item = s.items.data[0];
+      return {
+        id:            s.id,
+        customerName:  typeof cust === 'object' ? (cust.name ?? null) : null,
+        customerEmail: typeof cust === 'object' ? (cust.email ?? null) : null,
+        amount:        centsToDollars(item?.price.unit_amount ?? 0),
+        status:        s.status,
+        periodEnd:     (s as unknown as { current_period_end?: number }).current_period_end ?? null,
+        cancelAtEnd:   s.cancel_at_period_end,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function cancelSubscription(id: string): Promise<{ ok: boolean; error?: string | undefined }> {
+  try {
+    await stripe.subscriptions.cancel(id);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Erreur Stripe.' };
+  }
+}
+
 export interface InvoiceRow {
   id: string;
   number: string | null;

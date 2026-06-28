@@ -1,5 +1,6 @@
-import { listInvoices } from '@/lib/billing-actions';
+import { listInvoices, listSubscriptions } from '@/lib/billing-actions';
 import { CreateInvoiceForm } from '@/components/billing/create-invoice-form';
+import { Subscriptions } from '@/components/billing/subscriptions';
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   draft:         { label: 'Brouillon',     cls: 'bg-[#f5f5f5] text-[#525252]' },
@@ -13,7 +14,7 @@ const fmtMoney = (n: number) => '$' + n.toLocaleString('fr-CA', { minimumFractio
 const fmtDate  = (unix: number) => new Date(unix * 1000).toLocaleDateString('fr-CA', { year: 'numeric', month: 'short', day: 'numeric' });
 
 export default async function BillingPage() {
-  const invoices = await listInvoices();
+  const [invoices, subs] = await Promise.all([listInvoices(), listSubscriptions()]);
   const paid = invoices.filter((i) => i.status === 'paid').reduce((n, i) => n + i.amount, 0);
   const open = invoices.filter((i) => i.status === 'open').reduce((n, i) => n + i.amount, 0);
 
@@ -35,6 +36,12 @@ export default async function BillingPage() {
         </div>
       </div>
 
+      {/* ── Abonnements récurrents (hébergement / rank-and-rent) ─────────── */}
+      <h2 className="text-base font-semibold text-[#0a0a0a] pt-1">Abonnements récurrents</h2>
+      <Subscriptions subs={subs} />
+
+      {/* ── Factures à l'unité (sites web, etc.) ─────────────────────────── */}
+      <h2 className="text-base font-semibold text-[#0a0a0a] pt-2">Factures à l&apos;unité</h2>
       <CreateInvoiceForm />
 
       <div className="card overflow-hidden">
