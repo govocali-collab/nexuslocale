@@ -18,7 +18,7 @@ export function CreateInvoiceForm() {
   const [lines, setLines] = useState<{ description: string; amount: string }[]>([{ description: '', amount: '' }]);
   const [pending, start]  = useTransition();
   const [err, setErr]     = useState('');
-  const [done, setDone]   = useState<{ url?: string | undefined; number?: string | undefined; sent?: boolean } | null>(null);
+  const [done, setDone]   = useState<{ url?: string | undefined; number?: string | undefined; sent?: boolean | undefined } | null>(null);
 
   const total = lines.reduce((n, l) => n + (Number(l.amount) || 0), 0);
 
