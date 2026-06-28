@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono'
 export const metadata: Metadata = {
   title: 'NexusLocale — Dashboard',
   description: 'Poste de pilotage rank-and-rent',
-  icons: { icon: '/NexusLocale-fav.png' },
+  icons: { icon: '/NexusLocale-Fav-v2.png' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
