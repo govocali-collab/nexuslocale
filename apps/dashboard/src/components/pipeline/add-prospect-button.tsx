@@ -8,7 +8,7 @@ const inputCls =
   'w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm ' +
   'placeholder-[#a3a3a3] px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500';
 
-const EMPTY = { business_name: '', niche: '', city: '', phone: '', notes: '' };
+const EMPTY = { business_name: '', niche: '', city: '', phone: '', email: '', notes: '' };
 
 export function AddProspectButton() {
   const router = useRouter();
@@ -67,9 +67,15 @@ export function AddProspectButton() {
                   <input required value={f.city} onChange={set('city')} className={inputCls} placeholder="Longueuil" />
                 </div>
               </div>
-              <div>
-                <label className="label block mb-1">Téléphone</label>
-                <input type="tel" value={f.phone} onChange={set('phone')} className={inputCls} placeholder="(514) 555-0000" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="label block mb-1">Téléphone</label>
+                  <input type="tel" value={f.phone} onChange={set('phone')} className={inputCls} placeholder="(514) 555-0000" />
+                </div>
+                <div>
+                  <label className="label block mb-1">Courriel</label>
+                  <input type="email" value={f.email} onChange={set('email')} className={inputCls} placeholder="prospect@commerce.com" />
+                </div>
               </div>
               <div>
                 <label className="label block mb-1">Notes</label>

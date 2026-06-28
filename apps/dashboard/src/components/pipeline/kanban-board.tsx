@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Prospect } from '@/lib/queries';
 import { updateProspectStatus, deleteProspects } from '@/lib/actions';
@@ -111,6 +111,9 @@ function ProspectCard({
 
 export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
   const [board, setBoard]               = useState<Board>(() => buildBoard(prospects));
+
+  // Resynchronise le board quand les données serveur changent (ajout, suppression, refresh).
+  useEffect(() => { setBoard(buildBoard(prospects)); }, [prospects]);
   const [drag, setDrag]                 = useState<DragState | null>(null);
   const [overCol, setOverCol]           = useState<string | null>(null);
   const [overIndex, setOverIndex]       = useState<number | null>(null);

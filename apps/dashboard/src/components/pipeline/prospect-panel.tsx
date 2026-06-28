@@ -18,6 +18,7 @@ interface Props {
 export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
   const [notes,    setNotes]    = useState('');
   const [phone,    setPhone]    = useState('');
+  const [email,    setEmail]    = useState('');
   const [demoUrl,  setDemoUrl]  = useState('');
   const [status,   setStatus]   = useState('');
   const [saleValue,    setSaleValue]    = useState('');
@@ -30,6 +31,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
     if (!prospect) return;
     setNotes(prospect.notes    ?? '');
     setPhone(prospect.phone    ?? '');
+    setEmail(prospect.email    ?? '');
     setDemoUrl(prospect.demo_url ?? '');
     setStatus(prospect.status);
     setSaleValue(prospect.sale_value    != null ? String(prospect.sale_value)    : '');
@@ -55,6 +57,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
         phone:    phone    || null as unknown as string,
         demo_url: demoUrl  || null as unknown as string,
         status,
+        email:         email.trim() || null,
         sale_value:    saleNum,
         monthly_value: monthlyNum,
       });
@@ -64,7 +67,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
-      onSaved({ id: prospect.id, notes, phone, demo_url: demoUrl, status, sale_value: saleNum, monthly_value: monthlyNum });
+      onSaved({ id: prospect.id, notes, phone, demo_url: demoUrl, status, email: email.trim() || null, sale_value: saleNum, monthly_value: monthlyNum });
     });
   }
 
@@ -131,6 +134,15 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
             <label className="label">Téléphone</label>
             <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
               placeholder="+15145550000"
+              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                         placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+
+          {/* Courriel */}
+          <div className="space-y-1.5">
+            <label className="label">Courriel</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder="prospect@commerce.com"
               className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
                          placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
           </div>

@@ -11,7 +11,7 @@ export async function updateProspectStatus(id: string, status: string): Promise<
 }
 
 export async function createProspect(fields: {
-  business_name: string; niche: string; city: string; phone?: string; notes?: string;
+  business_name: string; niche: string; city: string; phone?: string; email?: string; notes?: string;
 }): Promise<{ error?: string }> {
   const business_name = fields.business_name.trim();
   const niche = fields.niche.trim();
@@ -22,6 +22,7 @@ export async function createProspect(fields: {
   const { error } = await createAdminClient().from('prospects').insert({
     business_name, niche, city,
     phone: fields.phone?.trim() || null,
+    email: fields.email?.trim() || null,
     notes: fields.notes?.trim() || null,
     web_presence: 'none',
     status: 'new',
@@ -45,7 +46,7 @@ export async function deleteProspects(ids: string[]): Promise<{ error?: string }
 
 export async function updateProspect(
   id: string,
-  fields: { notes?: string; phone?: string; demo_url?: string; status?: string; sale_value?: number | null; monthly_value?: number | null },
+  fields: { notes?: string; phone?: string; demo_url?: string; status?: string; email?: string | null; sale_value?: number | null; monthly_value?: number | null },
 ): Promise<{ error?: string }> {
   const { error } = await createAdminClient().from('prospects').update(fields).eq('id', id);
   if (error) return { error: error.message };
