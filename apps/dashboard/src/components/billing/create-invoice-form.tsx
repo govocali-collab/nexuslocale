@@ -2,13 +2,15 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { createInvoice, type InvoiceLine } from '@/lib/billing-actions';
+import { createInvoice, sendInvoiceNow, type InvoiceLine } from '@/lib/billing-actions';
 
 const inputCls =
   'w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm ' +
   'placeholder-[#a3a3a3] px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500';
 
 const fmt = (n: number) => '$' + n.toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+type Done = { number?: string | undefined; pdfUrl?: string | undefined; hostedUrl?: string | undefined; invoiceId?: string | undefined };
 
 export function CreateInvoiceForm() {
   const router = useRouter();
@@ -17,8 +19,10 @@ export function CreateInvoiceForm() {
   const [memo, setMemo]   = useState('');
   const [lines, setLines] = useState<{ description: string; amount: string }[]>([{ description: '', amount: '' }]);
   const [pending, start]  = useTransition();
+  const [sending, startSend] = useTransition();
   const [err, setErr]     = useState('');
-  const [done, setDone]   = useState<{ url?: string | undefined; number?: string | undefined; sent?: boolean | undefined } | null>(null);
+  const [done, setDone]   = useState<Done | null>(null);
+  const [sent, setSent]   = useState(false);
 
   const total = lines.reduce((n, l) => n + (Number(l.amount) || 0), 0);
 
@@ -28,40 +32,50 @@ export function CreateInvoiceForm() {
   const addLine = () => setLines((p) => [...p, { description: '', amount: '' }]);
   const rmLine  = (i: number) => setLines((p) => (p.length > 1 ? p.filter((_, j) => j !== i) : p));
 
-  function doSubmit(send: boolean) {
-    setErr(''); setDone(null);
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(''); setDone(null); setSent(false);
     const payloadLines: InvoiceLine[] = lines.map((l) => ({ description: l.description, amount: Number(l.amount) }));
     start(async () => {
-      const r = await createInvoice({ clientName: name, clientEmail: email, lines: payloadLines, memo, send });
+      const r = await createInvoice({ clientName: name, clientEmail: email, lines: payloadLines, memo });
       if (!r.ok) { setErr(r.error ?? 'Erreur.'); return; }
-      setDone({ url: r.url, number: r.number, sent: r.sent });
+      setDone({ number: r.number, pdfUrl: r.pdfUrl, hostedUrl: r.hostedUrl, invoiceId: r.invoiceId });
       setName(''); setEmail(''); setMemo(''); setLines([{ description: '', amount: '' }]);
       router.refresh();
+    });
+  }
+
+  function sendIt() {
+    if (!done?.invoiceId) return;
+    startSend(async () => {
+      const r = await sendInvoiceNow(done.invoiceId!);
+      if (r.ok) { setSent(true); router.refresh(); }
+      else setErr(r.error ?? 'Échec de l\'envoi.');
     });
   }
 
   if (done) {
     return (
       <div className="card p-6 text-center">
-        <div className="mx-auto mb-3 grid size-11 place-items-center rounded-full bg-[#5701f3] text-white text-xl">✓</div>
+        <div className="mx-auto mb-3 grid size-11 place-items-center rounded-full bg-[#5701f3] text-white text-xl">{sent ? '✓' : '👁'}</div>
         <h3 className="font-bold text-[#0a0a0a]">
-          {done.sent ? `Facture ${done.number ?? ''} créée et envoyée` : 'Brouillon créé'}
+          {sent ? `Facture ${done.number ?? ''} envoyée au client` : `Facture ${done.number ?? ''} créée — pas encore envoyée`}
         </h3>
         <p className="mt-1 text-sm text-[#525252]">
-          {done.sent
-            ? 'Le client a reçu un courriel avec le lien de paiement. (En mode test, le courriel n’est pas livré à un vrai client.)'
-            : 'Brouillon enregistré, rien n’a été envoyé. Tu peux le revoir/finaliser dans Stripe quand tu veux.'}
+          {sent ? 'Le client a reçu la facture par courriel.' : 'Prévisualise-la, puis envoie-la au client quand tu es prêt.'}
         </p>
-        <div className="mt-4 flex items-center justify-center gap-3">
-          {done.url && <a href={done.url} target="_blank" rel="noopener noreferrer" className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-4 py-2 text-sm font-medium text-white">Voir la facture</a>}
-          <button onClick={() => setDone(null)} className="rounded-md px-4 py-2 text-sm text-[#525252] hover:bg-[#f5f5f5]">Nouvelle facture</button>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          {done.pdfUrl && <a href={done.pdfUrl} target="_blank" rel="noopener noreferrer" className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-[#404040] hover:bg-[#f5f5f5]">Aperçu (PDF)</a>}
+          {!sent && <button onClick={sendIt} disabled={sending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-4 py-2 text-sm font-medium text-white">{sending ? 'Envoi…' : 'Envoyer au client'}</button>}
+          <button onClick={() => { setDone(null); setSent(false); }} className="rounded-md px-4 py-2 text-sm text-[#525252] hover:bg-[#f5f5f5]">Nouvelle facture</button>
         </div>
+        {err && <p className="mt-2 text-sm text-red-600">{err}</p>}
       </div>
     );
   }
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); doSubmit(true); }} className="card p-5 space-y-4">
+    <form onSubmit={submit} className="card p-5 space-y-4">
       <p className="label">Nouvelle facture</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -97,15 +111,9 @@ export function CreateInvoiceForm() {
 
       <div className="flex items-center justify-between pt-1">
         <span className="text-sm text-[#525252]">Total : <span className="font-bold text-[#0a0a0a]">{fmt(total)}</span> CAD</span>
-        <div className="flex items-center gap-2">
-          <button type="button" disabled={pending} onClick={() => doSubmit(false)}
-            className="rounded-md border border-neutral-300 disabled:opacity-70 px-4 py-2 text-sm font-medium text-[#404040] hover:bg-[#f5f5f5]">
-            Brouillon
-          </button>
-          <button type="submit" disabled={pending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2 text-sm font-medium text-white">
-            {pending ? '…' : 'Créer et envoyer'}
-          </button>
-        </div>
+        <button type="submit" disabled={pending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2 text-sm font-medium text-white">
+          {pending ? '…' : 'Créer la facture'}
+        </button>
       </div>
 
       {err && <p className="text-sm text-red-600">{err}</p>}

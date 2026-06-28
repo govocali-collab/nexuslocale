@@ -76,8 +76,8 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
 
         <div className="flex items-center justify-between gap-3">
           {sent
-            ? <span className="text-sm text-emerald-700 font-medium">✓ Abonnement créé — première facture envoyée au client par courriel.</span>
-            : <span className="text-xs text-[#a3a3a3]">Stripe envoie une facture chaque mois, automatiquement.</span>}
+            ? <span className="text-sm text-emerald-700 font-medium">✓ Abonnement créé — la 1re facture est prête à prévisualiser/envoyer dans l&apos;historique ci-dessous.</span>
+            : <span className="text-xs text-[#a3a3a3]">1re facture à prévisualiser ; les mois suivants partent automatiquement.</span>}
           <button type="submit" disabled={pending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2 text-sm font-medium text-white whitespace-nowrap">
             {pending ? '…' : 'Créer et envoyer'}
           </button>
