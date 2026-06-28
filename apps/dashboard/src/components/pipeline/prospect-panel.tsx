@@ -21,6 +21,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
   const [phone,    setPhone]    = useState('');
   const [demoUrl,  setDemoUrl]  = useState('');
   const [status,   setStatus]   = useState('');
+  const [saleValue,    setSaleValue]    = useState('');
+  const [monthlyValue, setMonthlyValue] = useState('');
   const [errMsg,   setErrMsg]   = useState('');
   const [saved,    setSaved]    = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -31,6 +33,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
     setPhone(prospect.phone    ?? '');
     setDemoUrl(prospect.demo_url ?? '');
     setStatus(prospect.status);
+    setSaleValue(prospect.sale_value    != null ? String(prospect.sale_value)    : '');
+    setMonthlyValue(prospect.monthly_value != null ? String(prospect.monthly_value) : '');
     setSaved(false);
     setErrMsg('');
   }, [prospect?.id]);
@@ -45,11 +49,15 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
     if (!prospect) return;
     setErrMsg('');
     startTransition(async () => {
+      const saleNum    = saleValue.trim()    === '' ? null : Number(saleValue);
+      const monthlyNum = monthlyValue.trim() === '' ? null : Number(monthlyValue);
       const result = await updateProspect(prospect.id, {
         notes:    notes    || null as unknown as string,
         phone:    phone    || null as unknown as string,
         demo_url: demoUrl  || null as unknown as string,
         status,
+        sale_value:    saleNum,
+        monthly_value: monthlyNum,
       });
       if (result.error) {
         setErrMsg(result.error);
@@ -57,7 +65,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
-      onSaved({ id: prospect.id, notes, phone, demo_url: demoUrl, status });
+      onSaved({ id: prospect.id, notes, phone, demo_url: demoUrl, status, sale_value: saleNum, monthly_value: monthlyNum });
     });
   }
 
@@ -135,6 +143,28 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
               placeholder="https://…"
               className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
                          placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+
+          {/* Valeurs $ */}
+          <div className="space-y-1.5">
+            <label className="label">Valeur ($)</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <input type="number" min={0} step="1" value={saleValue} onChange={e => setSaleValue(e.target.value)}
+                  placeholder="Vente unique"
+                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                             placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+                <p className="text-[11px] text-[#a3a3a3] mt-1">Site vendu (unique)</p>
+              </div>
+              <div>
+                <input type="number" min={0} step="1" value={monthlyValue} onChange={e => setMonthlyValue(e.target.value)}
+                  placeholder="Mensuel"
+                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                             placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+                <p className="text-[11px] text-[#a3a3a3] mt-1">Hébergement ($/mois)</p>
+              </div>
+            </div>
+            <p className="text-[11px] text-[#a3a3a3]">Compté dans la vue d&apos;ensemble quand le statut est « Gagné ».</p>
           </div>
 
           {/* Notes */}

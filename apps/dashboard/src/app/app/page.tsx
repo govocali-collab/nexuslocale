@@ -43,9 +43,9 @@ export default async function OverviewPage() {
       <h1 className="text-lg font-semibold text-[#0a0a0a]">Vue d'ensemble</h1>
 
       {/* ── KPI row ────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Sites par statut */}
-        <div className="card p-4 col-span-2">
+        <div className="card p-4 lg:col-span-3">
           <p className="label mb-3">Sites par statut</p>
           <div className="flex flex-wrap gap-2">
             {STATUSES.map(s => (
@@ -81,7 +81,16 @@ export default async function OverviewPage() {
           <p className="text-3xl font-bold mono text-[#0a0a0a]">
             ${Math.round(stats.mrr).toLocaleString('fr-CA')}
           </p>
-          <p className="text-xs mt-1 text-[#a3a3a3]">sites + clients + upsells</p>
+          <p className="text-xs mt-1 text-[#a3a3a3]">hébergement récurrent (prospects gagnés + clients)</p>
+        </div>
+
+        {/* Ventes de sites (one-time) */}
+        <div className="card p-4">
+          <p className="label mb-1">Ventes de sites (total)</p>
+          <p className="text-3xl font-bold mono text-[#0a0a0a]">
+            ${Math.round(stats.salesTotal).toLocaleString('fr-CA')}
+          </p>
+          <p className="text-xs mt-1 text-[#a3a3a3]">sites web vendus (prospects gagnés)</p>
         </div>
       </div>
 

@@ -7,6 +7,7 @@ export interface OverviewStats {
   leadsThisMonth:    number;
   leadsPrevMonth:    number;
   mrr:               number;
+  salesTotal:        number;
   prospectsByStatus: Record<string, number>;
 }
 
@@ -92,7 +93,7 @@ export async function getOverviewStats(): Promise<OverviewStats> {
     db.from('sites').select('monthly_rent').eq('status', 'rented'),
     db.from('clients').select('hosting_monthly'),
     db.from('upsells').select('monthly_price').eq('status', 'active'),
-    db.from('prospects').select('status'),
+    db.from('prospects').select('status, sale_value, monthly_value'),
   ]);
 
   const sitesByStatus: Record<string, number> = {};
@@ -101,10 +102,16 @@ export async function getOverviewStats(): Promise<OverviewStats> {
     sitesByStatus[st] = (sitesByStatus[st] ?? 0) + 1;
   }
 
+  // Revenus réalisés depuis les prospects « gagnés ».
+  const won = (prospectsRes.data ?? []).filter(p => (p.status as string) === 'won');
+  const salesTotal       = won.reduce((n, p) => n + ((p.sale_value    as number | null) ?? 0), 0);
+  const prospectsMonthly = won.reduce((n, p) => n + ((p.monthly_value as number | null) ?? 0), 0);
+
   const mrr =
     (rentedRes.data  ?? []).reduce((n, r) => n + ((r.monthly_rent   as number | null) ?? 0), 0) +
     (clientsRes.data ?? []).reduce((n, r) => n + ((r.hosting_monthly as number | null) ?? 0), 0) +
-    (upsellsRes.data ?? []).reduce((n, r) => n + ((r.monthly_price   as number) ?? 0), 0);
+    (upsellsRes.data ?? []).reduce((n, r) => n + ((r.monthly_price   as number) ?? 0), 0) +
+    prospectsMonthly;
 
   const prospectsByStatus: Record<string, number> = {};
   for (const p of prospectsRes.data ?? []) {
@@ -117,6 +124,7 @@ export async function getOverviewStats(): Promise<OverviewStats> {
     leadsThisMonth:    leadsThisRes.count  ?? 0,
     leadsPrevMonth:    leadsPrevRes.count  ?? 0,
     mrr,
+    salesTotal,
     prospectsByStatus,
   };
 }
@@ -285,6 +293,8 @@ export interface Prospect {
   demo_url:       string | null;
   website:        string | null;
   notes:          string | null;
+  sale_value:     number | null;
+  monthly_value:  number | null;
   created_at:     string;
 }
 
@@ -292,7 +302,7 @@ export async function getProspects(): Promise<Prospect[]> {
   const db = createAdminClient();
   const { data } = await db
     .from('prospects')
-    .select('id, business_name, niche, city, phone, rating, review_count, web_presence, pain_score, prospect_score, status, demo_url, website, notes, created_at')
+    .select('id, business_name, niche, city, phone, rating, review_count, web_presence, pain_score, prospect_score, status, demo_url, website, notes, sale_value, monthly_value, created_at')
     .order('prospect_score', { ascending: false, nullsFirst: false });
   return (data ?? []) as unknown as Prospect[];
 }

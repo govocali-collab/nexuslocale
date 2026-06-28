@@ -21,7 +21,7 @@ export async function deleteProspects(ids: string[]): Promise<{ error?: string }
 
 export async function updateProspect(
   id: string,
-  fields: { notes?: string; phone?: string; demo_url?: string; status?: string },
+  fields: { notes?: string; phone?: string; demo_url?: string; status?: string; sale_value?: number | null; monthly_value?: number | null },
 ): Promise<{ error?: string }> {
   const { error } = await createAdminClient().from('prospects').update(fields).eq('id', id);
   if (error) return { error: error.message };
