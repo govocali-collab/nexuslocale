@@ -167,7 +167,10 @@ export async function listInvoices(): Promise<InvoiceRow[]> {
       created:       i.created,
       hostedUrl:     i.hosted_invoice_url ?? null,
       pdfUrl:        i.invoice_pdf ?? null,
-      needsSend:     i.metadata?.['emailed'] === 'no' && i.status === 'open',
+      // « À envoyer » = finalisée (open) et pas encore envoyée par nous.
+      // Couvre les factures d'abonnement générées par Stripe (sans nos métadonnées),
+      // à condition que l'envoi auto de Stripe soit désactivé (réglage Stripe).
+      needsSend:     i.status === 'open' && i.metadata?.['emailed'] !== 'yes',
     }));
   } catch {
     return [];

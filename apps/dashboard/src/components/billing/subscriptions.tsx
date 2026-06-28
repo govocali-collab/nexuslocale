@@ -76,10 +76,10 @@ export function Subscriptions({ subs }: { subs: SubRow[] }) {
 
         <div className="flex items-center justify-between gap-3">
           {sent
-            ? <span className="text-sm text-emerald-700 font-medium">✓ Abonnement créé — la 1re facture est prête à prévisualiser/envoyer dans l&apos;historique ci-dessous.</span>
-            : <span className="text-xs text-[#a3a3a3]">1re facture à prévisualiser ; les mois suivants partent automatiquement.</span>}
+            ? <span className="text-sm text-emerald-700 font-medium">✓ Abonnement créé — chaque facture mensuelle apparaît « À envoyer » dans l&apos;historique pour que tu la consultes avant de l&apos;envoyer.</span>
+            : <span className="text-xs text-[#a3a3a3]">Chaque facture mensuelle est à prévisualiser, puis à envoyer manuellement.</span>}
           <button type="submit" disabled={pending} className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2 text-sm font-medium text-white whitespace-nowrap">
-            {pending ? '…' : 'Créer et envoyer'}
+            {pending ? '…' : 'Créer l\'abonnement'}
           </button>
         </div>
         {err && <p className="text-sm text-red-600">{err}</p>}
