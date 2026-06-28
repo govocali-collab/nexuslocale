@@ -14,12 +14,12 @@ export const DICT = {
       ctaSecondary: 'Comment ça marche',
     },
     why: {
-      heading: 'Des sites web qui vous ramènent des clients',
-      sub: 'Un beau design et du SEO local, faits pour transformer les recherches Google en clients.',
+      heading: 'On vous ramène des clients depuis Google',
+      sub: 'On bâtit et on ranke les sites ; vous, vous recevez les appels et les leads.',
       items: [
-        { t: 'Fait pour votre métier', d: 'Un site propre et professionnel, bâti autour de votre business local : plomberie, électricité, excavation et plus.' },
+        { t: 'Ciblé sur votre métier', d: 'On bâtit et on optimise un site pour votre métier et votre ville : plomberie, électricité, excavation et plus.' },
         { t: 'Bâti pour le top de Google', d: 'Le SEO local est intégré dès le départ, ciblé sur les recherches que le monde fait dans votre ville.' },
-        { t: "Plus d'appels et de leads", d: 'Le monde qui cherche votre service sur Google vous trouve en premier, et vous contacte directement.' },
+        { t: "Plus d'appels et de leads", d: 'Quand quelqu’un cherche votre service sur Google, l’appel vous revient directement.' },
         { t: "Aucuns frais d'avance", d: 'Modèle rank-and-rent : le site nous appartient. Vous payez juste pendant qu’il est dans le top et qu’il vous envoie des leads.' },
         { t: 'Géré au complet', d: "Domaine, hébergement, mises à jour, le technique : on s'occupe de tout pour vous." },
         { t: 'Des résultats clairs et mesurables', d: 'Suivez les positions Google et vos leads entrants. Vous voyez exactement ce que vous payez.' },
@@ -76,12 +76,12 @@ export const DICT = {
       ctaSecondary: 'How it works',
     },
     why: {
-      heading: 'Websites that bring you business',
-      sub: 'Beautiful design and local SEO, built to turn Google searches into customers.',
+      heading: 'We bring you customers from Google',
+      sub: 'We build and rank the sites; you get the calls and the leads.',
       items: [
-        { t: 'Designed for your trade', d: 'A clean, professional website built around your local business: plumbing, electrical, excavation and more.' },
+        { t: 'Targeted to your trade', d: 'We build and optimize a site for your trade and city: plumbing, electrical, excavation and more.' },
         { t: 'Built to rank', d: 'Local SEO is baked in from day one, targeting the exact searches people make in your city.' },
-        { t: 'More calls & leads', d: 'The people searching for your service on Google find you first, and reach out directly.' },
+        { t: 'More calls & leads', d: 'When someone searches for your service on Google, the call comes straight to you.' },
         { t: 'No upfront cost', d: 'Rank-and-rent model: we own the site. You pay only while it ranks and sends you leads.' },
         { t: 'Fully managed', d: "Domain, hosting, updates, technical work: we handle everything so you don't have to." },
         { t: 'Real, trackable results', d: "Follow the Google rankings and your incoming leads. You see exactly what you're paying for." },
