@@ -127,6 +127,12 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
     setSel(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }
 
+  const allIds = Object.values(board).flatMap(c => (c ?? []).map(p => p.id));
+  const allSelected = allIds.length > 0 && allIds.every(id => sel.has(id));
+  function toggleSelectAll() {
+    setSel(allSelected ? new Set() : new Set(allIds));
+  }
+
   function deleteSelected() {
     const ids = [...sel];
     if (ids.length === 0) return;
@@ -207,16 +213,23 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
 
   return (
     <>
-      {sel.size > 0 && (
-        <div className="sticky top-0 z-20 mb-2 flex items-center gap-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2">
-          <span className="text-sm font-medium text-red-700">{sel.size} sélectionné(s)</span>
-          <button onClick={deleteSelected} disabled={deleting}
-            className="rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 px-3 py-1 text-sm text-white transition-colors">
-            {deleting ? 'Suppression…' : '🗑 Supprimer'}
-          </button>
-          <button onClick={() => setSel(new Set())} className="text-xs text-red-500 hover:text-red-700 underline">Annuler</button>
-        </div>
-      )}
+      <div className={`sticky top-0 z-20 mb-2 flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors ${
+        sel.size > 0 ? 'bg-red-50 border-red-200' : 'bg-[#fafafa] border-[#e5e5e5]'
+      }`}>
+        <button onClick={toggleSelectAll} className="text-xs font-medium text-[#525252] hover:text-indigo-600 underline">
+          {allSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
+        </button>
+        {sel.size > 0 && (
+          <>
+            <span className="text-sm font-medium text-red-700">{sel.size} sélectionné(s)</span>
+            <button onClick={deleteSelected} disabled={deleting}
+              className="rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 px-3 py-1 text-sm text-white transition-colors">
+              {deleting ? 'Suppression…' : '🗑 Supprimer'}
+            </button>
+            <button onClick={() => setSel(new Set())} className="text-xs text-red-500 hover:text-red-700 underline">Annuler</button>
+          </>
+        )}
+      </div>
       <div
         className="flex gap-3 overflow-x-auto pb-4"
         style={{ minHeight: 'calc(100vh - 140px)' }}
