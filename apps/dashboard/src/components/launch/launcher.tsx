@@ -578,7 +578,7 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
       {/* Villes (sélection multiple) */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label className="label">Villes (&gt; 75 000 hab.) — {cities.length} sélectionnée(s)</label>
+          <label className="label">Villes (&gt; 50 000 hab.) — {cities.length} sélectionnée(s)</label>
           <button type="button" onClick={toggleAll} className="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline">
             {allSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
           </button>
