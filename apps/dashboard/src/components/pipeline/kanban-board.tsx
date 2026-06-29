@@ -40,9 +40,9 @@ function sortBoard(board: Board, key: SortKey): Board {
 
 function ScorePill({ score }: { score: number }) {
   const color =
-    score >= 70 ? 'bg-emerald-100 text-emerald-700' :
-    score >= 40 ? 'bg-amber-100 text-amber-700' :
-                  'bg-red-100 text-red-600';
+    score >= 200 ? 'bg-emerald-100 text-emerald-700' :
+    score >= 80  ? 'bg-amber-100 text-amber-700' :
+                   'bg-red-100 text-red-600';
   return (
     <span className={`text-xs font-semibold mono rounded px-1.5 py-0.5 ${color}`}>
       {Math.round(score)}
@@ -131,8 +131,8 @@ function ProspectCard({
 }
 
 export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[]; initialScript?: string }) {
-  const [sortKey, setSortKey]           = useState<SortKey>('score');
-  const [board, setBoard]               = useState<Board>(() => sortBoard(buildBoard(prospects), 'score'));
+  const [sortKey, setSortKey]           = useState<SortKey>('pain');
+  const [board, setBoard]               = useState<Board>(() => sortBoard(buildBoard(prospects), 'pain'));
 
   // Resynchronise + retrie le board quand les données serveur ou le tri changent.
   useEffect(() => { setBoard(sortBoard(buildBoard(prospects), sortKey)); }, [prospects, sortKey]);
@@ -255,8 +255,8 @@ export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[
           <span className="text-xs text-[#a3a3a3]">Trier :</span>
           <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
             className="text-xs rounded-md border-[#e5e5e5] bg-white py-1 pl-2 pr-7 text-[#404040] focus:ring-indigo-500 focus:border-indigo-500">
-            <option value="score">Score (opportunité)</option>
-            <option value="pain">Douleur (pire site)</option>
+            <option value="pain">Besoin d&apos;aide (pire site)</option>
+            <option value="score">Opportunité (valeur)</option>
             <option value="rating">Note Google</option>
             <option value="manual">Manuel</option>
           </select>
