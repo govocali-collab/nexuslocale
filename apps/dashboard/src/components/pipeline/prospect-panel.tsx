@@ -5,6 +5,7 @@ import type { Prospect } from '@/lib/queries';
 import { updateProspect } from '@/lib/actions';
 import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
 import { sellingArguments } from '@/lib/selling-points';
+import { callProspect } from '@/lib/call-actions';
 
 // Étapes = source unique partagée (cf. @/lib/pipeline) → reste synchro avec le kanban.
 const STATUSES = PIPELINE_STATUSES;
@@ -27,7 +28,9 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
   const [errMsg,   setErrMsg]   = useState('');
   const [saved,    setSaved]    = useState(false);
   const [copied,   setCopied]   = useState(false);
+  const [callMsg,  setCallMsg]  = useState('');
   const [isPending, startTransition] = useTransition();
+  const [calling,   startCall]       = useTransition();
 
   useEffect(() => {
     if (!prospect) return;
@@ -86,6 +89,16 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
     navigator.clipboard.writeText(bookingUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  }
+
+  function call() {
+    if (!phone.trim()) return;
+    setCallMsg('');
+    startCall(async () => {
+      const r = await callProspect(phone.trim());
+      setCallMsg(r.ok ? '📞 Ton cellulaire va sonner — réponds pour être connecté au prospect.' : (r.error ?? 'Échec de l’appel.'));
+      setTimeout(() => setCallMsg(''), 6000);
+    });
   }
 
   return (
@@ -184,10 +197,17 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
           {/* Téléphone */}
           <div className="space-y-1.5">
             <label className="label">Téléphone</label>
-            <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-              placeholder="+15145550000"
-              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
-                         placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+            <div className="flex items-center gap-2">
+              <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+                placeholder="+15145550000"
+                className="flex-1 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
+                           placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+              <button type="button" onClick={call} disabled={!phone.trim() || calling}
+                className="rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 px-3 py-1.5 text-sm text-white whitespace-nowrap">
+                {calling ? '…' : '📞 Appeler'}
+              </button>
+            </div>
+            {callMsg && <p className="text-xs text-[#525252]">{callMsg}</p>}
           </div>
 
           {/* Courriel */}
