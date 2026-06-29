@@ -10,18 +10,12 @@ function xml(body: string) {
 }
 
 export async function POST(req: Request) {
-  const agent = process.env['AGENT_PHONE'];
-  const fallback = process.env['TWILIO_CALLER_NUMBER'] ?? '';
+  const agent  = process.env['AGENT_PHONE'];
+  const caller = process.env['TWILIO_CALLER_NUMBER'] ?? '';
   if (!agent) {
     return xml('<Say voice="alice" language="fr-CA">Ce numéro n\'est pas configuré pour le moment.</Say>');
   }
-  let from = fallback;
-  try {
-    const form = await req.formData();
-    from = (form.get('From')?.toString()) || fallback; // affiche le vrai appelant sur ton cell
-  } catch { /* garde le fallback */ }
-
-  // callerId doit être un numéro Twilio possédé OU l'appelant ; on tente l'appelant, sinon le numéro Twilio.
-  const callerId = from || fallback;
-  return xml(`<Dial callerId="${callerId}" timeout="25"><Number>${agent}</Number></Dial>`);
+  // callerId = numéro Twilio possédé (fiable, jamais rejeté). Ton cell verra ce numéro
+  // sonner → tu sais que c'est un appel d'affaires via ta ligne NexusLocale.
+  return xml(`<Dial callerId="${caller}" timeout="25"><Number>${agent}</Number></Dial>`);
 }
