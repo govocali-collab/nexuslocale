@@ -12,7 +12,7 @@ const fmt = (n: number) => '$' + n.toLocaleString('fr-CA', { minimumFractionDigi
 
 type Done = { number?: string | undefined; pdfUrl?: string | undefined; hostedUrl?: string | undefined; invoiceId?: string | undefined };
 
-export function CreateInvoiceForm({ initialName, initialEmail }: { initialName?: string; initialEmail?: string } = {}) {
+export function CreateInvoiceForm({ initialName, initialEmail }: { initialName?: string | undefined; initialEmail?: string | undefined } = {}) {
   const router = useRouter();
   const [name, setName]   = useState(initialName ?? '');
   const [email, setEmail] = useState(initialEmail ?? '');
