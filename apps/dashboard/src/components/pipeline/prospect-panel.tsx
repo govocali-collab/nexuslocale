@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition } from 'react';
 import type { Prospect } from '@/lib/queries';
 import { updateProspect } from '@/lib/actions';
 import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
+import { sellingArguments } from '@/lib/selling-points';
 
 // Étapes = source unique partagée (cf. @/lib/pipeline) → reste synchro avec le kanban.
 const STATUSES = PIPELINE_STATUSES;
@@ -72,6 +73,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
 
   if (!prospect) return null;
 
+  const args = sellingArguments(prospect);
+
   return (
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
@@ -118,6 +121,21 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
               )}
             </dl>
           </div>
+
+          {/* Arguments de vente */}
+          {args.length > 0 && (
+            <div className="space-y-2 rounded-lg border border-indigo-100 bg-indigo-50/60 p-3">
+              <p className="label text-indigo-700">💡 Arguments de vente</p>
+              <ul className="space-y-2">
+                {args.map((a, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-[#404040] leading-snug">
+                    <span className="shrink-0">{a.icon}</span>
+                    <span>{a.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Statut */}
           <div className="space-y-1.5">

@@ -286,9 +286,10 @@ export interface Prospect {
   phone:          string | null;
   rating:         number | null;
   review_count:   number | null;
-  web_presence:   string;
-  pain_score:     number | null;
-  prospect_score: number | null;
+  web_presence:    string;
+  pain_score:      number | null;
+  prospect_score:  number | null;
+  detected_issues: string[] | null;
   status:         string;
   demo_url:       string | null;
   website:        string | null;
@@ -303,7 +304,7 @@ export async function getProspects(): Promise<Prospect[]> {
   const db = createAdminClient();
   const { data } = await db
     .from('prospects')
-    .select('id, business_name, niche, city, phone, rating, review_count, web_presence, pain_score, prospect_score, status, demo_url, website, notes, email, sale_value, monthly_value, created_at')
+    .select('id, business_name, niche, city, phone, rating, review_count, web_presence, pain_score, prospect_score, detected_issues, status, demo_url, website, notes, email, sale_value, monthly_value, created_at')
     .order('prospect_score', { ascending: false, nullsFirst: false });
   return (data ?? []) as unknown as Prospect[];
 }
