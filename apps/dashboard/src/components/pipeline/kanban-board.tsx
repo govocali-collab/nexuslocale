@@ -24,6 +24,20 @@ function buildBoard(prospects: Prospect[]): Board {
   return board;
 }
 
+type SortKey = 'score' | 'pain' | 'rating' | 'manual';
+
+// Tri des cartes dans chaque colonne (décroissant). 'manual' = ordre du board (drag).
+function sortBoard(board: Board, key: SortKey): Board {
+  if (key === 'manual') return board;
+  const cmp =
+    key === 'pain'   ? (a: Prospect, b: Prospect) => (b.pain_score ?? 0) - (a.pain_score ?? 0)
+    : key === 'rating' ? (a: Prospect, b: Prospect) => (b.rating ?? 0) - (a.rating ?? 0)
+    :                    (a: Prospect, b: Prospect) => (b.prospect_score ?? 0) - (a.prospect_score ?? 0);
+  const next: Board = {};
+  for (const col of Object.keys(board)) next[col] = [...(board[col] ?? [])].sort(cmp);
+  return next;
+}
+
 function ScorePill({ score }: { score: number }) {
   const color =
     score >= 70 ? 'bg-emerald-100 text-emerald-700' :
@@ -117,10 +131,11 @@ function ProspectCard({
 }
 
 export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[]; initialScript?: string }) {
-  const [board, setBoard]               = useState<Board>(() => buildBoard(prospects));
+  const [sortKey, setSortKey]           = useState<SortKey>('score');
+  const [board, setBoard]               = useState<Board>(() => sortBoard(buildBoard(prospects), 'score'));
 
-  // Resynchronise le board quand les données serveur changent (ajout, suppression, refresh).
-  useEffect(() => { setBoard(buildBoard(prospects)); }, [prospects]);
+  // Resynchronise + retrie le board quand les données serveur ou le tri changent.
+  useEffect(() => { setBoard(sortBoard(buildBoard(prospects), sortKey)); }, [prospects, sortKey]);
   const [drag, setDrag]                 = useState<DragState | null>(null);
   const [overCol, setOverCol]           = useState<string | null>(null);
   const [overIndex, setOverIndex]       = useState<number | null>(null);
@@ -236,6 +251,16 @@ export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[
             <button onClick={() => setSel(new Set())} className="text-xs text-red-500 hover:text-red-700 underline">Annuler</button>
           </>
         )}
+        <div className="flex items-center gap-1.5 ml-auto">
+          <span className="text-xs text-[#a3a3a3]">Trier :</span>
+          <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
+            className="text-xs rounded-md border-[#e5e5e5] bg-white py-1 pl-2 pr-7 text-[#404040] focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="score">Score (opportunité)</option>
+            <option value="pain">Douleur (pire site)</option>
+            <option value="rating">Note Google</option>
+            <option value="manual">Manuel</option>
+          </select>
+        </div>
       </div>
       <div
         className="flex gap-3 overflow-x-auto pb-4"
