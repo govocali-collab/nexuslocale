@@ -95,6 +95,13 @@ function ProspectCard({
           ? <span className="text-xs mono text-[#525252]">{p.phone}</span>
           : <span />}
         <div className="flex items-center gap-2">
+          {p.website
+            ? <a href={p.website.startsWith('http') ? p.website : `https://${p.website}`} target="_blank" rel="noopener noreferrer"
+                 className="text-xs text-sky-600 hover:text-sky-800 font-medium" title={`Voir le site : ${p.website}`}
+                 onClick={e => e.stopPropagation()}>🌐 site</a>
+            : p.web_presence === 'social_only'
+              ? <span className="text-xs text-amber-600" title="Réseaux sociaux seulement">📱 réseaux</span>
+              : <span className="text-xs text-red-500" title="Aucun site web — bonne cible">⛔ aucun site</span>}
           {p.notes && <span className="text-xs text-[#a3a3a3]" title="A des notes">📝</span>}
           {p.demo_url && (
             <a href={p.demo_url} target="_blank" rel="noopener noreferrer"
