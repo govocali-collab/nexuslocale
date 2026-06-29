@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/admin';
 import { getActionQueues } from '@/lib/queries';
 import { Launcher } from '@/components/launch/launcher';
+import { LocalLauncherBanner } from '@/components/launch/local-banner';
 
 async function getSites() {
   const { data } = await createAdminClient()
@@ -23,6 +24,8 @@ export default async function LaunchPage({
   return (
     <div className="space-y-4">
       <h1 className="text-lg font-semibold text-[#0a0a0a]">Lanceur d'actions</h1>
+
+      <LocalLauncherBanner />
 
       {/* ── Files d'attente ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
