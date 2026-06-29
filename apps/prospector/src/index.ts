@@ -129,10 +129,17 @@ async function runScan(niche: string, location: string, options: ScanOptions) {
   const scored = scoreAll(analyzed);
 
   // ── Filtre opportunités : pas de site, site cassé ou désuet ────────────
-  // On exclut les entreprises avec un bon site moderne (pain_score < minPain).
+  // On exclut : (1) les bons sites modernes (pain < minPain) ET (2) ceux dont le
+  // SEUL défaut est mineur (ex. HTTPS manquant) — pas une vraie opportunité.
+  const MINOR_ISSUES = ['Pas de HTTPS'];
   const before = scored.length;
-  const opportunities = scored.filter((p) => p.pain_score >= options.minPain);
-  console.log(`\n[filter] ${opportunities.length}/${before} opportunité(s) gardée(s) (pain_score ≥ ${options.minPain}) — ${before - opportunities.length} entreprise(s) avec un bon site exclue(s)`);
+  const opportunities = scored.filter((p) => {
+    if (p.pain_score < options.minPain) return false;
+    const issues = p.detected_issues ?? [];
+    const onlyMinor = issues.length > 0 && issues.every((i) => MINOR_ISSUES.some((m) => i.includes(m)));
+    return !onlyMinor;
+  });
+  console.log(`\n[filter] ${opportunities.length}/${before} opportunité(s) gardée(s) — exclus : bons sites + ceux dont le seul défaut est mineur (HTTPS manquant)`);
 
   // ── Sortie JSON (consommée par le dashboard) ───────────────────────────
   if (options.json) {
