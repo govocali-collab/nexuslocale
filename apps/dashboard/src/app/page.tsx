@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://nexuslocale.com'),
   title: TITLE,
   description: DESC,
-  icons: { icon: '/NexusLocale-Fav-v2.png', shortcut: '/NexusLocale-Fav-v2.png', apple: '/NexusLocale-Fav-v2.png' },
+  icons: { icon: '/NexusLocale-Fav-v3.png', shortcut: '/NexusLocale-Fav-v3.png', apple: '/NexusLocale-Fav-v3.png' },
   openGraph: {
     title: TITLE,
     description: DESC,

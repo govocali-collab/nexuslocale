@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   title: 'NexusLocale — Dashboard',
   description: 'Poste de pilotage rank-and-rent',
   icons: {
-    icon: '/NexusLocale-Fav-v2.png',
-    shortcut: '/NexusLocale-Fav-v2.png',
-    apple: '/NexusLocale-Fav-v2.png',
+    icon: '/NexusLocale-Fav-v3.png',
+    shortcut: '/NexusLocale-Fav-v3.png',
+    apple: '/NexusLocale-Fav-v3.png',
   },
 };
 
