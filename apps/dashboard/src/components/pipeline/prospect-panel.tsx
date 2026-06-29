@@ -6,7 +6,8 @@ import { updateProspect } from '@/lib/actions';
 import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
 import { sellingArguments } from '@/lib/selling-points';
 import { callProspect } from '@/lib/call-actions';
-import { saveCallScript, DEFAULT_CALL_SCRIPT } from '@/lib/settings-actions';
+import { saveCallScript } from '@/lib/settings-actions';
+import { DEFAULT_CALL_SCRIPT } from '@/lib/call-script-default';
 
 // Remplace les variables du script par les infos du prospect.
 function renderScript(tpl: string, p: Prospect): string {
