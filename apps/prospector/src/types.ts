@@ -36,6 +36,7 @@ export interface ScanOptions {
   simulate:    boolean;
   json:        boolean;
   judge:       boolean;
+  minPain:     number; // ne garder que les prospects dont le pain_score ≥ ce seuil (filtre les bons sites)
 }
 
 // Coût approximatif Google Places API (vérifier console.cloud.google.com pour prix actuels)

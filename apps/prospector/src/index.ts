@@ -31,6 +31,7 @@ program
   .option('--min-reviews <n>',   'Exclure les entreprises sous ce nombre d\'avis', '0')
   .option('--json',              'Émet aussi les résultats en JSON (pour le dashboard)')
   .option('--judge',             'Jugement IA des sites « a un site » (Claude ouvre et évalue vieux/cassé)')
+  .option('--min-pain <n>',      'Ne garder que les prospects avec pain_score ≥ n (défaut 10 = exclut les bons sites)', '10')
   .action(async (niche: string, location: string, opts: Record<string, string | boolean>) => {
     const options: ScanOptions = {
       limit:      Number(opts['limit']      ?? 60),
@@ -39,6 +40,7 @@ program
       simulate:   Boolean(opts['simulate']),
       json:       Boolean(opts['json']),
       judge:      Boolean(opts['judge']),
+      minPain:    Number(opts['minPain']    ?? 10),
     };
 
     await runScan(niche, location, options);
@@ -126,22 +128,28 @@ async function runScan(niche: string, location: string, options: ScanOptions) {
   // ── Scoring ────────────────────────────────────────────────────────────
   const scored = scoreAll(analyzed);
 
+  // ── Filtre opportunités : pas de site, site cassé ou désuet ────────────
+  // On exclut les entreprises avec un bon site moderne (pain_score < minPain).
+  const before = scored.length;
+  const opportunities = scored.filter((p) => p.pain_score >= options.minPain);
+  console.log(`\n[filter] ${opportunities.length}/${before} opportunité(s) gardée(s) (pain_score ≥ ${options.minPain}) — ${before - opportunities.length} entreprise(s) avec un bon site exclue(s)`);
+
   // ── Sortie JSON (consommée par le dashboard) ───────────────────────────
   if (options.json) {
-    console.log('__NEXUS_JSON__' + JSON.stringify({ niche, city, prospects: scored }) + '__NEXUS_END__');
+    console.log('__NEXUS_JSON__' + JSON.stringify({ niche, city, prospects: opportunities }) + '__NEXUS_END__');
   }
 
   // ── Tableau terminal ───────────────────────────────────────────────────
-  printTable(scored);
+  printTable(opportunities);
 
   // ── Export CSV ─────────────────────────────────────────────────────────
-  const csvPath = exportCsv(scored, niche, city);
+  const csvPath = exportCsv(opportunities, niche, city);
   console.log(`\n📄 CSV exporté : ${csvPath}`);
 
   // ── Écriture Supabase ──────────────────────────────────────────────────
   if (!options.simulate) {
     console.log('\n[db] Écriture dans Supabase…');
-    const { written, skipped } = await upsertProspects(scored, niche, city);
+    const { written, skipped } = await upsertProspects(opportunities, niche, city);
     console.log(`[db] ✓ ${written} écrit(s), ${skipped} ignoré(s)`);
   } else {
     console.log('\n[simulate] Écriture Supabase ignorée en mode --simulate');
