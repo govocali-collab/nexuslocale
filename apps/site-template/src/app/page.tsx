@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function HomePage() {
   const config   = getConfig();
-  const { business, pages, local_data, niche, branding } = config;
+  const { business, pages, local_data, niche, branding, city } = config;
   const faqs     = local_data.faqs ?? [];
   const heroImg  = heroImageUrl(niche, branding.hero_image_url);
 
@@ -27,10 +27,13 @@ export default function HomePage() {
       {faqs.length > 0 && <SchemaLD data={buildFaqLd(faqs)!} />}
 
       {/* ── Hero ── */}
-      <section
-        className="relative text-white py-24 px-4"
-        style={{ backgroundImage: `url(${heroImg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
+      <section className="relative text-white py-24 px-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={heroImg}
+          alt={`${niche} à ${city}`}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-black/55" />
         <div className="relative max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight drop-shadow-lg">
@@ -77,8 +80,8 @@ export default function HomePage() {
                         <div className="relative h-44 overflow-hidden">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={serviceImageUrl(s.slug)}
-                            alt=""
+                            src={s.image_url ?? serviceImageUrl(s.slug)}
+                            alt={`${s.nav_label} à ${city}`}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />

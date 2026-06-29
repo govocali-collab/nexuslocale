@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { runGscSubmit, runRank, runCron } from '@/lib/launch-actions';
+import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult, type SubmitResult, type CronResult } from '@/lib/launch-actions';
+import type { FinderResult, FinderDomain, ProspectorResult, Prospect } from '@/lib/launch-actions';
+import { CITIES_BY_PROVINCE, PROVINCES, NEIGHBORHOODS } from '@/lib/quebec-cities';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
 interface ActionQueue {
@@ -11,86 +13,823 @@ interface ActionQueue {
 }
 
 const TABS = [
-  { id: 'finder',  label: '🔍 Finder',       desc: 'Scanner une niche pour trouver des domaines' },
-  { id: 'submit',  label: '📤 Soumettre GSC', desc: 'Vérifier et indexer un site dans Search Console' },
-  { id: 'rank',    label: '📊 Tracker',       desc: 'Suivre les positions SERP d\'un site' },
-  { id: 'cron',    label: '🔄 Cron',          desc: 'Lancer le suivi hebdomadaire de tous les sites' },
+  { id: 'finder',   label: '🔍 Finder',       desc: '1 · Trouver la niche, les mots-clés et le domaine' },
+  { id: 'generate', label: '🏗️ Générer',      desc: '2 · Bâtir le site SEO (contenu IA + photos)' },
+  { id: 'submit',   label: '📤 Soumettre GSC', desc: '3 · Indexer le site dans Google Search Console' },
+  { id: 'rank',     label: '📊 Tracker',       desc: '4 · Suivre les positions Google chaque semaine' },
+  { id: 'prospect', label: '🎯 Prospector',   desc: '5 · Après ~1 mois : trouver les clients à qui louer' },
+  { id: 'beau',     label: '🎨 Beau site',    desc: 'Offre à part : beau site one-page pour un client' },
+  { id: 'cron',     label: '🔄 Cron',          desc: 'Automatisation : suivi hebdomadaire de tous les sites' },
 ] as const;
 type TabId = (typeof TABS)[number]['id'];
 
 function Output({ out, ok, pending }: { out: string; ok: boolean; pending: boolean }) {
   if (pending) return (
-    <div className="mt-4 rounded-lg bg-[#F5F4FF] border border-[#D9D7F0] px-4 py-3 text-sm text-[#6B6B9E] flex items-center gap-2">
+    <div className="mt-4 rounded-lg bg-[#fafafa] border border-[#e5e5e5] px-4 py-3 text-sm text-[#525252] flex items-center gap-2">
       <span className="inline-block w-3 h-3 rounded-full bg-indigo-400 animate-pulse" />
       En cours…
     </div>
   );
   if (!out) return null;
   return (
-    <div className={`mt-4 rounded-lg border px-4 py-3 ${ok ? 'bg-[#F5F4FF] border-[#D9D7F0]' : 'bg-red-50 border-red-200'}`}>
-      <pre className={`text-xs whitespace-pre-wrap font-mono leading-relaxed ${ok ? 'text-[#1C1560]' : 'text-red-700'}`}>
+    <div className={`mt-4 rounded-lg border px-4 py-3 ${ok ? 'bg-[#fafafa] border-[#e5e5e5]' : 'bg-red-50 border-red-200'}`}>
+      <pre className={`text-xs whitespace-pre-wrap font-mono leading-relaxed ${ok ? 'text-[#0a0a0a]' : 'text-red-700'}`}>
         {out}
       </pre>
     </div>
   );
 }
 
+// ── Tableaux de résultats ───────────────────────────────────────────────────────
+const fmtNum = (n: number | null) => (n == null ? '—' : n.toLocaleString('fr-CA'));
+const fmtCpc = (n: number | null) => (n == null ? '—' : `$${n.toFixed(2)}`);
+
+const TH = 'px-3 py-2 font-medium text-[#404040]';
+const TD = 'px-3 py-2 border-t border-[#f5f5f5]';
+
+function Badge({ text, cls }: { text: string; cls: string }) {
+  return <span className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${cls}`}>{text}</span>;
+}
+
+function kdCls(kd: number | null) {
+  if (kd == null) return 'bg-[#f5f5f5] text-[#a3a3a3]';
+  return kd <= 30 ? 'bg-green-100 text-green-700' : kd <= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
+}
+
+// CPC : plus c'est élevé, plus le client vaut cher → vert = vaut la peine.
+function cpcCls(cpc: number | null) {
+  if (cpc == null || cpc <= 0) return 'bg-[#f5f5f5] text-[#a3a3a3]';
+  return cpc >= 10 ? 'bg-green-100 text-green-700' : cpc >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-[#f5f5f5] text-[#525252]';
+}
+
+type KwSortKey = 'keyword' | 'search_volume' | 'cpc' | 'keyword_difficulty' | 'score';
+
+function KeywordTable({ result, selected, onToggle }: { result: FinderResult; selected: string[]; onToggle: (kw: string) => void }) {
+  const [q,        setQ]        = useState('');
+  const [minVol,   setMinVol]   = useState('');
+  const [maxKd,    setMaxKd]     = useState('');
+  const [showHelp, setShowHelp] = useState(false);
+  const [sort,     setSort]     = useState<{ key: KwSortKey; dir: 'asc' | 'desc' }>({ key: 'score', dir: 'desc' });
+
+  const minVolNum = minVol === '' ? null : Number(minVol);
+  const maxKdNum  = maxKd  === '' ? null : Number(maxKd);
+
+  const rows = result.keywords
+    .filter(k => {
+      if (q && !k.keyword.toLowerCase().includes(q.toLowerCase())) return false;
+      if (minVolNum != null && (k.search_volume ?? 0) < minVolNum) return false;
+      if (maxKdNum != null && k.keyword_difficulty != null && k.keyword_difficulty > maxKdNum) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const dir = sort.dir === 'asc' ? 1 : -1;
+      if (sort.key === 'keyword') return a.keyword.localeCompare(b.keyword) * dir;
+      const av = (a[sort.key] as number | null) ?? -Infinity;
+      const bv = (b[sort.key] as number | null) ?? -Infinity;
+      return (av - bv) * dir;
+    });
+
+  function toggleSort(key: KwSortKey) {
+    setSort(s => s.key === key
+      ? { key, dir: s.dir === 'desc' ? 'asc' : 'desc' }
+      : { key, dir: key === 'keyword' ? 'asc' : 'desc' });
+  }
+  const arrow = (key: KwSortKey) => sort.key === key ? (sort.dir === 'desc' ? ' ↓' : ' ↑') : '';
+  const hasFilter = q !== '' || minVol !== '' || maxKd !== '';
+  const inputCls = 'rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-2 py-1 placeholder-[#a3a3a3]';
+
+  return (
+    <div className="mt-4 space-y-3">
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-sm font-medium text-[#0a0a0a]">{rows.length} / {result.keywords.length} mot(s)-clé</span>
+        <Badge text={`Niche score ${result.niche_score}`} cls="bg-indigo-100 text-indigo-700" />
+        <button
+          onClick={() => setShowHelp(h => !h)}
+          aria-label="Comprendre les colonnes"
+          className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold transition-colors ${
+            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#f5f5f5] text-[#525252] hover:bg-indigo-100 hover:text-indigo-700'
+          }`}
+        >?</button>
+      </div>
+
+      {/* Encadré d'aide */}
+      {showHelp && (
+        <div className="rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-3 text-sm space-y-1.5">
+          <p><span className="font-semibold text-[#0a0a0a]">Volume</span> <span className="text-[#525252]">— combien de fois ce mot-clé est cherché par mois (au Québec). Gros = beaucoup de monde cherche. ⚠️ Peu fiable en local.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">CPC</span> <span className="text-[#525252]">— ce qu'un annonceur paie par clic. 🟢 Élevé = un client vaut cher. <strong>Ton meilleur indicateur.</strong></span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">KD</span> <span className="text-[#525252]">— difficulté à ranker (0-100). 🟢 Bas (≤30) = facile à atteindre le top de Google.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Score</span> <span className="text-[#525252]">— note globale = valeur × demande ÷ difficulté. Plus haut = meilleure opportunité.</span></p>
+          <p className="pt-1 text-[#0a0a0a]">👉 <strong>Le combo gagnant : CPC 🟢 vert + KD 🟢 vert.</strong></p>
+        </div>
+      )}
+
+      {/* Barre de filtre */}
+      <div className="flex flex-wrap items-center gap-2">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Filtrer un mot-clé…"
+          className={`${inputCls} flex-1 min-w-[10rem]`} />
+        <input value={minVol} onChange={e => setMinVol(e.target.value)} type="number" min={0} placeholder="Volume min"
+          className={`${inputCls} w-28`} />
+        <input value={maxKd} onChange={e => setMaxKd(e.target.value)} type="number" min={0} max={100} placeholder="KD max"
+          className={`${inputCls} w-24`} />
+        {hasFilter && (
+          <button onClick={() => { setQ(''); setMinVol(''); setMaxKd(''); }}
+            className="text-xs text-[#a3a3a3] hover:text-[#0a0a0a] underline">Réinitialiser</button>
+        )}
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
+        <table className="w-full text-sm">
+          <thead className="bg-[#fafafa]">
+            <tr>
+              <th className={`${TH} w-8`}></th>
+              {([
+                ['keyword',            'Mot-clé', 'text-left'],
+                ['search_volume',      'Volume',  'text-right'],
+                ['cpc',                'CPC',     'text-right'],
+                ['keyword_difficulty', 'KD',      'text-center'],
+                ['score',              'Score',   'text-right'],
+              ] as [KwSortKey, string, string][]).map(([key, label, align]) => (
+                <th key={key} className={`${align} ${TH} whitespace-nowrap`}>
+                  <button onClick={() => toggleSort(key)}
+                    className="cursor-pointer select-none hover:text-[#0a0a0a] font-medium">{label}{arrow(key)}</button>
+                  {key !== 'keyword' && (
+                    <button onClick={() => setShowHelp(true)} aria-label={`Aide : ${label}`}
+                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#f5f5f5] text-[#a3a3a3] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((k, i) => {
+              const isSel = selected.includes(k.keyword);
+              return (
+              <tr key={k.keyword + i} onClick={() => onToggle(k.keyword)}
+                className={`cursor-pointer ${isSel ? 'bg-indigo-50' : 'hover:bg-[#fafafa]'}`}>
+                <td className={`${TD} text-center`}>
+                  <span className={`inline-flex items-center justify-center h-4 w-4 rounded border-2 align-middle text-white text-[10px] font-bold ${isSel ? 'border-indigo-600 bg-indigo-600' : 'border-[#d4d4d4]'}`}>{isSel ? '✓' : ''}</span>
+                </td>
+                <td className={`${TD} text-[#0a0a0a] ${isSel ? 'font-semibold' : ''}`}>{k.keyword}</td>
+                <td className={`${TD} text-right tabular-nums text-[#404040]`}>{fmtNum(k.search_volume)}</td>
+                <td className={`${TD} text-right`}><Badge text={fmtCpc(k.cpc)} cls={cpcCls(k.cpc)} /></td>
+                <td className={`${TD} text-center`}><Badge text={k.keyword_difficulty == null ? '—' : String(k.keyword_difficulty)} cls={kdCls(k.keyword_difficulty)} /></td>
+                <td className={`${TD} text-right tabular-nums font-semibold text-[#0a0a0a]`}>{Math.round(k.score).toLocaleString('fr-CA')}</td>
+              </tr>
+              );
+            })}
+            {rows.length === 0 && (
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-[#a3a3a3]">
+                {result.keywords.length === 0
+                  ? "Le scan n'a trouvé aucun mot-clé — vérifie l'orthographe de la niche (ex. « ostéopathe », pas « ostéoathe »)."
+                  : 'Aucun mot-clé ne correspond aux filtres.'}
+              </td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function DomainCard({ candidates }: { candidates: FinderDomain[] }) {
+  const available = candidates.filter(d => d.available);
+  const taken     = candidates.filter(d => !d.available);
+  return (
+    <div className="rounded-lg border border-[#e5e5e5] bg-white p-4">
+      <p className="label mb-2">🌐 Domaines disponibles ({available.length})</p>
+      {available.length === 0 ? (
+        <p className="text-sm text-[#a3a3a3]">Aucun domaine exact disponible — essaie une variante de niche/ville.</p>
+      ) : (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+          {available.map(d => (
+            <li key={d.domain} className="flex items-center justify-between rounded-md bg-[#fafafa] px-3 py-1.5">
+              <span className="mono text-sm text-[#0a0a0a]">{d.domain}</span>
+              <span className="text-xs text-emerald-600 font-medium whitespace-nowrap">
+                {d.price_usd ? `$${d.price_usd.toFixed(2)}/an` : 'dispo'}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {taken.length > 0 && (
+        <p className="text-xs text-[#d4d4d4] mt-2">Déjà pris : {taken.map(d => d.domain).join(' · ')}</p>
+      )}
+      {available.length > 0 && (
+        <p className="text-[11px] text-[#a3a3a3] mt-2">
+          Pour réserver : <span className="mono">finder buy {available[0]?.domain}</span> (achat ~13 $).
+        </p>
+      )}
+    </div>
+  );
+}
+
+const PRESENCE: Record<string, { label: string; cls: string }> = {
+  none:        { label: 'Aucun site',   cls: 'bg-red-100 text-red-700' },
+  social_only: { label: 'Réseaux soc.', cls: 'bg-amber-100 text-amber-700' },
+  has_site:    { label: 'A un site',    cls: 'bg-[#f5f5f5] text-[#404040]' },
+};
+function painCls(s: number) {
+  return s >= 50 ? 'bg-red-100 text-red-700' : s >= 20 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+}
+function painEmoji(s: number) {
+  return s >= 80 ? '💀' : s >= 50 ? '🔴' : s >= 20 ? '🟡' : '🟢';
+}
+
+type ProSortKey = 'business_name' | 'rating' | 'review_count' | 'pain_score' | 'prospect_score';
+
+function ProspectTable({ result, onPick }: { result: ProspectorResult; onPick?: ((name: string) => void) | undefined }) {
+  const [showHelp,   setShowHelp]   = useState(false);
+  const [q,          setQ]          = useState('');
+  const [presence,   setPresence]   = useState('');
+  const [minPain,    setMinPain]    = useState('');
+  const [minReviews, setMinReviews] = useState('');
+  const [sort,       setSort]       = useState<{ key: ProSortKey; dir: 'asc' | 'desc' }>({ key: 'prospect_score', dir: 'desc' });
+
+  const minPainNum = minPain    === '' ? null : Number(minPain);
+  const minRevNum  = minReviews === '' ? null : Number(minReviews);
+
+  const rows = result.prospects
+    .filter(p => {
+      if (q && !p.business_name.toLowerCase().includes(q.toLowerCase())) return false;
+      if (presence && p.web_presence !== presence) return false;
+      if (minPainNum != null && p.pain_score < minPainNum) return false;
+      if (minRevNum != null && (p.review_count ?? 0) < minRevNum) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const dir = sort.dir === 'asc' ? 1 : -1;
+      if (sort.key === 'business_name') return a.business_name.localeCompare(b.business_name) * dir;
+      const av = (a[sort.key] as number | null) ?? -Infinity;
+      const bv = (b[sort.key] as number | null) ?? -Infinity;
+      return (av - bv) * dir;
+    });
+
+  function toggleSort(key: ProSortKey) {
+    setSort(s => s.key === key
+      ? { key, dir: s.dir === 'desc' ? 'asc' : 'desc' }
+      : { key, dir: key === 'business_name' ? 'asc' : 'desc' });
+  }
+  const arrow = (key: ProSortKey) => sort.key === key ? (sort.dir === 'desc' ? ' ↓' : ' ↑') : '';
+  const hasFilter = q !== '' || presence !== '' || minPain !== '' || minReviews !== '';
+  const inputCls = 'rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-2 py-1 placeholder-[#a3a3a3]';
+
+  const HEADERS: { key?: ProSortKey; label: string; align: string; help?: boolean }[] = [
+    { key: 'business_name',  label: 'Entreprise',   align: 'text-left' },
+    { key: 'rating',         label: 'Note',         align: 'text-center' },
+    { key: 'review_count',   label: 'Avis',         align: 'text-right' },
+    {                        label: 'Présence web', align: 'text-left',   help: true },
+    { key: 'pain_score',     label: 'Pain',         align: 'text-center', help: true },
+    { key: 'prospect_score', label: 'Score',        align: 'text-right',  help: true },
+    {                        label: 'Problèmes',    align: 'text-left' },
+    {                        label: 'Téléphone',    align: 'text-left' },
+  ];
+
+  return (
+    <div className="mt-4 space-y-3">
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-sm font-medium text-[#0a0a0a]">{rows.length} / {result.prospects.length} prospect(s)</span>
+        <button
+          onClick={() => setShowHelp(h => !h)}
+          aria-label="Comprendre les colonnes"
+          className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold transition-colors ${
+            showHelp ? 'bg-indigo-600 text-white' : 'bg-[#f5f5f5] text-[#525252] hover:bg-indigo-100 hover:text-indigo-700'
+          }`}
+        >?</button>
+      </div>
+
+      {showHelp && (
+        <div className="rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-3 text-sm space-y-1.5">
+          <p><span className="font-semibold text-[#0a0a0a]">Note / Avis</span> <span className="text-[#525252]">— sa note Google (étoiles) et son nombre d'avis. Beaucoup d'avis = commerce établi et occupé.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Présence web</span> <span className="text-[#525252]">— a-t-il un site? 🔴 « Aucun site » = facile à dépasser sur Google.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Pain</span> <span className="text-[#525252]">— à quel point son site est faible/absent (0-100). 🔴 Élevé = mauvais ou pas de site → facile à dépasser ET client affamé.</span></p>
+          <p><span className="font-semibold text-[#0a0a0a]">Score</span> <span className="text-[#525252]">— à quel point c'est un <strong>bon prospect à contacter</strong> = commerce réputé (avis + note) <strong>mais</strong> site faible. Plus haut = à appeler en premier.</span></p>
+          <p className="pt-1 text-[#0a0a0a]">👉 <strong>Le prospect en or : beaucoup d'avis + Pain 🔴 élevé</strong> (un vrai bon commerce sans bon site).</p>
+        </div>
+      )}
+
+      {/* Barre de filtre */}
+      <div className="flex flex-wrap items-center gap-2">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Filtrer une entreprise…"
+          className={`${inputCls} flex-1 min-w-[10rem]`} />
+        <select value={presence} onChange={e => setPresence(e.target.value)} className={inputCls}>
+          <option value="">Toute présence</option>
+          <option value="none">Aucun site</option>
+          <option value="social_only">Réseaux soc.</option>
+          <option value="has_site">A un site</option>
+        </select>
+        <input value={minPain} onChange={e => setMinPain(e.target.value)} type="number" min={0} max={100} placeholder="Pain min"
+          className={`${inputCls} w-24`} />
+        <input value={minReviews} onChange={e => setMinReviews(e.target.value)} type="number" min={0} placeholder="Avis min"
+          className={`${inputCls} w-24`} />
+        {hasFilter && (
+          <button onClick={() => { setQ(''); setPresence(''); setMinPain(''); setMinReviews(''); }}
+            className="text-xs text-[#a3a3a3] hover:text-[#0a0a0a] underline">Réinitialiser</button>
+        )}
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
+        <table className="w-full text-sm">
+          <thead className="bg-[#fafafa]">
+            <tr>
+              {HEADERS.map(h => (
+                <th key={h.label} className={`${h.align} ${TH} whitespace-nowrap`}>
+                  {h.key
+                    ? <button onClick={() => toggleSort(h.key as ProSortKey)} className="cursor-pointer select-none hover:text-[#0a0a0a] font-medium">{h.label}{arrow(h.key)}</button>
+                    : <span className="font-medium">{h.label}</span>}
+                  {h.help && (
+                    <button onClick={() => setShowHelp(true)} aria-label={`Aide : ${h.label}`}
+                      className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#f5f5f5] text-[#a3a3a3] hover:bg-indigo-100 hover:text-indigo-700 text-[10px] font-bold align-middle">?</button>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((p, i) => {
+              const pres = PRESENCE[p.web_presence] ?? { label: p.web_presence, cls: 'bg-[#f5f5f5] text-[#404040]' };
+              return (
+                <tr key={p.business_name + i} className="hover:bg-[#fafafa] align-top">
+                  <td className={`${TD} text-[#0a0a0a] font-medium`}>
+                    {p.business_name}
+                    {onPick && (
+                      <button onClick={() => onPick(p.business_name)}
+                        className="block mt-0.5 text-[11px] font-normal text-indigo-600 hover:text-indigo-800">→ Générer le site pour ce commerce</button>
+                    )}
+                  </td>
+                  <td className={`${TD} text-center text-[#404040] whitespace-nowrap`}>{p.rating != null ? `⭐ ${p.rating.toFixed(1)}` : '—'}</td>
+                  <td className={`${TD} text-right tabular-nums text-[#404040]`}>{p.review_count ?? '—'}</td>
+                  <td className={TD}>
+                    <div className="flex items-center gap-1.5">
+                      <Badge text={pres.label} cls={pres.cls} />
+                      {p.website && (
+                        <a href={p.website} target="_blank" rel="noopener noreferrer"
+                          title={`Voir le site : ${p.website}`} aria-label="Voir le site"
+                          className="inline-flex items-center justify-center h-5 w-5 rounded-md text-indigo-600 hover:bg-indigo-50 hover:text-indigo-800 transition-colors">
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                          </svg>
+                        </a>
+                      )}
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.business_name)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        title={`Chercher « ${p.business_name} » sur Google Maps`} aria-label="Ouvrir Google Maps"
+                        className="inline-flex items-center justify-center h-5 w-5 rounded-md text-rose-600 hover:bg-rose-50 hover:text-rose-800 transition-colors">
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                      </a>
+                    </div>
+                  </td>
+                  <td className={`${TD} text-center`}><Badge text={`${painEmoji(p.pain_score)} ${p.pain_score}`} cls={painCls(p.pain_score)} /></td>
+                  <td className={`${TD} text-right tabular-nums font-semibold text-[#0a0a0a]`}>{p.prospect_score}</td>
+                  <td className={`${TD} text-xs text-[#525252] max-w-[18rem]`}>{p.detected_issues.slice(0, 3).join(', ') || '—'}</td>
+                  <td className={`${TD} text-[#404040] whitespace-nowrap`}>{p.phone ?? '—'}</td>
+                </tr>
+              );
+            })}
+            {rows.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-[#a3a3a3]">Aucun prospect ne correspond aux filtres.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function RawLogs({ out, ok }: { out: string; ok: boolean }) {
+  if (!out) return null;
+  return (
+    <details className="mt-3">
+      <summary className="text-xs text-[#a3a3a3] cursor-pointer hover:text-[#525252]">Voir les logs bruts</summary>
+      <Output out={out} ok={ok} pending={false} />
+    </details>
+  );
+}
+
 // ── Finder ────────────────────────────────────────────────────────────────────
-function FinderPanel() {
+function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keywords?: string[]) => void }) {
   const [niche,    setNiche]    = useState('');
   const [city,     setCity]     = useState('');
   const [limit,    setLimit]    = useState(100);
-  const [estimate, setEstimate] = useState(true);
+  const [maxKd,    setMaxKd]    = useState(30);
+  const [estimate, setEstimate] = useState(false);
+  const [result,   setResult]   = useState<{ out: string; ok: boolean; data: FinderResult | null } | null>(null);
+  const [selectedKws, setSelectedKws] = useState<string[]>([]);
+  const [pending,  start]       = useTransition();
 
-  const cmd = `pnpm --filter @nexuslocale/finder cli scan "${niche || '<niche>'}" "${city || '<ville>'}" --limit ${limit}${estimate ? ' --estimate' : ''}`;
+  const ready = niche.trim() !== '' && city.trim() !== '';
 
-  function copy() { navigator.clipboard.writeText(cmd); }
+  function toggleKw(kw: string) {
+    setSelectedKws(prev => prev.includes(kw) ? prev.filter(x => x !== kw) : [...prev, kw]);
+  }
+
+  function launch() {
+    if (!ready) return;
+    setResult(null);
+    setSelectedKws([]);
+    start(async () => {
+      const r = await runFinderScan(niche.trim(), city.trim(), {
+        country: 'CA', lang: 'fr', limit, maxDifficulty: maxKd, estimate,
+      });
+      setResult(r);
+    });
+  }
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label block mb-1">Niche</label>
           <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="plombier"
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
-                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
         <div>
           <label className="label block mb-1">Ville</label>
-          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Montréal"
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5
-                       placeholder-[#9A97C0] focus:ring-indigo-500 focus:border-indigo-500" />
+          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Brossard"
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <div>
           <label className="label block mb-1">Limite mots-clés</label>
           <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} min={10} max={500}
-            className="w-28 rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+            className="w-28 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5" />
+        </div>
+        <div>
+          <label className="label block mb-1">KD max</label>
+          <input type="number" value={maxKd} onChange={e => setMaxKd(Number(e.target.value))} min={0} max={100}
+            className="w-24 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5" />
         </div>
         <label className="flex items-center gap-2 cursor-pointer mt-4">
           <input type="checkbox" checked={estimate} onChange={e => setEstimate(e.target.checked)}
-            className="rounded border-[#D9D7F0] text-indigo-600" />
-          <span className="text-sm text-[#3D3D6B]">--estimate (coûts seulement)</span>
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">--estimate (données simulées, gratuit)</span>
         </label>
       </div>
 
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={launch} disabled={!ready || pending}
+          className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 disabled:cursor-not-allowed
+                     px-4 py-2 text-sm text-white transition-colors">
+          {pending ? 'Scan en cours…' : estimate ? 'Estimer (gratuit)' : 'Lancer le scan réel'}
+        </button>
+        <span className="text-xs text-[#a3a3a3]">
+          {estimate
+            ? 'Mode simulé — aucun appel API, aucun coût.'
+            : 'Appel DataForSEO réel — ~$0.003 en crédits. Crée le site dans Supabase.'}
+        </span>
+      </div>
+
+      {result?.data && result.data.keywords.length > 0 && (
+        <div className="flex items-center gap-3 flex-wrap rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+          <button onClick={() => onNext(niche.trim(), city.trim(), selectedKws)}
+            className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-4 py-2 text-sm text-white font-medium transition-colors">
+            Prochaine étape : bâtir le site →
+          </button>
+          <span className="text-xs text-[#3D6B4A]">
+            {selectedKws.length > 0
+              ? <>🎯 {selectedKws.length} mot(s)-clé cible(s) : <strong>{selectedKws.slice(0, 3).join(', ')}{selectedKws.length > 3 ? '…' : ''}</strong>. </>
+              : '👉 Coche un ou plusieurs mots-clés à cibler. '}
+            Puis génère le config du site (les clients, ce sera plus tard, une fois le site rangé).
+          </span>
+        </div>
+      )}
+
+      {result?.data && result.data.candidates.length > 0 && <DomainCard candidates={result.data.candidates} />}
+
+      {result?.data
+        ? <><KeywordTable result={result.data} selected={selectedKws} onToggle={toggleKw} /><RawLogs out={result.out} ok={result.ok} /></>
+        : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
+    </div>
+  );
+}
+
+// ── Prospector ──────────────────────────────────────────────────────────────────
+function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: string; initialCity?: string; onNext?: (name: string, city: string) => void }) {
+  const [niche,      setNiche]      = useState(initialNiche ?? '');
+  const [province,   setProvince]   = useState('QC');
+  const [cities,     setCities]     = useState<string[]>(initialCity ? [initialCity] : []);
+  const [limit,      setLimit]      = useState('');
+  const [minReviews, setMinReviews] = useState('');
+  const [simulate,   setSimulate]   = useState(false);
+  const [judge,      setJudge]      = useState(false);
+  const [deep,       setDeep]       = useState(false);
+  const [result,     setResult]     = useState<{ out: string; ok: boolean; data: ProspectorResult | null } | null>(null);
+  const [cityMap,    setCityMap]    = useState<Record<string, string>>({});
+  const [progress,   setProgress]   = useState<string | null>(null);
+  const [pending,    start]         = useTransition();
+
+  const cityList    = CITIES_BY_PROVINCE[province] ?? [];
+  const limitN      = Number(limit) || 60;
+  const minReviewsN = Number(minReviews) || 0;
+
+  // En profondeur : une recherche par quartier (sinon une par ville).
+  const tasksFor = (city: string): { location: string; storeCity?: string; label: string }[] => {
+    const hoods = deep ? NEIGHBORHOODS[city] : undefined;
+    if (hoods && hoods.length) return hoods.map(h => ({ location: `${h}, ${city} ${province}`, storeCity: city, label: `${city} · ${h}` }));
+    return [{ location: `${city} ${province}`, label: city }];
+  };
+  const taskCount   = cities.reduce((n, c) => n + tasksFor(c).length, 0);
+
+  const ready       = niche.trim() !== '' && cities.length > 0;
+  const allSelected = cityList.length > 0 && cities.length === cityList.length;
+  const estCost     = ((Math.ceil(limitN / 20) * 0.032 + limitN * 0.017) * Math.max(1, taskCount)).toFixed(2);
+
+  function toggleCity(name: string) {
+    setCities(prev => prev.includes(name) ? prev.filter(c => c !== name) : [...prev, name]);
+  }
+  function toggleAll() {
+    setCities(allSelected ? [] : cityList.map(c => c.name));
+  }
+
+  function launch() {
+    if (!ready) return;
+    setResult(null); setProgress(null);
+    start(async () => {
+      const tasks = cities.flatMap(c => tasksFor(c).map(t => ({ ...t, city: c })));
+      const allProspects: Prospect[] = [];
+      const map: Record<string, string> = {};
+      const logs: string[] = [];
+      let okAll = true;
+      for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i]!;
+        setProgress(`${i + 1}/${tasks.length} : ${t.label}…`);
+        const r = await runProspectorScan(niche.trim(), t.location, { limit: limitN, minReviews: minReviewsN, simulate, judge, ...(t.storeCity ? { storeCity: t.storeCity } : {}) });
+        logs.push(`━━━━━━ ${t.label} ━━━━━━\n${r.out}`);
+        if (!r.ok) okAll = false;
+        for (const p of (r.data?.prospects ?? [])) { allProspects.push(p); map[p.business_name] = t.city; }
+      }
+      setProgress(null);
+      setCityMap(map);
+      setResult({ out: logs.join('\n\n'), ok: okAll, data: { niche: niche.trim(), city: cities.join(', '), prospects: allProspects } });
+    });
+  }
+
+  return (
+    <div className="space-y-4">
       <div>
-        <p className="label mb-1">Commande à exécuter dans le terminal</p>
-        <div className="flex items-start gap-2">
-          <pre className="flex-1 rounded-lg bg-[#1C1560] text-[#E8E6FF] text-xs p-3 font-mono overflow-x-auto whitespace-pre-wrap">
-            {cmd}
-          </pre>
-          <button onClick={copy}
-            className="shrink-0 rounded-md bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 text-xs text-white transition-colors">
-            Copier
+        <label className="label block mb-1">Niche</label>
+        <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="dégât d'eau"
+          className="w-full sm:w-1/2 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                     placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+
+      {/* Province */}
+      <div>
+        <label className="label block mb-1">Province</label>
+        <select value={province} onChange={e => { setProvince(e.target.value); setCities([]); }}
+          className="w-full sm:w-1/2 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
+          {PROVINCES.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
+        </select>
+      </div>
+
+      {/* Villes (sélection multiple) */}
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="label">Villes (&gt; 50 000 hab.) — {cities.length} sélectionnée(s)</label>
+          <button type="button" onClick={toggleAll} className="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline">
+            {allSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
           </button>
         </div>
-        <p className="text-xs text-[#9A97C0] mt-1.5">
-          Le scan crée le site dans Supabase et liste les domaines disponibles.
-          Lance depuis la racine du projet.
-        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 rounded-md border border-[#e5e5e5] bg-[#fafafa] p-2 max-h-56 overflow-y-auto">
+          {cityList.map(c => {
+            const on = cities.includes(c.name);
+            return (
+              <label key={c.name} className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 text-sm transition-colors ${on ? 'bg-indigo-50 text-indigo-800' : 'hover:bg-white text-[#404040]'}`}>
+                <input type="checkbox" checked={on} onChange={() => toggleCity(c.name)} className="rounded border-[#e5e5e5] text-indigo-600" />
+                <span className="truncate">{c.name}</span>
+                <span className="ml-auto text-[10px] text-[#a3a3a3] whitespace-nowrap">{(c.pop / 1000).toFixed(0)}k</span>
+              </label>
+            );
+          })}
+        </div>
       </div>
+
+      <div className="flex items-center gap-4 flex-wrap">
+        <div>
+          <label className="label block mb-1">Limite entreprises</label>
+          <input type="number" value={limit} onChange={e => setLimit(e.target.value)} min={1} max={200} placeholder="60"
+            className="w-28 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3]" />
+        </div>
+        <div>
+          <label className="label block mb-1">Avis min.</label>
+          <input type="number" value={minReviews} onChange={e => setMinReviews(e.target.value)} min={0} max={500} placeholder="0"
+            className="w-24 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3]" />
+        </div>
+        <label className="flex items-center gap-2 cursor-pointer mt-4">
+          <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">--simulate (fixtures, gratuit)</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer mt-4" title="Claude ouvre les sites « a un site » et juge vieux/cassé">
+          <input type="checkbox" checked={judge} onChange={e => setJudge(e.target.checked)}
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">🤖 Analyse IA des sites</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer mt-4" title="Cherche par quartier (Google plafonne à 60/recherche) — bien plus d'entreprises locales">
+          <input type="checkbox" checked={deep} onChange={e => setDeep(e.target.checked)}
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">🔬 Scan en profondeur (par quartier)</span>
+        </label>
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={launch} disabled={!ready || pending}
+          className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 disabled:cursor-not-allowed
+                     px-4 py-2 text-sm text-white transition-colors">
+          {pending ? (progress ?? 'Scan en cours…') : simulate ? 'Tester (fixtures)' : `Lancer le scan réel${cities.length > 1 ? ` (${cities.length} villes)` : ''}`}
+        </button>
+        <span className="text-xs text-[#a3a3a3]">
+          {simulate
+            ? 'Mode fixtures — aucun appel API, aucun coût.'
+            : `${cities.length || 0} ville(s)${deep ? ` → ${taskCount} recherche(s) par quartier` : ''} — ~$${estCost} en crédits au total. Écrit les prospects dans Supabase.`}
+        </span>
+      </div>
+
+      {result?.data
+        ? <><ProspectTable result={result.data} onPick={onNext ? (name => onNext(name, cityMap[name] ?? cities[0] ?? '')) : undefined} /><RawLogs out={result.out} ok={result.ok} /></>
+        : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
+    </div>
+  );
+}
+
+// ── GSC Submit ────────────────────────────────────────────────────────────────
+// ── Générer le config ───────────────────────────────────────────────────────────
+function GenPanel({ initialName, initialCity, initialKeywords, nicheSite }: { initialName?: string; initialCity?: string; initialKeywords?: string[]; nicheSite?: boolean }) {
+  const [name,     setName]     = useState(initialName ?? '');
+  const [city,     setCity]     = useState(initialCity ?? '');
+  const [simulate, setSimulate] = useState(true);
+  const [result,   setResult]   = useState<{ out: string; ok: boolean } | null>(null);
+  const [pending,  start]       = useTransition();
+
+  const keywords  = initialKeywords ?? [];
+  const isNiche   = nicheSite ?? false;
+
+  function launch() {
+    setResult(null);
+    start(async () => setResult(await runDemoGen(name, city, { simulate, keywords, nicheSite: isNiche })));
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-[#525252]">
+        Génère le <strong className="text-[#0a0a0a]">config du site</strong> (contenu rédigé par l'IA) pour un commerce.
+        Le fichier est écrit dans <span className="mono">configs/</span> et sert ensuite au déploiement.
+      </p>
+      {keywords.length > 0 && (
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm">
+          <span className="font-medium text-[#0a0a0a]">🎯 {keywords.length} mot(s)-clé cible(s)</span>
+          <span className="text-[#525252]"> → une page de service par mot-clé : </span>
+          <span className="text-[#404040]">{keywords.join(' · ')}</span>
+        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="label block mb-1">{isNiche ? 'Niche' : 'Nom du commerce'}</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder={isNiche ? 'plombier' : 'SAM Plomberie'}
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+        <div>
+          <label className="label block mb-1">Ville</label>
+          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Longueuil"
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+      </div>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" checked={simulate} onChange={e => setSimulate(e.target.checked)}
+          className="rounded border-[#e5e5e5] text-indigo-600" />
+        <span className="text-sm text-[#404040]">--simulate (contenu fictif, gratuit)</span>
+      </label>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={launch} disabled={pending}
+          className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 disabled:cursor-not-allowed px-4 py-2 text-sm text-white transition-colors">
+          {pending ? 'Génération…' : simulate ? 'Générer (fictif, gratuit)' : 'Générer le config (IA)'}
+        </button>
+        <span className="text-xs text-[#a3a3a3]">
+          {simulate
+            ? 'Mode fictif — gratuit (le contenu IA et les mots-clés ne s\'appliquent qu\'en mode réel).'
+            : isNiche
+              ? 'Contenu rédigé par Claude — ~$0.08. Site de niche générique (aucun prospect requis).'
+              : 'Contenu rédigé par Claude — ~$0.08. Le commerce doit exister (scan Prospector au préalable).'}
+        </span>
+      </div>
+      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+    </div>
+  );
+}
+
+// ── Beau site (générateur design-first, style SiteDrop) ───────────────────────────
+function GenBeauPanel() {
+  const [name,        setName]        = useState('');
+  const [industry,    setIndustry]    = useState('');
+  const [description, setDescription] = useState('');
+  const [details,     setDetails]     = useState('');
+  const [result,      setResult]      = useState<{ html: string; ok: boolean; error?: string } | null>(null);
+  const [pending,     start]          = useTransition();
+  const [slug,        setSlug]        = useState('');
+  const [pub,         setPub]         = useState<{ ok: boolean; url?: string; error?: string } | null>(null);
+  const [pubPending,  startPub]       = useTransition();
+
+  const ready  = name.trim() !== '' && industry.trim() !== '' && description.trim() !== '';
+  const inCls  = 'w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-ink text-sm px-3 py-1.5 placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500';
+  const mkSlug = (s: string) => s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  function launch() {
+    if (!ready) return;
+    setResult(null); setPub(null);
+    start(async () => {
+      const brief = { businessName: name.trim(), industry: industry.trim(), description: description.trim(), details: details.trim() || undefined };
+      const r = await generateBeautifulSite(brief);
+      setResult(r);
+      if (r.ok && !slug) setSlug(mkSlug(name));
+    });
+  }
+
+  function publish() {
+    if (!result?.html || !slug.trim()) return;
+    setPub(null);
+    startPub(async () => setPub(await publishBeautifulSite(slug, name.trim(), result.html)));
+  }
+
+  function download() {
+    if (!result?.html) return;
+    const blob = new Blob([result.html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `${name.trim().toLowerCase().replace(/\s+/g, '-') || 'site'}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-zinc-500">
+        Génère un <strong className="text-ink">beau site one-page</strong> (design libre, Claude Opus) — pour un client qui veut un site esthétique.
+        ⚠️ Appel réel ~$0.22, ~1 minute.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="label block mb-1">Nom du commerce</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Studio Lumière" className={inCls} />
+        </div>
+        <div>
+          <label className="label block mb-1">Industrie</label>
+          <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="salon de coiffure" className={inCls} />
+        </div>
+      </div>
+      <div>
+        <label className="label block mb-1">Ce que fait le commerce</label>
+        <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
+          placeholder="Coupe, coloration, soins capillaires haut de gamme à Brossard…" className={inCls} />
+      </div>
+      <div>
+        <label className="label block mb-1">Préférences (optionnel)</label>
+        <textarea value={details} onChange={e => setDetails(e.target.value)} rows={2}
+          placeholder="Couleurs, ton, sections incontournables, coordonnées…" className={inCls} />
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={launch} disabled={!ready || pending} className="btn-brand">
+          {pending ? 'Génération… (~1 min)' : 'Générer le beau site'}
+        </button>
+        <span className="text-xs text-[#a3a3a3]">Design unique à chaque génération. Pas de SEO multi-pages (c'est l'autre mode).</span>
+      </div>
+
+      {pending && <Output out="" ok pending />}
+      {result && !result.ok && <Output out={result.error ?? 'Erreur de génération.'} ok={false} pending={false} />}
+      {result?.ok && result.html && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-ink">Aperçu</span>
+            <button onClick={download} className="text-xs text-indigo-600 hover:underline">⬇ Télécharger le .html</button>
+          </div>
+          <iframe
+            srcDoc={result.html}
+            title="Aperçu du site"
+            className="w-full h-[640px] rounded-lg border border-zinc-200 bg-white"
+            sandbox="allow-scripts"
+          />
+
+          {/* Publier (hébergement multi-tenant à /s/<slug>) */}
+          <div className="flex items-center gap-2 flex-wrap border-t border-zinc-200 pt-3">
+            <span className="text-xs text-zinc-500 whitespace-nowrap">Publier à <span className="mono">/s/</span></span>
+            <input value={slug} onChange={e => setSlug(mkSlug(e.target.value))} placeholder="studio-lumiere"
+              className="rounded-md bg-[#fafafa] border-[#e5e5e5] text-ink text-sm px-2 py-1 w-48" />
+            <button onClick={publish} disabled={pubPending || !slug.trim()} className="btn-brand py-1.5">
+              {pubPending ? 'Publication…' : 'Publier'}
+            </button>
+            {pub?.ok && pub.url && (
+              <a href={pub.url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline">
+                ✓ en ligne → {pub.url}
+              </a>
+            )}
+            {pub && !pub.ok && <span className="text-xs text-red-600">{pub.error}</span>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -102,7 +841,7 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
   const [estimate,  setEstimate]  = useState(true);
   const [skipVerif, setSkipVerif] = useState(false);
   const [force,     setForce]     = useState(false);
-  const [result,    setResult]    = useState<{ out: string; ok: boolean } | null>(null);
+  const [result,    setResult]    = useState<{ out: string; ok: boolean; data: SubmitResult | null } | null>(null);
   const [pending,   start]        = useTransition();
 
   function launch() {
@@ -118,7 +857,7 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
       <div>
         <label className="label block mb-1">Site</label>
         <select value={siteId} onChange={e => setSiteId(e.target.value)}
-          className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm py-1.5">
+          className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5">
           {sites.map(s => (
             <option key={s.id} value={s.id}>
               {s.domain ?? s.id} — {s.niche}, {s.city}
@@ -136,19 +875,68 @@ function SubmitPanel({ sites, preselect, onPreselect }: { sites: Site[]; presele
         ].map(([val, set, label]) => (
           <label key={String(label)} className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={val as boolean} onChange={e => (set as (v: boolean) => void)(e.target.checked)}
-              className="rounded border-[#D9D7F0] text-indigo-600" />
-            <span className="text-sm text-[#3D3D6B]">{String(label)}</span>
+              className="rounded border-[#e5e5e5] text-indigo-600" />
+            <span className="text-sm text-[#404040]">{String(label)}</span>
           </label>
         ))}
       </div>
 
       <button onClick={launch} disabled={pending || !siteId}
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 px-5 py-2
+        className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2
                    text-sm font-medium text-white transition-colors">
         Lancer la soumission
       </button>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {pending && <Output out="" ok pending />}
+      {!pending && result?.data?.steps?.length ? (
+        <>
+          <SubmitPlan data={result.data} />
+          <RawLogs out={result.out} ok={result.ok} />
+        </>
+      ) : !pending && result ? (
+        <Output out={result.out} ok={result.ok} pending={false} />
+      ) : null}
+    </div>
+  );
+}
+
+// Plan de soumission GSC (étapes + URLs + mots-clés) — remplace les logs ASCII.
+function SubmitPlan({ data }: { data: SubmitResult }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 text-sm text-[#404040]">
+        <span className="font-medium text-[#0a0a0a]">{data.domain ?? data.site_id}</span>
+        {data.estimate && <Badge text="aperçu" cls="bg-amber-100 text-amber-700" />}
+        <span className="text-[#a3a3a3]">· {data.urls.length} URLs · {data.keywords.length} mots-clés</span>
+      </div>
+
+      <ol className="space-y-2">
+        {data.steps.map((s, i) => (
+          <li key={i} className="flex gap-3 rounded-lg border border-[#e5e5e5] bg-white p-3">
+            <span className="flex-none flex items-center justify-center h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">{i + 1}</span>
+            <div className="min-w-0">
+              <div className="text-sm font-medium text-[#0a0a0a]">{s.title}</div>
+              <ul className="mt-1 space-y-0.5">
+                {s.details.map((d, j) => (
+                  <li key={j} className="text-xs text-[#525252] break-all">{d.startsWith('http') ? <span className="mono text-indigo-600">{d}</span> : <>→ {d}</>}</li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {data.keywords.length > 0 && (
+        <div>
+          <div className="label mb-1">Mots-clés qui seront trackés</div>
+          <div className="flex flex-wrap gap-1.5">
+            {data.keywords.slice(0, 12).map((k, i) => (
+              <span key={i} className="inline-block rounded-md bg-[#fafafa] border border-[#e5e5e5] px-2 py-0.5 text-xs text-[#404040]">{k}</span>
+            ))}
+            {data.keywords.length > 12 && <span className="text-xs text-[#a3a3a3] self-center">+{data.keywords.length - 12}</span>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -160,7 +948,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
   const [estimate, setEstimate] = useState(true);
   const [withGsc,  setWithGsc] = useState(false);
   const [top,      setTop]     = useState(20);
-  const [result,   setResult]  = useState<{ out: string; ok: boolean } | null>(null);
+  const [result,   setResult]  = useState<{ out: string; ok: boolean; data: RankResult | null } | null>(null);
   const [pending,  start]      = useTransition();
 
   function launch() {
@@ -173,11 +961,11 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label block mb-1">Site</label>
           <select value={siteId} onChange={e => setSiteId(e.target.value)}
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm py-1.5">
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5">
             {sites.map(s => (
               <option key={s.id} value={s.id}>
                 {s.domain ?? s.id} — {s.niche}
@@ -189,7 +977,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
         <div>
           <label className="label block mb-1">Top N positions</label>
           <input type="number" value={top} onChange={e => setTop(Number(e.target.value))} min={1} max={100}
-            className="w-full rounded-md bg-[#F5F4FF] border-[#D9D7F0] text-[#1C1560] text-sm px-3 py-1.5" />
+            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5" />
         </div>
       </div>
 
@@ -200,19 +988,73 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
         ].map(([val, set, label]) => (
           <label key={String(label)} className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={val as boolean} onChange={e => (set as (v: boolean) => void)(e.target.checked)}
-              className="rounded border-[#D9D7F0] text-indigo-600" />
-            <span className="text-sm text-[#3D3D6B]">{String(label)}</span>
+              className="rounded border-[#e5e5e5] text-indigo-600" />
+            <span className="text-sm text-[#404040]">{String(label)}</span>
           </label>
         ))}
       </div>
 
       <button onClick={launch} disabled={pending || !siteId}
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 px-5 py-2
+        className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-5 py-2
                    text-sm font-medium text-white transition-colors">
         Tracker les positions
       </button>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {pending && <Output out="" ok pending />}
+      {!pending && result?.data?.positions?.length ? (
+        <>
+          <PositionsTable data={result.data} />
+          <RawLogs out={result.out} ok={result.ok} />
+        </>
+      ) : !pending && result ? (
+        <Output out={result.out} ok={result.ok} pending={false} />
+      ) : null}
+    </div>
+  );
+}
+
+// Table des positions SERP (Tracker) — remplace les logs ASCII bruts.
+function PositionsTable({ data }: { data: RankResult }) {
+  const posCls = (p: number | null) =>
+    p == null         ? 'bg-[#f5f5f5] text-[#a3a3a3]'
+    : p <= 3          ? 'bg-emerald-100 text-emerald-700'
+    : p <= 10         ? 'bg-lime-100 text-lime-700'
+    : p <= 20         ? 'bg-amber-100 text-amber-700'
+    :                   'bg-orange-100 text-orange-700';
+  const posLabel = (p: number | null) => (p == null ? '—' : `#${p}`);
+  const ranked = data.positions.filter(p => p.position != null).length;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm text-[#404040]">
+        <span className="font-medium text-[#0a0a0a]">{data.domain ?? data.site_id}</span>
+        {data.estimate && <Badge text="simulé" cls="bg-amber-100 text-amber-700" />}
+        <span className="text-[#a3a3a3]">· {ranked}/{data.positions.length} positionnés</span>
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
+        <table className="w-full text-sm">
+          <thead className="bg-[#fafafa]">
+            <tr>
+              <th className={`${TH} text-left`}>Mot-clé</th>
+              <th className={`${TH} text-center`}>Position</th>
+              <th className={`${TH} text-left`}>Page</th>
+              <th className={`${TH} text-right`}>Clics</th>
+              <th className={`${TH} text-right`}>Impr.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.positions.map((p, i) => (
+              <tr key={p.keyword + i} className="hover:bg-[#fafafa]">
+                <td className={`${TD} text-[#0a0a0a]`}>{p.keyword}</td>
+                <td className={`${TD} text-center`}><Badge text={posLabel(p.position)} cls={posCls(p.position)} /></td>
+                <td className={`${TD} text-[#525252]`}>{p.position != null ? (p.page ?? '/') : <span className="text-[#a3a3a3]">hors top 100</span>}</td>
+                <td className={`${TD} text-right tabular-nums text-[#404040]`}>{p.clicks ?? '—'}</td>
+                <td className={`${TD} text-right tabular-nums text-[#404040]`}>{p.impressions ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -220,7 +1062,7 @@ function RankPanel({ sites, preselect, onPreselect }: { sites: Site[]; preselect
 // ── Cron ──────────────────────────────────────────────────────────────────────
 function CronPanel() {
   const [dryRun, setDryRun] = useState(true);
-  const [result, setResult] = useState<{ out: string; ok: boolean } | null>(null);
+  const [result, setResult] = useState<{ out: string; ok: boolean; data: CronResult | null } | null>(null);
   const [pending, start]    = useTransition();
 
   function launch() {
@@ -233,64 +1075,130 @@ function CronPanel() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-[#6B6B9E]">
+      <p className="text-sm text-[#525252]">
         Lance le suivi des positions pour tous les sites avec statut{' '}
-        <span className="mono text-[#1C1560]">indexed</span>,{' '}
-        <span className="mono text-[#1C1560]">ranking</span> ou{' '}
-        <span className="mono text-[#1C1560]">rented</span>.
+        <span className="mono text-[#0a0a0a]">indexed</span>,{' '}
+        <span className="mono text-[#0a0a0a]">ranking</span> ou{' '}
+        <span className="mono text-[#0a0a0a]">rented</span>.
         Alerte les sites sans position après 6 semaines.
       </p>
 
       <label className="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" checked={dryRun} onChange={e => setDryRun(e.target.checked)}
-          className="rounded border-[#D9D7F0] text-indigo-600" />
-        <span className="text-sm text-[#3D3D6B]">--dry-run (simulation, aucune écriture en base)</span>
+          className="rounded border-[#e5e5e5] text-indigo-600" />
+        <span className="text-sm text-[#404040]">--dry-run (simulation, aucune écriture en base)</span>
       </label>
 
       <button onClick={launch} disabled={pending}
-        className={`rounded-md px-5 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50
-          ${dryRun ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
+        className={`rounded-md px-5 py-2 text-sm font-medium text-white transition-colors disabled:opacity-70
+          ${dryRun ? 'bg-[#5701f3] hover:bg-[#4801cc]' : 'bg-[#5701f3] hover:bg-[#4801cc]'}`}>
         {dryRun ? 'Simuler le cron' : '🚀 Lancer le cron (réel)'}
       </button>
 
-      <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />
+      {pending && <Output out="" ok pending />}
+      {!pending && result?.data ? (
+        <>
+          <CronTable data={result.data} />
+          <RawLogs out={result.out} ok={result.ok} />
+        </>
+      ) : !pending && result ? (
+        <Output out={result.out} ok={result.ok} pending={false} />
+      ) : null}
+    </div>
+  );
+}
+
+// Résumé du cron (par site : traité / ignoré / erreur) — remplace les logs ASCII.
+function CronTable({ data }: { data: CronResult }) {
+  const st = (s: CronResult['results'][number]['status']) =>
+    s === 'tracked' ? { label: '✓ traité',  cls: 'bg-emerald-100 text-emerald-700' }
+    : s === 'dry-run' ? { label: 'simulé',   cls: 'bg-indigo-100 text-indigo-700' }
+    : s === 'skipped' ? { label: 'ignoré',   cls: 'bg-[#f5f5f5] text-[#a3a3a3]' }
+    :                   { label: '✗ erreur', cls: 'bg-red-100 text-red-700' };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm text-[#404040]">
+        <span className="font-medium text-[#0a0a0a]">{data.processed}/{data.total} sites traités</span>
+        {data.dryRun && <Badge text="simulation" cls="bg-amber-100 text-amber-700" />}
+        <span className="text-[#a3a3a3]">· {data.date}</span>
+      </div>
+      {data.results.length === 0 ? (
+        <p className="text-sm text-[#a3a3a3]">Aucun site à suivre (statuts indexed / ranking / rented).</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-[#e5e5e5]">
+          <table className="w-full text-sm">
+            <thead className="bg-[#fafafa]">
+              <tr>
+                <th className={`${TH} text-left`}>Site</th>
+                <th className={`${TH} text-center`}>Statut</th>
+                <th className={`${TH} text-right`}>Mots-clés</th>
+                <th className={`${TH} text-right`}>Top 20</th>
+                <th className={`${TH} text-left`}>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.results.map((r, i) => {
+                const b = st(r.status);
+                return (
+                  <tr key={r.siteId + i} className="hover:bg-[#fafafa]">
+                    <td className={`${TD} mono text-[#0a0a0a]`}>{r.domain}</td>
+                    <td className={`${TD} text-center`}><Badge text={b.label} cls={b.cls} /></td>
+                    <td className={`${TD} text-right tabular-nums text-[#404040]`}>{r.keywordsChecked || '—'}</td>
+                    <td className={`${TD} text-right tabular-nums`}>{r.top20Count > 0 ? <span className="text-emerald-600 font-medium">{r.top20Count}</span> : '—'}</td>
+                    <td className={`${TD} text-xs text-[#525252]`}>{r.error ?? r.note ?? (r.statusChanged ? '→ status ranking' : '—')}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-export function Launcher({ sites, initialQueues }: { sites: Site[]; initialQueues?: ActionQueue }) {
-  const [tab,        setTab]        = useState<TabId>('finder');
+export function Launcher({ sites, initialQueues, initialTab }: { sites: Site[]; initialQueues?: ActionQueue; initialTab?: string | undefined }) {
+  const startTab = (TABS.some(t => t.id === initialTab) ? initialTab : 'finder') as TabId;
+  const [tab,        setTab]        = useState<TabId>(startTab);
   const [submitSite, setSubmitSite] = useState(sites[0]?.id ?? '');
   const [rankSite,   setRankSite]   = useState(sites[0]?.id ?? '');
+  const [proPrefill, setProPrefill] = useState<{ niche: string; city: string }>({ niche: '', city: '' });
+  const [genPrefill, setGenPrefill] = useState<{ name: string; city: string; keywords: string[]; nicheSite: boolean }>({ name: '', city: '', keywords: [], nicheSite: false });
 
   function goSubmit(siteId: string) { setSubmitSite(siteId); setTab('submit'); }
   function goRank(siteId: string)   { setRankSite(siteId);   setTab('rank'); }
+  function goProspector(niche: string, city: string) { setProPrefill({ niche, city }); setTab('prospect'); }
+  function goGenerate(name: string, city: string, keywords: string[] = [], nicheSite = false) { setGenPrefill({ name, city, keywords, nicheSite }); setTab('generate'); }
 
   return (
     <div className="space-y-3">
       {/* Tab selector */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
         {TABS.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`rounded-lg border px-3 py-3 text-left transition-all ${
+            className={`flex flex-col rounded-lg border px-3 py-3 text-left transition-all ${
               tab === t.id
                 ? 'border-indigo-400 bg-indigo-50 ring-2 ring-indigo-200'
-                : 'card hover:border-indigo-200 hover:bg-[#F5F4FF]'
+                : 'card hover:border-indigo-200 hover:bg-[#fafafa]'
             }`}
           >
-            <p className="text-sm font-medium text-[#1C1560]">{t.label}</p>
-            <p className="text-xs text-[#9A97C0] mt-0.5 leading-snug">{t.desc}</p>
+            <p className="text-sm font-medium text-[#0a0a0a] leading-tight break-words">{t.label}</p>
+            <p className="text-xs text-[#a3a3a3] mt-1.5 leading-snug">{t.desc}</p>
           </button>
         ))}
       </div>
 
       {/* Active panel */}
       <div className="card p-5">
-        {tab === 'finder' && <FinderPanel />}
-        {tab === 'submit' && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
+        {tab === 'finder'   && <FinderPanel onNext={(n, c, k) => goGenerate(n, c, k ?? [], true)} />}
+        {tab === 'prospect' && <ProspectPanel key={`${proPrefill.niche}|${proPrefill.city}`} initialNiche={proPrefill.niche} initialCity={proPrefill.city} onNext={goGenerate} />}
+        {tab === 'generate' && <GenPanel key={`${genPrefill.name}|${genPrefill.city}|${genPrefill.keywords.join(',')}|${genPrefill.nicheSite}`} initialName={genPrefill.name} initialCity={genPrefill.city} initialKeywords={genPrefill.keywords} nicheSite={genPrefill.nicheSite} />}
+        {tab === 'beau'     && <GenBeauPanel />}
+        {tab === 'submit'   && <SubmitPanel sites={sites} preselect={submitSite} onPreselect={setSubmitSite} />}
         {tab === 'rank'   && <RankPanel   sites={sites} preselect={rankSite}   onPreselect={setRankSite} />}
         {tab === 'cron'   && <CronPanel />}
       </div>

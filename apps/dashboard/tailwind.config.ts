@@ -6,7 +6,38 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['var(--font-geist-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-geist-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      colors: {
+        app: '#fafafa',   // fond neutre (aligné sur la landing)
+        ink: '#0a0a0a',   // texte noir (aligné sur la landing)
+        // Palette de marque — violet #5701f3 (style SiteDrop)
+        brand: {
+          50:  '#f0ebfe',
+          100: '#ddd0fd',
+          200: '#c4adfb',
+          300: '#a784f9',
+          400: '#8a4ff7',
+          500: '#5701f3',
+          600: '#4801cc',
+          700: '#3a01a1',
+        },
+        // On aligne `indigo` (utilisé partout dans les composants) sur le violet de marque
+        // → toute l'app adopte le look SiteDrop sans éditer chaque fichier.
+        indigo: {
+          50:  '#f0ebfe',
+          100: '#ddd0fd',
+          200: '#c4adfb',
+          300: '#a784f9',
+          400: '#8a4ff7',
+          500: '#5701f3',
+          600: '#4801cc',
+          700: '#3a01a1',
+          800: '#2d0079',
+          900: '#1f0054',
+          950: '#14003a',
+        },
       },
     },
   },

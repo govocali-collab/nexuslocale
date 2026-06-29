@@ -6,14 +6,14 @@ export type SiteStatus = 'research' | 'built' | 'indexed' | 'ranking' | 'rented'
 export type LeadType = 'call' | 'sms' | 'form';
 
 export type WebPresence = 'none' | 'social_only' | 'has_site';
-export type ProspectStatus = 'new' | 'demo_sent' | 'negotiating' | 'won' | 'lost';
+export type ProspectStatus = 'new' | 'demo_booked' | 'demo_sent' | 'negotiating' | 'won' | 'lost';
 
 export type UpsellProduct = 'call_tracking' | 'sms_automation' | 'ai_chatbot' | 'voice_receptionist';
 export type UpsellStatus = 'active' | 'paused' | 'cancelled';
 
 // ─── Tables ───────────────────────────────────────────────────────────────────
 
-export interface Site {
+export type Site = {
   id: string;
   domain: string;
   type: SiteType;
@@ -29,7 +29,7 @@ export interface Site {
   created_at: string;
 }
 
-export interface Lead {
+export type Lead = {
   id: string;
   site_id: string;
   type: LeadType;
@@ -40,7 +40,7 @@ export interface Lead {
   created_at: string;
 }
 
-export interface Ranking {
+export type Ranking = {
   id:          string;
   site_id:     string;
   keyword:     string;
@@ -54,7 +54,7 @@ export interface Ranking {
   created_at:  string;
 }
 
-export interface Prospect {
+export type Prospect = {
   id: string;
   business_name: string;
   niche: string;
@@ -74,7 +74,7 @@ export interface Prospect {
   created_at: string;
 }
 
-export interface Client {
+export type Client = {
   id: string;
   business_name: string;
   contact: string | null;
@@ -87,7 +87,7 @@ export interface Client {
   created_at: string;
 }
 
-export interface Upsell {
+export type Upsell = {
   id: string;
   client_id: string;
   product: UpsellProduct;
@@ -118,40 +118,18 @@ export type UpsellUpdate = Partial<UpsellInsert>;
 
 // ─── Database schema (pour Supabase generics) ─────────────────────────────────
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
-      sites: {
-        Row: Site;
-        Insert: SiteInsert;
-        Update: SiteUpdate;
-      };
-      leads: {
-        Row: Lead;
-        Insert: LeadInsert;
-        Update: LeadUpdate;
-      };
-      rankings: {
-        Row: Ranking;
-        Insert: RankingInsert;
-        Update: RankingUpdate;
-      };
-      prospects: {
-        Row: Prospect;
-        Insert: ProspectInsert;
-        Update: ProspectUpdate;
-      };
-      clients: {
-        Row: Client;
-        Insert: ClientInsert;
-        Update: ClientUpdate;
-      };
-      upsells: {
-        Row: Upsell;
-        Insert: UpsellInsert;
-        Update: UpsellUpdate;
-      };
+      sites:     { Row: Site;     Insert: SiteInsert;     Update: SiteUpdate;     Relationships: [] };
+      leads:     { Row: Lead;     Insert: LeadInsert;     Update: LeadUpdate;     Relationships: [] };
+      rankings:  { Row: Ranking;  Insert: RankingInsert;  Update: RankingUpdate;  Relationships: [] };
+      prospects: { Row: Prospect; Insert: ProspectInsert; Update: ProspectUpdate; Relationships: [] };
+      clients:   { Row: Client;   Insert: ClientInsert;   Update: ClientUpdate;   Relationships: [] };
+      upsells:   { Row: Upsell;   Insert: UpsellInsert;   Update: UpsellUpdate;   Relationships: [] };
     };
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
     Enums: {
       site_type: SiteType;
       site_status: SiteStatus;
@@ -161,5 +139,6 @@ export interface Database {
       upsell_product: UpsellProduct;
       upsell_status: UpsellStatus;
     };
+    CompositeTypes: { [_ in never]: never };
   };
-}
+};

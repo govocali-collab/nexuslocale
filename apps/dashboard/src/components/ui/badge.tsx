@@ -11,6 +11,7 @@ const STATUS_STYLES: Record<string, string> = {
   form:        'bg-emerald-100 text-emerald-700',
   // prospect status
   new:         'bg-slate-100 text-slate-600',
+  demo_booked: 'bg-violet-100 text-violet-700',
   demo_sent:   'bg-sky-100 text-sky-700',
   negotiating: 'bg-amber-100 text-amber-700',
   won:         'bg-emerald-100 text-emerald-700',

@@ -69,7 +69,10 @@ export function Footer({ config }: FooterProps) {
       <div className="border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500">
           <p>© {year} {business.name}. Tous droits réservés.</p>
-          <Link href="/contact" className="hover:text-gray-300 transition-colors">Demander un estimé</Link>
+          <div className="flex items-center gap-4">
+            <a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition-colors">Photos : Pexels</a>
+            <Link href="/contact" className="hover:text-gray-300 transition-colors">Demander un estimé</Link>
+          </div>
         </div>
       </div>
     </footer>

@@ -7,6 +7,7 @@ export interface OverviewStats {
   leadsThisMonth:    number;
   leadsPrevMonth:    number;
   mrr:               number;
+  salesTotal:        number;
   prospectsByStatus: Record<string, number>;
 }
 
@@ -37,6 +38,9 @@ export interface SiteRow {
   monthly_rent:   number | null;
   leads_month:    number;
   best_position:  number | null;
+  niche_score:    number | null;
+  top_volume:     number | null;
+  keyword_count:  number;
 }
 
 export interface SiteDetail {
@@ -89,7 +93,7 @@ export async function getOverviewStats(): Promise<OverviewStats> {
     db.from('sites').select('monthly_rent').eq('status', 'rented'),
     db.from('clients').select('hosting_monthly'),
     db.from('upsells').select('monthly_price').eq('status', 'active'),
-    db.from('prospects').select('status'),
+    db.from('prospects').select('status, sale_value, monthly_value'),
   ]);
 
   const sitesByStatus: Record<string, number> = {};
@@ -98,10 +102,16 @@ export async function getOverviewStats(): Promise<OverviewStats> {
     sitesByStatus[st] = (sitesByStatus[st] ?? 0) + 1;
   }
 
+  // Revenus : uniquement les prospects dans la colonne « Gagnés ».
+  const won = (prospectsRes.data ?? []).filter(p => (p.status as string) === 'won');
+  const salesTotal       = won.reduce((n, p) => n + ((p.sale_value    as number | null) ?? 0), 0);
+  const prospectsMonthly = won.reduce((n, p) => n + ((p.monthly_value as number | null) ?? 0), 0);
+
   const mrr =
     (rentedRes.data  ?? []).reduce((n, r) => n + ((r.monthly_rent   as number | null) ?? 0), 0) +
     (clientsRes.data ?? []).reduce((n, r) => n + ((r.hosting_monthly as number | null) ?? 0), 0) +
-    (upsellsRes.data ?? []).reduce((n, r) => n + ((r.monthly_price   as number) ?? 0), 0);
+    (upsellsRes.data ?? []).reduce((n, r) => n + ((r.monthly_price   as number) ?? 0), 0) +
+    prospectsMonthly;
 
   const prospectsByStatus: Record<string, number> = {};
   for (const p of prospectsRes.data ?? []) {
@@ -114,6 +124,7 @@ export async function getOverviewStats(): Promise<OverviewStats> {
     leadsThisMonth:    leadsThisRes.count  ?? 0,
     leadsPrevMonth:    leadsPrevRes.count  ?? 0,
     mrr,
+    salesTotal,
     prospectsByStatus,
   };
 }
@@ -180,7 +191,7 @@ export async function getSitesList(filters?: {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const thirtyAgo  = new Date(Date.now() - 30 * 86400_000).toISOString();
 
-  let q = db.from('sites').select('id, domain, type, niche, city, status, twilio_number, monthly_rent');
+  let q = db.from('sites').select('id, domain, type, niche, city, status, twilio_number, monthly_rent, research_data');
   if (filters?.status) q = q.eq('status', filters.status);
   if (filters?.type)   q = q.eq('type', filters.type);
   if (filters?.q)      q = q.or(`domain.ilike.%${filters.q}%,niche.ilike.%${filters.q}%`);
@@ -208,18 +219,27 @@ export async function getSitesList(filters?: {
     }
   }
 
-  return (sitesRes.data ?? []).map(s => ({
-    id:            s.id as string,
-    domain:        s.domain as string | null,
-    type:          s.type as string,
-    niche:         s.niche as string,
-    city:          s.city as string,
-    status:        s.status as string,
-    twilio_number: s.twilio_number as string | null,
-    monthly_rent:  s.monthly_rent  as number | null,
-    leads_month:   leadsPerSite[s.id as string]       ?? 0,
-    best_position: bestPositionPerSite[s.id as string] ?? null,
-  }));
+  return (sitesRes.data ?? []).map(s => {
+    const rd = s.research_data as
+      { niche_score?: number; keywords?: { search_volume?: number | null }[] } | null;
+    const kws    = rd?.keywords ?? [];
+    const topVol = kws.reduce((max, k) => Math.max(max, k.search_volume ?? 0), 0);
+    return {
+      id:            s.id as string,
+      domain:        s.domain as string | null,
+      type:          s.type as string,
+      niche:         s.niche as string,
+      city:          s.city as string,
+      status:        s.status as string,
+      twilio_number: s.twilio_number as string | null,
+      monthly_rent:  s.monthly_rent  as number | null,
+      leads_month:   leadsPerSite[s.id as string]       ?? 0,
+      best_position: bestPositionPerSite[s.id as string] ?? null,
+      niche_score:   rd?.niche_score ?? null,
+      top_volume:    kws.length ? topVol : null,
+      keyword_count: kws.length,
+    };
+  });
 }
 
 // ─── Détail d'un site ─────────────────────────────────────────────────────────
@@ -266,13 +286,17 @@ export interface Prospect {
   phone:          string | null;
   rating:         number | null;
   review_count:   number | null;
-  web_presence:   string;
-  pain_score:     number | null;
-  prospect_score: number | null;
+  web_presence:    string;
+  pain_score:      number | null;
+  prospect_score:  number | null;
+  detected_issues: string[] | null;
   status:         string;
   demo_url:       string | null;
   website:        string | null;
   notes:          string | null;
+  email:          string | null;
+  sale_value:     number | null;
+  monthly_value:  number | null;
   created_at:     string;
 }
 
@@ -280,9 +304,31 @@ export async function getProspects(): Promise<Prospect[]> {
   const db = createAdminClient();
   const { data } = await db
     .from('prospects')
-    .select('id, business_name, niche, city, phone, rating, review_count, web_presence, pain_score, prospect_score, status, demo_url, website, notes, created_at')
+    .select('id, business_name, niche, city, phone, rating, review_count, web_presence, pain_score, prospect_score, detected_issues, status, demo_url, website, notes, email, sale_value, monthly_value, created_at')
     .order('prospect_score', { ascending: false, nullsFirst: false });
   return (data ?? []) as unknown as Prospect[];
+}
+
+export interface WonDeal { date: string; sale_value: number; monthly_value: number }
+
+// Prospects « Gagnés » pour le suivi des ventes par mois.
+// Mois attribué à won_at (date de conversion) ; repli sur created_at si la colonne
+// won_at n'existe pas encore (migration 016 non lancée).
+export async function getSalesDeals(): Promise<WonDeal[]> {
+  const db = createAdminClient();
+  type Row = { won_at?: string | null; created_at: string; sale_value: number | null; monthly_value: number | null };
+  type Res = { data: Row[] | null; error: { message: string } | null };
+  let res = (await db.from('prospects')
+    .select('won_at, created_at, sale_value, monthly_value').eq('status', 'won')) as unknown as Res;
+  if (res.error && /won_at/i.test(res.error.message)) {
+    res = (await db.from('prospects')
+      .select('created_at, sale_value, monthly_value').eq('status', 'won')) as unknown as Res;
+  }
+  return (res.data ?? []).map((d) => ({
+    date:          (d.won_at ?? d.created_at),
+    sale_value:    d.sale_value    ?? 0,
+    monthly_value: d.monthly_value ?? 0,
+  }));
 }
 
 // ─── Lanceur : files d'attente ────────────────────────────────────────────────

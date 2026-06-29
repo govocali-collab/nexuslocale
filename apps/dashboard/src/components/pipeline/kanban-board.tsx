@@ -1,22 +1,16 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Prospect } from '@/lib/queries';
-import { updateProspectStatus } from '@/lib/actions';
+import { updateProspectStatus, deleteProspects } from '@/lib/actions';
 import { ProspectPanel } from './prospect-panel';
+import { PIPELINE_STATUSES, PIPELINE_LABELS, PIPELINE_ACCENT } from '@/lib/pipeline';
 
-const COLUMNS = ['new', 'demo_sent', 'negotiating', 'won', 'lost'] as const;
-
-const COLUMN_LABELS: Record<string, string> = {
-  new: 'Nouveaux', demo_sent: 'Démo envoyée',
-  negotiating: 'Négociation', won: 'Gagnés', lost: 'Perdus',
-};
-
-const COLUMN_ACCENT: Record<string, string> = {
-  new: 'border-t-slate-400', demo_sent: 'border-t-sky-500',
-  negotiating: 'border-t-amber-500', won: 'border-t-emerald-500', lost: 'border-t-red-400',
-};
+// Étapes du pipeline = source unique partagée (cf. @/lib/pipeline).
+const COLUMNS       = PIPELINE_STATUSES;
+const COLUMN_LABELS = PIPELINE_LABELS;
+const COLUMN_ACCENT = PIPELINE_ACCENT;
 
 type Board = Record<string, Prospect[]>;
 
@@ -28,6 +22,20 @@ function buildBoard(prospects: Prospect[]): Board {
     board[col]!.push(p);
   }
   return board;
+}
+
+type SortKey = 'score' | 'pain' | 'rating' | 'manual';
+
+// Tri des cartes dans chaque colonne (décroissant). 'manual' = ordre du board (drag).
+function sortBoard(board: Board, key: SortKey): Board {
+  if (key === 'manual') return board;
+  const cmp =
+    key === 'pain'   ? (a: Prospect, b: Prospect) => (b.pain_score ?? 0) - (a.pain_score ?? 0)
+    : key === 'rating' ? (a: Prospect, b: Prospect) => (b.rating ?? 0) - (a.rating ?? 0)
+    :                    (a: Prospect, b: Prospect) => (b.prospect_score ?? 0) - (a.prospect_score ?? 0);
+  const next: Board = {};
+  for (const col of Object.keys(board)) next[col] = [...(board[col] ?? [])].sort(cmp);
+  return next;
 }
 
 function ScorePill({ score }: { score: number }) {
@@ -49,15 +57,17 @@ interface DragState {
 }
 
 function ProspectCard({
-  p, isDragging, isDropTarget,
-  onDragStart, onDragEnter, onClick,
+  p, isDragging, isDropTarget, selected,
+  onDragStart, onDragEnter, onClick, onToggleSelect,
 }: {
   p: Prospect;
   isDragging: boolean;
   isDropTarget: boolean;
+  selected: boolean;
   onDragStart: () => void;
   onDragEnter: () => void;
   onClick: () => void;
+  onToggleSelect: () => void;
 }) {
   return (
     <div
@@ -68,27 +78,45 @@ function ProspectCard({
       className={`bg-white border rounded-lg p-3 cursor-pointer
                   hover:shadow-sm hover:border-indigo-200 transition-all space-y-1.5 select-none
                   ${isDragging   ? 'opacity-40 scale-95' : ''}
-                  ${isDropTarget ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-[#D9D7F0]'}`}
+                  ${selected ? 'border-indigo-400 ring-2 ring-indigo-300 bg-indigo-50'
+                    : isDropTarget ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-[#e5e5e5]'}`}
     >
       <div className="flex items-start justify-between gap-1">
-        <span className="font-medium text-[#1C1560] text-sm leading-snug">{p.business_name}</span>
+        <div className="flex items-start gap-2 min-w-0">
+          <input
+            type="checkbox"
+            checked={selected}
+            onClick={e => e.stopPropagation()}
+            onChange={onToggleSelect}
+            className="mt-0.5 rounded border-[#d4d4d4] text-indigo-600 cursor-pointer flex-none"
+            aria-label={`Sélectionner ${p.business_name}`}
+          />
+          <span className="font-medium text-[#0a0a0a] text-sm leading-snug">{p.business_name}</span>
+        </div>
         {p.prospect_score != null && <ScorePill score={p.prospect_score} />}
       </div>
-      <div className="text-xs text-[#9A97C0]">{p.niche} · {p.city}</div>
+      <div className="text-xs text-[#a3a3a3]">{p.niche} · {p.city}</div>
       {p.rating != null && (
         <div className="text-xs text-amber-600">
           ⭐ {p.rating}
           {p.review_count != null && (
-            <span className="text-[#B0ADCC] ml-1">({p.review_count})</span>
+            <span className="text-[#a3a3a3] ml-1">({p.review_count})</span>
           )}
         </div>
       )}
       <div className="flex items-center justify-between pt-0.5">
         {p.phone
-          ? <span className="text-xs mono text-[#6B6B9E]">{p.phone}</span>
+          ? <span className="text-xs mono text-[#525252]">{p.phone}</span>
           : <span />}
         <div className="flex items-center gap-2">
-          {p.notes && <span className="text-xs text-[#9A97C0]" title="A des notes">📝</span>}
+          {p.website
+            ? <a href={p.website.startsWith('http') ? p.website : `https://${p.website}`} target="_blank" rel="noopener noreferrer"
+                 className="text-xs text-sky-600 hover:text-sky-800 font-medium" title={`Voir le site : ${p.website}`}
+                 onClick={e => e.stopPropagation()}>🌐 site</a>
+            : p.web_presence === 'social_only'
+              ? <span className="text-xs text-amber-600" title="Réseaux sociaux seulement">📱 réseaux</span>
+              : <span className="text-xs text-red-500" title="Aucun site web — bonne cible">⛔ aucun site</span>}
+          {p.notes && <span className="text-xs text-[#a3a3a3]" title="A des notes">📝</span>}
           {p.demo_url && (
             <a href={p.demo_url} target="_blank" rel="noopener noreferrer"
                className="text-xs text-indigo-600 hover:text-indigo-800"
@@ -102,14 +130,47 @@ function ProspectCard({
   );
 }
 
-export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
-  const [board, setBoard]               = useState<Board>(() => buildBoard(prospects));
+export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[]; initialScript?: string }) {
+  const [sortKey, setSortKey]           = useState<SortKey>('score');
+  const [board, setBoard]               = useState<Board>(() => sortBoard(buildBoard(prospects), 'score'));
+
+  // Resynchronise + retrie le board quand les données serveur ou le tri changent.
+  useEffect(() => { setBoard(sortBoard(buildBoard(prospects), sortKey)); }, [prospects, sortKey]);
   const [drag, setDrag]                 = useState<DragState | null>(null);
   const [overCol, setOverCol]           = useState<string | null>(null);
   const [overIndex, setOverIndex]       = useState<number | null>(null);
   const [selected, setSelected]         = useState<Prospect | null>(null);
+  const [sel, setSel]                   = useState<Set<string>>(new Set());
+  const [deleting, startDelete]         = useTransition();
   const [, startTransition]             = useTransition();
   const router                          = useRouter();
+
+  function toggleSelect(id: string) {
+    setSel(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  }
+
+  const allIds = Object.values(board).flatMap(c => (c ?? []).map(p => p.id));
+  const allSelected = allIds.length > 0 && allIds.every(id => sel.has(id));
+  function toggleSelectAll() {
+    setSel(allSelected ? new Set() : new Set(allIds));
+  }
+
+  function deleteSelected() {
+    const ids = [...sel];
+    if (ids.length === 0) return;
+    if (!confirm(`Supprimer ${ids.length} prospect(s) du pipeline ? Cette action est définitive.`)) return;
+    startDelete(async () => {
+      const r = await deleteProspects(ids);
+      if (r.error) { alert('Échec de la suppression : ' + r.error); return; }
+      setBoard(prev => {
+        const next: Board = {};
+        for (const col of Object.keys(prev)) next[col] = prev[col]!.filter(p => !sel.has(p.id));
+        return next;
+      });
+      setSel(new Set());
+      router.refresh();
+    });
+  }
 
   function handleDragStart(p: Prospect, col: string, index: number) {
     setDrag({ id: p.id, col, index });
@@ -174,6 +235,33 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
 
   return (
     <>
+      <div className={`sticky top-0 z-20 mb-2 flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors ${
+        sel.size > 0 ? 'bg-red-50 border-red-200' : 'bg-[#fafafa] border-[#e5e5e5]'
+      }`}>
+        <button onClick={toggleSelectAll} className="text-xs font-medium text-[#525252] hover:text-indigo-600 underline">
+          {allSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
+        </button>
+        {sel.size > 0 && (
+          <>
+            <span className="text-sm font-medium text-red-700">{sel.size} sélectionné(s)</span>
+            <button onClick={deleteSelected} disabled={deleting}
+              className="rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 px-3 py-1 text-sm text-white transition-colors">
+              {deleting ? 'Suppression…' : '🗑 Supprimer'}
+            </button>
+            <button onClick={() => setSel(new Set())} className="text-xs text-red-500 hover:text-red-700 underline">Annuler</button>
+          </>
+        )}
+        <div className="flex items-center gap-1.5 ml-auto">
+          <span className="text-xs text-[#a3a3a3]">Trier :</span>
+          <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
+            className="text-xs rounded-md border-[#e5e5e5] bg-white py-1 pl-2 pr-7 text-[#404040] focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="score">Score (opportunité)</option>
+            <option value="pain">Douleur (pire site)</option>
+            <option value="rating">Note Google</option>
+            <option value="manual">Manuel</option>
+          </select>
+        </div>
+      </div>
       <div
         className="flex gap-3 overflow-x-auto pb-4"
         style={{ minHeight: 'calc(100vh - 140px)' }}
@@ -197,8 +285,8 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
             >
               {/* Header */}
               <div className={`card border-t-4 ${COLUMN_ACCENT[col]} px-3 py-2 mb-2 flex items-center justify-between`}>
-                <span className="text-sm font-medium text-[#1C1560]">{COLUMN_LABELS[col]}</span>
-                <span className="text-xs mono text-[#9A97C0] bg-[#EEEDF8] rounded px-1.5 py-0.5">
+                <span className="text-sm font-medium text-[#0a0a0a]">{COLUMN_LABELS[col]}</span>
+                <span className="text-xs mono text-[#a3a3a3] bg-[#f4f4f4] rounded px-1.5 py-0.5">
                   {cards.length}
                 </span>
               </div>
@@ -220,9 +308,11 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
                       p={p}
                       isDragging={drag?.id === p.id}
                       isDropTarget={false}
+                      selected={sel.has(p.id)}
                       onDragStart={() => handleDragStart(p, col, i)}
                       onDragEnter={() => { setOverCol(col); setOverIndex(i); }}
                       onClick={() => handleCardClick(p)}
+                      onToggleSelect={() => toggleSelect(p.id)}
                     />
                   </div>
                 ))}
@@ -233,7 +323,7 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
                 )}
 
                 {cards.length === 0 && !isOver && (
-                  <div className="flex items-center justify-center h-16 text-xs text-[#C0BDE0]">
+                  <div className="flex items-center justify-center h-16 text-xs text-[#d4d4d4]">
                     Vide
                   </div>
                 )}
@@ -248,6 +338,7 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
         prospect={selected}
         onClose={() => setSelected(null)}
         onSaved={handlePanelSaved}
+        initialScript={initialScript}
       />
     </>
   );

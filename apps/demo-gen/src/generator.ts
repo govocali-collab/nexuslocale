@@ -8,13 +8,14 @@ const MAX_TOKENS = 8192; // max pour claude-sonnet-4-6
 export async function generateContent(
   prospect: ProspectFull,
   apiKey: string,
-  hintOnRetry?: string,
+  opts?: { targetKeywords?: string[] | undefined; hintOnRetry?: string | undefined },
 ): Promise<GeneratedContent> {
   const client = new Anthropic({ apiKey });
 
-  const userPrompt = hintOnRetry
-    ? `${buildUserPrompt(prospect)}\n\n⚠ Correction requise : ${hintOnRetry}`
-    : buildUserPrompt(prospect);
+  const base = buildUserPrompt(prospect, opts?.targetKeywords);
+  const userPrompt = opts?.hintOnRetry
+    ? `${base}\n\n⚠ Correction requise : ${opts.hintOnRetry}`
+    : base;
 
   const response = await client.messages.create({
     model:      MODEL,

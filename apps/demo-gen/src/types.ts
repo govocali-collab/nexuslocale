@@ -54,6 +54,7 @@ export interface GeneratedContent {
       h1:               string;
       meta_title:       string;
       meta_description: string;
+      image_query?:     string;
       sections:  Array<{ heading: string; body: string }>;
       local_data: {
         neighborhoods?:      string[];
