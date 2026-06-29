@@ -56,36 +56,46 @@ function twilioClient() {
   return sid && token ? Twilio(sid, token) : null;
 }
 
-// Programme un SMS de rappel ~2h avant le RDV. Retourne le SID (pour annulation) ou null.
-async function scheduleReminder(phone: string | null, startsAt: string, zoomUrl: string | null): Promise<string | null> {
+// Trois rappels : 3h, 1h et 15 min avant le RDV (texte adapté à chaque moment).
+const REMINDERS: Array<{ ms: number; body: (heure: string, zoom: string | null) => string }> = [
+  { ms: 3 * 60 * 60 * 1000, body: (h, z) => `Rappel : votre démo Zoom avec NexusLocale est aujourd'hui à ${h}.${z ? ` Lien : ${z}` : ''} À tantôt !` },
+  { ms: 1 * 60 * 60 * 1000, body: (h, z) => `Votre démo Zoom avec NexusLocale est dans 1 heure (à ${h}).${z ? ` Lien : ${z}` : ''}` },
+  { ms: 15 * 60 * 1000,     body: (h, z) => `Ça commence bientôt ! Votre démo Zoom est dans ~15 minutes.${z ? ` Rejoignez : ${z}` : ''}` },
+];
+
+// Programme les rappels SMS (3h / 1h / 15 min avant). Retourne les SID (pour annulation).
+// Un rappel est ignoré s'il tombe dans le passé, à <16 min (minimum Twilio) ou à >7 jours.
+async function scheduleReminders(phone: string | null, startsAt: string, zoomUrl: string | null): Promise<string[]> {
   const mgSid = process.env['TWILIO_MESSAGING_SERVICE_SID'];
   const client = twilioClient();
-  if (!mgSid || !client || !phone) return null;
+  if (!mgSid || !client || !phone) return [];
   const to = toE164(phone);
-  if (!to) return null;
+  if (!to) return [];
 
   const startMs = new Date(startsAt).getTime();
   const nowMs = Date.now();
-  const minMs = nowMs + 16 * 60 * 1000;      // Twilio : min 15 min dans le futur
-  const maxMs = nowMs + 7 * 24 * 3600 * 1000; // Twilio : max 7 jours
-  let sendAtMs = startMs - 2 * 60 * 60 * 1000; // 2h avant
-  if (sendAtMs < minMs) sendAtMs = minMs;      // RDV proche → on envoie dans 16 min
-  if (sendAtMs >= startMs || sendAtMs > maxMs) return null; // déjà passé, ou >7j (non planifiable)
-
+  const minMs = nowMs + 16 * 60 * 1000;       // Twilio : min ~15 min dans le futur
+  const maxMs = nowMs + 7 * 24 * 3600 * 1000;  // Twilio : max 7 jours
   const heure = new Date(startsAt).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Toronto' });
-  const body = `Rappel : votre démo Zoom avec NexusLocale est aujourd'hui à ${heure}.${zoomUrl ? ` Lien : ${zoomUrl}` : ''} À tantôt !`;
-  try {
-    const msg = await client.messages.create({ messagingServiceSid: mgSid, to, body, scheduleType: 'fixed', sendAt: new Date(sendAtMs) });
-    return msg.sid;
-  } catch {
-    return null;
+
+  const sids: string[] = [];
+  for (const r of REMINDERS) {
+    const sendAtMs = startMs - r.ms;
+    if (sendAtMs < minMs || sendAtMs >= startMs || sendAtMs > maxMs) continue;
+    try {
+      const msg = await client.messages.create({ messagingServiceSid: mgSid, to, body: r.body(heure, zoomUrl), scheduleType: 'fixed', sendAt: new Date(sendAtMs) });
+      sids.push(msg.sid);
+    } catch { /* on ignore ce rappel */ }
   }
+  return sids;
 }
 
-async function cancelReminder(sid: string | null | undefined) {
+async function cancelReminders(sidStr: string | null | undefined) {
   const client = twilioClient();
-  if (!sid || !client) return;
-  try { await client.messages(sid).update({ status: 'canceled' }); } catch { /* déjà parti/annulé */ }
+  if (!sidStr || !client) return;
+  for (const sid of sidStr.split(',').filter(Boolean)) {
+    try { await client.messages(sid).update({ status: 'canceled' }); } catch { /* déjà parti/annulé */ }
+  }
 }
 
 export async function POST(req: Request) {
@@ -105,7 +115,7 @@ export async function POST(req: Request) {
 
   if (event === 'BOOKING_CANCELLED') {
     const { data: existing } = await db.from('appointments').select('sms_sid').eq('cal_uid', uid).maybeSingle();
-    await cancelReminder(existing?.sms_sid as string | undefined);
+    await cancelReminders(existing?.sms_sid as string | undefined);
     await db.from('appointments').update({ status: 'cancelled' }).eq('cal_uid', uid);
     return Response.json({ ok: true, event });
   }
@@ -123,7 +133,7 @@ export async function POST(req: Request) {
 
     // Si reprogrammation : annule l'ancien SMS programmé.
     const { data: existing } = await db.from('appointments').select('sms_sid').eq('cal_uid', uid).maybeSingle();
-    await cancelReminder(existing?.sms_sid as string | undefined);
+    await cancelReminders(existing?.sms_sid as string | undefined);
 
     // Relie au prospect (par courriel) et le passe en « demo_booked ».
     let prospectId: string | null = null;
@@ -137,8 +147,9 @@ export async function POST(req: Request) {
       }
     }
 
-    // Programme le SMS de rappel via Twilio.
-    const smsSid = await scheduleReminder(phone, startsAt, zoom);
+    // Programme les rappels SMS via Twilio (3h / 1h / 15 min avant).
+    const sids = await scheduleReminders(phone, startsAt, zoom);
+    const smsSid = sids.length ? sids.join(',') : null;
 
     await db.from('appointments').upsert(
       {
@@ -149,7 +160,7 @@ export async function POST(req: Request) {
       { onConflict: 'cal_uid' },
     );
 
-    return Response.json({ ok: true, event, prospectId, smsScheduled: Boolean(smsSid) });
+    return Response.json({ ok: true, event, prospectId, smsScheduled: sids.length });
   }
 
   return Response.json({ ok: true, ignored: event });
