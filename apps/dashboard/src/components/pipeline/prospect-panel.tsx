@@ -110,8 +110,11 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
         {/* Header */}
         <div className="flex items-start justify-between px-5 py-4 border-b border-[#e5e5e5] bg-[#fafafa]">
           <div className="min-w-0">
-            <h2 className="font-semibold text-[#0a0a0a] truncate">{prospect.business_name}</h2>
-            <p className="text-xs text-[#a3a3a3] mt-0.5">{prospect.niche} · {prospect.city}</p>
+            <h2 className="font-semibold text-[#0a0a0a] text-base truncate">{prospect.business_name}</h2>
+            <p className="text-xs text-[#a3a3a3] mt-0.5">
+              {prospect.niche} · {prospect.city}
+              {prospect.rating != null && <span className="text-amber-600"> · ⭐ {prospect.rating} ({prospect.review_count ?? 0})</span>}
+            </p>
           </div>
           <button onClick={onClose} className="ml-3 shrink-0 text-[#a3a3a3] hover:text-[#0a0a0a] text-lg leading-none">
             ✕
@@ -121,34 +124,36 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
 
-          {/* Infos lecture seule */}
+          {/* ═══ 1 · Actions rapides ═══ */}
           <div className="space-y-2">
-            <p className="label">Informations</p>
-            <dl className="space-y-1.5 text-sm">
-              {[
-                ['Score',       prospect.prospect_score != null ? Math.round(prospect.prospect_score) : '—'],
-                ['Douleur',     prospect.pain_score     ?? '—'],
-                ['Google',      prospect.rating != null ? `${prospect.rating} ⭐ (${prospect.review_count ?? 0})` : '—'],
-                ['Web',         prospect.web_presence],
-              ].map(([k, v]) => (
-                <div key={String(k)} className="flex justify-between">
-                  <dt className="text-[#a3a3a3]">{k}</dt>
-                  <dd className="text-[#0a0a0a] font-medium mono text-xs">{String(v)}</dd>
-                </div>
-              ))}
-              {prospect.website && (
-                <div className="flex justify-between">
-                  <dt className="text-[#a3a3a3]">Site actuel</dt>
-                  <dd>
-                    <a href={prospect.website} target="_blank" rel="noopener noreferrer"
-                       className="text-xs text-indigo-600 hover:text-indigo-800 mono">↗ visiter</a>
-                  </dd>
-                </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={call} disabled={!phone.trim() || calling}
+                className="rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 px-3 py-1.5 text-sm font-medium text-white">
+                {calling ? '…' : '📞 Appeler'}
+              </button>
+              {bookingUrl && (
+                <a href={bookingUrl} target="_blank" rel="noopener noreferrer"
+                  className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-3 py-1.5 text-sm font-medium text-white">
+                  📅 Réserver démo
+                </a>
               )}
-            </dl>
+              {bookingUrl && (
+                <button type="button" onClick={copyBooking}
+                  className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-[#404040] hover:bg-[#f5f5f5]">
+                  {copied ? 'Lien copié ✓' : 'Copier lien démo'}
+                </button>
+              )}
+              {prospect.website && (
+                <a href={prospect.website.startsWith('http') ? prospect.website : `https://${prospect.website}`} target="_blank" rel="noopener noreferrer"
+                  className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-[#404040] hover:bg-[#f5f5f5]">
+                  🌐 Voir le site
+                </a>
+              )}
+            </div>
+            {callMsg && <p className="text-xs text-[#525252]">{callMsg}</p>}
           </div>
 
-          {/* Arguments de vente */}
+          {/* ═══ 2 · Arguments de vente ═══ */}
           {args.length > 0 && (
             <div className="space-y-2 rounded-lg border border-indigo-100 bg-indigo-50/60 p-3">
               <p className="label text-indigo-700">💡 Arguments de vente</p>
@@ -163,102 +168,82 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
             </div>
           )}
 
-          {/* Rendez-vous démo Zoom */}
-          <div className="space-y-1.5">
-            <label className="label">Rendez-vous démo Zoom</label>
-            {bookingUrl ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <a href={bookingUrl} target="_blank" rel="noopener noreferrer"
-                    className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-3 py-1.5 text-sm font-medium text-white whitespace-nowrap">
-                    📅 Réserver une démo
-                  </a>
-                  <button type="button" onClick={copyBooking}
-                    className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-[#404040] hover:bg-[#f5f5f5] whitespace-nowrap">
-                    {copied ? 'Copié ✓' : 'Copier le lien'}
-                  </button>
-                </div>
-                <p className="text-xs text-[#a3a3a3]">Lien pré-rempli (nom{email.trim() ? ' + courriel' : ''}) — ouvre-le ou envoie-le au prospect.</p>
-              </>
-            ) : (
-              <p className="text-xs text-[#a3a3a3]">Configure <span className="mono">NEXT_PUBLIC_CAL_LINK</span> pour activer le lien de réservation.</p>
-            )}
-          </div>
+          {/* ═══ 3 · Suivi ═══ */}
+          <div className="space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#a3a3a3] border-b border-[#f0f0f0] pb-1.5">Suivi</p>
 
-          {/* Statut */}
-          <div className="space-y-1.5">
-            <label className="label">Statut</label>
-            <select value={status} onChange={e => setStatus(e.target.value)}
-              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5">
-              {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
-            </select>
-          </div>
-
-          {/* Téléphone */}
-          <div className="space-y-1.5">
-            <label className="label">Téléphone</label>
-            <div className="flex items-center gap-2">
-              <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                placeholder="+15145550000"
-                className="flex-1 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
-                           placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
-              <button type="button" onClick={call} disabled={!phone.trim() || calling}
-                className="rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 px-3 py-1.5 text-sm text-white whitespace-nowrap">
-                {calling ? '…' : '📞 Appeler'}
-              </button>
+            <div className="space-y-1.5">
+              <label className="label">Statut</label>
+              <select value={status} onChange={e => setStatus(e.target.value)}
+                className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm py-1.5">
+                {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+              </select>
             </div>
-            {callMsg && <p className="text-xs text-[#525252]">{callMsg}</p>}
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="label">Téléphone</label>
+                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+15145550000"
+                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="label">Courriel</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="prospect@commerce.com"
+                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="label">URL de démo (site bâti pour lui)</label>
+              <input type="url" value={demoUrl} onChange={e => setDemoUrl(e.target.value)} placeholder="https://…"
+                className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="label">Notes</label>
+              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={5}
+                placeholder="Intéressé par le SEO local… rappeler jeudi… budget ~300$/mois…"
+                className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm placeholder-[#a3a3a3] px-3 py-2 resize-none focus:ring-indigo-500 focus:border-indigo-500" />
+            </div>
           </div>
 
-          {/* Courriel */}
-          <div className="space-y-1.5">
-            <label className="label">Courriel</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="prospect@commerce.com"
-              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
-                         placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
-          </div>
-
-          {/* Démo URL */}
-          <div className="space-y-1.5">
-            <label className="label">URL de démo</label>
-            <input type="url" value={demoUrl} onChange={e => setDemoUrl(e.target.value)}
-              placeholder="https://…"
-              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
-                         placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
-          </div>
-
-          {/* Valeurs $ */}
-          <div className="space-y-1.5">
-            <label className="label">Valeur ($)</label>
+          {/* ═══ 4 · Valeur du deal ═══ */}
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#a3a3a3] border-b border-[#f0f0f0] pb-1.5">Valeur du deal</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <input type="number" min={0} step="1" value={saleValue} onChange={e => setSaleValue(e.target.value)}
-                  placeholder="Vente unique"
-                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
-                             placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
-                <p className="text-[11px] text-[#a3a3a3] mt-1">Site vendu (unique)</p>
+                <input type="number" min={0} step="1" value={saleValue} onChange={e => setSaleValue(e.target.value)} placeholder="Vente unique"
+                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+                <p className="text-[11px] text-[#a3a3a3] mt-1">💻 Site vendu (unique)</p>
               </div>
               <div>
-                <input type="number" min={0} step="1" value={monthlyValue} onChange={e => setMonthlyValue(e.target.value)}
-                  placeholder="Mensuel"
-                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
-                             placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
-                <p className="text-[11px] text-[#a3a3a3] mt-1">Hébergement ($/mois)</p>
+                <input type="number" min={0} step="1" value={monthlyValue} onChange={e => setMonthlyValue(e.target.value)} placeholder="Mensuel"
+                  className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm placeholder-[#a3a3a3] px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500" />
+                <p className="text-[11px] text-[#a3a3a3] mt-1">🔁 Hébergement ($/mois)</p>
               </div>
             </div>
             <p className="text-[11px] text-[#a3a3a3]">Compté dans la vue d&apos;ensemble quand le statut est « Gagné ».</p>
           </div>
 
-          {/* Notes */}
-          <div className="space-y-1.5">
-            <label className="label">Notes</label>
-            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={7}
-              placeholder="Intéressé par le SEO local… rappeler jeudi… budget ~300$/mois…"
-              className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm
-                         placeholder-[#a3a3a3] px-3 py-2 resize-none
-                         focus:ring-indigo-500 focus:border-indigo-500" />
-          </div>
+          {/* ═══ 5 · Détails (lecture seule) ═══ */}
+          <details className="group">
+            <summary className="text-[11px] font-semibold uppercase tracking-wide text-[#a3a3a3] cursor-pointer select-none border-b border-[#f0f0f0] pb-1.5 list-none flex items-center justify-between">
+              Détails <span className="text-[#d4d4d4] group-open:rotate-180 transition-transform">▾</span>
+            </summary>
+            <dl className="space-y-1.5 text-sm pt-2">
+              {[
+                ['Score',        prospect.prospect_score != null ? Math.round(prospect.prospect_score) : '—'],
+                ['Douleur',      prospect.pain_score ?? '—'],
+                ['Présence web', prospect.web_presence],
+                ['Ajouté le',    new Date(prospect.created_at).toLocaleDateString('fr-CA')],
+              ].map(([k, v]) => (
+                <div key={String(k)} className="flex justify-between">
+                  <dt className="text-[#a3a3a3]">{k}</dt>
+                  <dd className="text-[#0a0a0a] font-medium mono text-xs">{String(v)}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
 
           {errMsg && (
             <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
