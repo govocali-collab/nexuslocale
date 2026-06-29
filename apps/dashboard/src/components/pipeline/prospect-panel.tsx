@@ -26,6 +26,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
   const [monthlyValue, setMonthlyValue] = useState('');
   const [errMsg,   setErrMsg]   = useState('');
   const [saved,    setSaved]    = useState(false);
+  const [copied,   setCopied]   = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -74,6 +75,18 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
   if (!prospect) return null;
 
   const args = sellingArguments(prospect);
+
+  // Lien de réservation Cal.com pré-rempli avec le prospect (à ouvrir ou à lui envoyer).
+  const calLink = process.env.NEXT_PUBLIC_CAL_LINK ?? '';
+  const bookingUrl = calLink
+    ? `https://cal.com/${calLink}?name=${encodeURIComponent(prospect.business_name)}${email.trim() ? `&email=${encodeURIComponent(email.trim())}` : ''}`
+    : '';
+  function copyBooking() {
+    if (!bookingUrl) return;
+    navigator.clipboard.writeText(bookingUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   return (
     <>
@@ -136,6 +149,28 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
               </ul>
             </div>
           )}
+
+          {/* Rendez-vous démo Zoom */}
+          <div className="space-y-1.5">
+            <label className="label">Rendez-vous démo Zoom</label>
+            {bookingUrl ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <a href={bookingUrl} target="_blank" rel="noopener noreferrer"
+                    className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] px-3 py-1.5 text-sm font-medium text-white whitespace-nowrap">
+                    📅 Réserver une démo
+                  </a>
+                  <button type="button" onClick={copyBooking}
+                    className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-[#404040] hover:bg-[#f5f5f5] whitespace-nowrap">
+                    {copied ? 'Copié ✓' : 'Copier le lien'}
+                  </button>
+                </div>
+                <p className="text-xs text-[#a3a3a3]">Lien pré-rempli (nom{email.trim() ? ' + courriel' : ''}) — ouvre-le ou envoie-le au prospect.</p>
+              </>
+            ) : (
+              <p className="text-xs text-[#a3a3a3]">Configure <span className="mono">NEXT_PUBLIC_CAL_LINK</span> pour activer le lien de réservation.</p>
+            )}
+          </div>
 
           {/* Statut */}
           <div className="space-y-1.5">
