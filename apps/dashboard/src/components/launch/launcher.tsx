@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult, type SubmitResult, type CronResult } from '@/lib/launch-actions';
-import type { FinderResult, FinderDomain, ProspectorResult } from '@/lib/launch-actions';
+import type { FinderResult, FinderDomain, ProspectorResult, Prospect } from '@/lib/launch-actions';
+import { CITIES_BY_PROVINCE, PROVINCES } from '@/lib/quebec-cities';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
 interface ActionQueue {
@@ -508,46 +509,94 @@ function FinderPanel({ onNext }: { onNext: (niche: string, city: string, keyword
 // ── Prospector ──────────────────────────────────────────────────────────────────
 function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: string; initialCity?: string; onNext?: (name: string, city: string) => void }) {
   const [niche,      setNiche]      = useState(initialNiche ?? '');
-  const [city,       setCity]       = useState(initialCity ?? '');
+  const [province,   setProvince]   = useState('QC');
+  const [cities,     setCities]     = useState<string[]>(initialCity ? [initialCity] : []);
   const [limit,      setLimit]      = useState('');
   const [minReviews, setMinReviews] = useState('');
   const [simulate,   setSimulate]   = useState(false);
   const [judge,      setJudge]      = useState(false);
   const [result,     setResult]     = useState<{ out: string; ok: boolean; data: ProspectorResult | null } | null>(null);
+  const [cityMap,    setCityMap]    = useState<Record<string, string>>({});
+  const [progress,   setProgress]   = useState<string | null>(null);
   const [pending,    start]         = useTransition();
 
-  // Champs vides par défaut → valeurs par défaut au lancement.
+  const cityList    = CITIES_BY_PROVINCE[province] ?? [];
   const limitN      = Number(limit) || 60;
   const minReviewsN = Number(minReviews) || 0;
 
-  const ready    = niche.trim() !== '' && city.trim() !== '';
-  const estCost  = (Math.ceil(limitN / 20) * 0.032 + limitN * 0.017).toFixed(2);
+  const ready       = niche.trim() !== '' && cities.length > 0;
+  const allSelected = cityList.length > 0 && cities.length === cityList.length;
+  const estCost     = ((Math.ceil(limitN / 20) * 0.032 + limitN * 0.017) * Math.max(1, cities.length)).toFixed(2);
+
+  function toggleCity(name: string) {
+    setCities(prev => prev.includes(name) ? prev.filter(c => c !== name) : [...prev, name]);
+  }
+  function toggleAll() {
+    setCities(allSelected ? [] : cityList.map(c => c.name));
+  }
 
   function launch() {
     if (!ready) return;
-    setResult(null);
+    setResult(null); setProgress(null);
     start(async () => {
-      const r = await runProspectorScan(niche.trim(), city.trim(), { limit: limitN, minReviews: minReviewsN, simulate, judge });
-      setResult(r);
+      const allProspects: Prospect[] = [];
+      const map: Record<string, string> = {};
+      const logs: string[] = [];
+      let okAll = true;
+      for (let i = 0; i < cities.length; i++) {
+        const c = cities[i]!;
+        setProgress(`Ville ${i + 1}/${cities.length} : ${c}…`);
+        const r = await runProspectorScan(niche.trim(), `${c} ${province}`, { limit: limitN, minReviews: minReviewsN, simulate, judge });
+        logs.push(`━━━━━━ ${c} ━━━━━━\n${r.out}`);
+        if (!r.ok) okAll = false;
+        for (const p of (r.data?.prospects ?? [])) { allProspects.push(p); map[p.business_name] = c; }
+      }
+      setProgress(null);
+      setCityMap(map);
+      setResult({ out: logs.join('\n\n'), ok: okAll, data: { niche: niche.trim(), city: cities.join(', '), prospects: allProspects } });
     });
   }
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="label block mb-1">Niche</label>
-          <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="dégât d'eau"
-            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
-                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
+      <div>
+        <label className="label block mb-1">Niche</label>
+        <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="dégât d'eau"
+          className="w-full sm:w-1/2 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
+                     placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+
+      {/* Province */}
+      <div>
+        <label className="label block mb-1">Province</label>
+        <select value={province} onChange={e => { setProvince(e.target.value); setCities([]); }}
+          className="w-full sm:w-1/2 rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
+          {PROVINCES.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
+        </select>
+      </div>
+
+      {/* Villes (sélection multiple) */}
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="label">Villes (&gt; 75 000 hab.) — {cities.length} sélectionnée(s)</label>
+          <button type="button" onClick={toggleAll} className="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline">
+            {allSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
+          </button>
         </div>
-        <div>
-          <label className="label block mb-1">Ville</label>
-          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Brossard QC"
-            className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-sm px-3 py-1.5
-                       placeholder-[#a3a3a3] focus:ring-indigo-500 focus:border-indigo-500" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 rounded-md border border-[#e5e5e5] bg-[#fafafa] p-2 max-h-56 overflow-y-auto">
+          {cityList.map(c => {
+            const on = cities.includes(c.name);
+            return (
+              <label key={c.name} className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 text-sm transition-colors ${on ? 'bg-indigo-50 text-indigo-800' : 'hover:bg-white text-[#404040]'}`}>
+                <input type="checkbox" checked={on} onChange={() => toggleCity(c.name)} className="rounded border-[#e5e5e5] text-indigo-600" />
+                <span className="truncate">{c.name}</span>
+                <span className="ml-auto text-[10px] text-[#a3a3a3] whitespace-nowrap">{(c.pop / 1000).toFixed(0)}k</span>
+              </label>
+            );
+          })}
         </div>
       </div>
+
       <div className="flex items-center gap-4 flex-wrap">
         <div>
           <label className="label block mb-1">Limite entreprises</label>
@@ -575,17 +624,17 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
         <button onClick={launch} disabled={!ready || pending}
           className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 disabled:cursor-not-allowed
                      px-4 py-2 text-sm text-white transition-colors">
-          {pending ? 'Scan en cours…' : simulate ? 'Tester (fixtures)' : 'Lancer le scan réel'}
+          {pending ? (progress ?? 'Scan en cours…') : simulate ? 'Tester (fixtures)' : `Lancer le scan réel${cities.length > 1 ? ` (${cities.length} villes)` : ''}`}
         </button>
         <span className="text-xs text-[#a3a3a3]">
           {simulate
             ? 'Mode fixtures — aucun appel API, aucun coût.'
-            : `Appel Google Places réel — ~$${estCost} en crédits. Écrit les prospects dans Supabase.`}
+            : `${cities.length || 0} ville(s) × Google Places réel — ~$${estCost} en crédits au total. Écrit les prospects dans Supabase.`}
         </span>
       </div>
 
       {result?.data
-        ? <><ProspectTable result={result.data} onPick={onNext ? (name => onNext(name, city.trim())) : undefined} /><RawLogs out={result.out} ok={result.ok} /></>
+        ? <><ProspectTable result={result.data} onPick={onNext ? (name => onNext(name, cityMap[name] ?? cities[0] ?? '')) : undefined} /><RawLogs out={result.out} ok={result.ok} /></>
         : <Output out={result?.out ?? ''} ok={result?.ok ?? true} pending={pending} />}
     </div>
   );
