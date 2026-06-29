@@ -1,9 +1,10 @@
 import { getProspects } from '@/lib/queries';
+import { getCallScript } from '@/lib/settings-actions';
 import { KanbanBoard } from '@/components/pipeline/kanban-board';
 import { AddProspectButton } from '@/components/pipeline/add-prospect-button';
 
 export default async function PipelinePage() {
-  const prospects = await getProspects();
+  const [prospects, callScript] = await Promise.all([getProspects(), getCallScript()]);
 
   return (
     <div className="space-y-4">
@@ -17,7 +18,7 @@ export default async function PipelinePage() {
         <AddProspectButton />
       </div>
 
-      <KanbanBoard prospects={prospects} />
+      <KanbanBoard prospects={prospects} initialScript={callScript} />
     </div>
   );
 }

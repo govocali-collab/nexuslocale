@@ -116,7 +116,7 @@ function ProspectCard({
   );
 }
 
-export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
+export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[]; initialScript?: string }) {
   const [board, setBoard]               = useState<Board>(() => buildBoard(prospects));
 
   // Resynchronise le board quand les données serveur changent (ajout, suppression, refresh).
@@ -313,6 +313,7 @@ export function KanbanBoard({ prospects }: { prospects: Prospect[] }) {
         prospect={selected}
         onClose={() => setSelected(null)}
         onSaved={handlePanelSaved}
+        initialScript={initialScript}
       />
     </>
   );

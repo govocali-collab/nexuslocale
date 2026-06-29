@@ -6,6 +6,15 @@ import { updateProspect } from '@/lib/actions';
 import { PIPELINE_STATUSES, PIPELINE_LABELS } from '@/lib/pipeline';
 import { sellingArguments } from '@/lib/selling-points';
 import { callProspect } from '@/lib/call-actions';
+import { saveCallScript, DEFAULT_CALL_SCRIPT } from '@/lib/settings-actions';
+
+// Remplace les variables du script par les infos du prospect.
+function renderScript(tpl: string, p: Prospect): string {
+  return tpl
+    .replaceAll('{entreprise}', p.business_name)
+    .replaceAll('{ville}', p.city)
+    .replaceAll('{niche}', p.niche);
+}
 
 // Étapes = source unique partagée (cf. @/lib/pipeline) → reste synchro avec le kanban.
 const STATUSES = PIPELINE_STATUSES;
@@ -15,9 +24,17 @@ interface Props {
   prospect: Prospect | null;
   onClose: () => void;
   onSaved: (updated: Partial<Prospect> & { id: string }) => void;
+  initialScript?: string | undefined;
 }
 
-export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
+export function ProspectPanel({ prospect, onClose, onSaved, initialScript }: Props) {
+  // Script global partagé : modifié une fois → change dans toutes les fiches.
+  const [script,        setScript]        = useState(initialScript ?? DEFAULT_CALL_SCRIPT);
+  const [scriptEditing, setScriptEditing] = useState(false);
+  const [scriptDraft,   setScriptDraft]   = useState('');
+  const [scriptSaved,   setScriptSaved]   = useState(false);
+  const [scriptErr,     setScriptErr]     = useState('');
+  const [scriptSaving,  startScriptSave]  = useTransition();
   const [notes,    setNotes]    = useState('');
   const [phone,    setPhone]    = useState('');
   const [email,    setEmail]    = useState('');
@@ -103,6 +120,21 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
     });
   }
 
+  function saveScript() {
+    setScriptErr('');
+    startScriptSave(async () => {
+      const r = await saveCallScript(scriptDraft);
+      if (r.ok) {
+        setScript(scriptDraft);
+        setScriptEditing(false);
+        setScriptSaved(true);
+        setTimeout(() => setScriptSaved(false), 2500);
+      } else {
+        setScriptErr(r.error ?? 'Échec de la sauvegarde.');
+      }
+    });
+  }
+
   return (
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
@@ -173,6 +205,37 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
               </ul>
             </div>
           )}
+
+          {/* ═══ Script d'appel (global, éditable) ═══ */}
+          <details className="rounded-lg border border-[#e5e5e5] group">
+            <summary className="px-3 py-2 cursor-pointer select-none list-none flex items-center justify-between text-sm font-medium text-[#0a0a0a]">
+              📜 Script d&apos;appel <span className="text-[#d4d4d4] group-open:rotate-180 transition-transform">▾</span>
+            </summary>
+            <div className="px-3 pb-3 space-y-2">
+              {scriptEditing ? (
+                <>
+                  <textarea value={scriptDraft} onChange={e => setScriptDraft(e.target.value)} rows={14}
+                    className="w-full rounded-md bg-[#fafafa] border-[#e5e5e5] text-[#0a0a0a] text-xs px-3 py-2 leading-relaxed focus:ring-indigo-500 focus:border-indigo-500" />
+                  <p className="text-[11px] text-[#a3a3a3]">Variables : <span className="mono">{'{entreprise}'}</span> · <span className="mono">{'{ville}'}</span> · <span className="mono">{'{niche}'}</span> — remplacées dans chaque fiche.</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button type="button" onClick={saveScript} disabled={scriptSaving}
+                      className="rounded-md bg-[#5701f3] hover:bg-[#4801cc] disabled:opacity-70 px-3 py-1.5 text-sm font-medium text-white">
+                      {scriptSaving ? '…' : 'Sauvegarder (toutes les fiches)'}
+                    </button>
+                    <button type="button" onClick={() => setScriptEditing(false)} className="text-xs text-[#525252] hover:text-[#0a0a0a]">Annuler</button>
+                    {scriptSaved && <span className="text-xs text-emerald-600 font-medium">✓ Sauvegardé</span>}
+                    {scriptErr && <span className="text-xs text-red-600">{scriptErr}</span>}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="whitespace-pre-wrap text-sm text-[#404040] leading-relaxed">{renderScript(script, prospect)}</div>
+                  <button type="button" onClick={() => { setScriptDraft(script); setScriptEditing(true); }}
+                    className="text-xs text-indigo-600 hover:text-indigo-800">✏️ Éditer le script</button>
+                </>
+              )}
+            </div>
+          </details>
 
           {/* ═══ 3 · Suivi ═══ */}
           <div className="space-y-3">
