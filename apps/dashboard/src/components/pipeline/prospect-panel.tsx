@@ -105,7 +105,7 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <aside className="fixed right-0 top-0 h-full w-[36rem] max-w-[94%] bg-white border-l border-[#e5e5e5]
+      <aside className="fixed right-0 top-0 h-screen w-[36rem] max-w-[94%] bg-white border-l border-[#e5e5e5]
                         shadow-xl z-50 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-start justify-between px-5 py-4 border-b border-[#e5e5e5] bg-[#fafafa]">
