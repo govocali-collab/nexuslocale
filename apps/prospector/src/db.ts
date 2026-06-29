@@ -8,6 +8,25 @@ function getDb() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+// Clé normalisée (nom + ville) pour repérer un doublon, insensible à la casse/accents.
+export function prospectKey(name: string, city: string): string {
+  const n = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+  return `${n(name)}|${n(city)}`;
+}
+
+// Récupère les clés (nom|ville) de tous les prospects déjà en base, pour éviter
+// de re-télécharger/ré-analyser une entreprise déjà trouvée lors d'un scan précédent.
+export async function getExistingKeys(): Promise<Set<string>> {
+  const db = getDb();
+  if (!db) return new Set();
+  const { data, error } = await db.from('prospects').select('business_name, city');
+  if (error) {
+    console.warn(`[dedup] lecture des prospects existants échouée : ${error.message}`);
+    return new Set();
+  }
+  return new Set((data ?? []).map((r) => prospectKey(r.business_name as string, r.city as string)));
+}
+
 export async function upsertProspects(
   prospects: AnalyzedProspect[],
   niche: string,

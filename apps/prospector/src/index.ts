@@ -9,7 +9,7 @@ import { collectPlaces } from './places.js';
 import { analyzeAll } from './analyzer.js';
 import { judgeSites } from './judge.js';
 import { scoreAll } from './scorer.js';
-import { upsertProspects } from './db.js';
+import { upsertProspects, getExistingKeys, prospectKey } from './db.js';
 import { printTable, exportCsv } from './output.js';
 import type { PlaceResult, ScanOptions } from './types.js';
 import { PLACES_API_COST } from './types.js';
@@ -107,6 +107,22 @@ async function runScan(niche: string, location: string, options: ScanOptions) {
   if (places.length === 0) {
     console.log('Aucun résultat après filtrage.');
     process.exit(0);
+  }
+
+  // ── Dé-duplication : ne JAMAIS re-télécharger une entreprise déjà en base ──
+  if (!options.simulate) {
+    const existing = await getExistingKeys();
+    const beforeDedup = places.length;
+    places = places.filter((p) => !existing.has(prospectKey(p.business_name, city)));
+    const dupes = beforeDedup - places.length;
+    if (dupes > 0) {
+      console.log(`[dedup] ${dupes} entreprise(s) déjà en base ignorée(s) — ${places.length} nouvelle(s) à analyser`);
+    }
+    if (places.length === 0) {
+      console.log('Toutes les entreprises trouvées sont déjà en base — rien de nouveau à télécharger.');
+      if (options.json) console.log('__NEXUS_JSON__' + JSON.stringify({ niche, city, prospects: [] }) + '__NEXUS_END__');
+      process.exit(0);
+    }
   }
 
   // ── Analyse des sites web ──────────────────────────────────────────────
