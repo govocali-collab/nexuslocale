@@ -84,6 +84,8 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
   const bookingUrl = calLink
     ? `https://cal.com/${calLink}?name=${encodeURIComponent(prospect.business_name)}${email.trim() ? `&email=${encodeURIComponent(email.trim())}` : ''}`
     : '';
+  // Lien vers la facturation, pré-rempli avec ce client.
+  const billingUrl = `/app/billing?name=${encodeURIComponent(prospect.business_name)}${email.trim() ? `&email=${encodeURIComponent(email.trim())}` : ''}`;
   function copyBooking() {
     if (!bookingUrl) return;
     navigator.clipboard.writeText(bookingUrl);
@@ -149,6 +151,10 @@ export function ProspectPanel({ prospect, onClose, onSaved }: Props) {
                   🌐 Voir le site
                 </a>
               )}
+              <a href={billingUrl}
+                className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-[#404040] hover:bg-[#f5f5f5]">
+                🧾 Facturer
+              </a>
             </div>
             {callMsg && <p className="text-xs text-[#525252]">{callMsg}</p>}
           </div>

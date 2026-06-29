@@ -12,12 +12,14 @@ const fmt = (n: number) => '$' + n.toLocaleString('fr-CA', { minimumFractionDigi
 
 type Done = { number?: string | undefined; pdfUrl?: string | undefined; hostedUrl?: string | undefined; invoiceId?: string | undefined };
 
-export function CreateInvoiceForm() {
+export function CreateInvoiceForm({ initialName, initialEmail }: { initialName?: string; initialEmail?: string } = {}) {
   const router = useRouter();
-  const [name, setName]   = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName]   = useState(initialName ?? '');
+  const [email, setEmail] = useState(initialEmail ?? '');
   const [memo, setMemo]   = useState('');
-  const [lines, setLines] = useState<{ description: string; amount: string; detail: string }[]>([{ description: '', amount: '', detail: '' }]);
+  const [lines, setLines] = useState<{ description: string; amount: string; detail: string }[]>(
+    initialName ? [{ description: `Site web — ${initialName}`, amount: '', detail: '' }] : [{ description: '', amount: '', detail: '' }],
+  );
   const [pending, start]  = useTransition();
   const [sending, startSend] = useTransition();
   const [err, setErr]     = useState('');

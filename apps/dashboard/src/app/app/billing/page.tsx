@@ -3,8 +3,8 @@ import { BillingTabs } from '@/components/billing/billing-tabs';
 
 const fmtMoney = (n: number) => '$' + n.toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export default async function BillingPage() {
-  const [invoices, subs] = await Promise.all([listInvoices(), listSubscriptions()]);
+export default async function BillingPage({ searchParams }: { searchParams: Promise<{ name?: string; email?: string }> }) {
+  const [{ name, email }, invoices, subs] = await Promise.all([searchParams, listInvoices(), listSubscriptions()]);
   const paid = invoices.filter((i) => i.status === 'paid').reduce((n, i) => n + i.amount, 0);
   const open = invoices.filter((i) => i.status === 'open').reduce((n, i) => n + i.amount, 0);
 
@@ -26,7 +26,7 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      <BillingTabs invoices={invoices} subs={subs} />
+      <BillingTabs invoices={invoices} subs={subs} prefillName={name} prefillEmail={email} />
     </div>
   );
 }

@@ -8,7 +8,7 @@ import type { InvoiceRow, SubRow } from '@/lib/billing-actions';
 
 type TabId = 'unit' | 'recurring' | 'history';
 
-export function BillingTabs({ invoices, subs }: { invoices: InvoiceRow[]; subs: SubRow[] }) {
+export function BillingTabs({ invoices, subs, prefillName, prefillEmail }: { invoices: InvoiceRow[]; subs: SubRow[]; prefillName?: string; prefillEmail?: string }) {
   const [tab, setTab] = useState<TabId>('unit');
 
   const activeRecurring = subs.filter((s) => s.status === 'active' || s.status === 'trialing').length;
@@ -43,7 +43,7 @@ export function BillingTabs({ invoices, subs }: { invoices: InvoiceRow[]; subs: 
         })}
       </div>
 
-      {tab === 'unit'      && <CreateInvoiceForm />}
+      {tab === 'unit'      && <CreateInvoiceForm initialName={prefillName} initialEmail={prefillEmail} />}
       {tab === 'recurring' && <Subscriptions subs={subs} />}
       {tab === 'history'   && <InvoicesTable invoices={invoices} />}
     </div>
