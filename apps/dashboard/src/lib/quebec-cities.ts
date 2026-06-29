@@ -31,3 +31,26 @@ export const CITIES_BY_PROVINCE: Record<string, CityInfo[]> = {
     { name: 'Châteauguay',               pop: 50815 },
   ],
 };
+
+// Quartiers / arrondissements pour le « scan en profondeur » : Google plafonne à
+// 60 résultats par recherche, donc chercher par quartier multiplie la couverture
+// (surtout les petites entreprises locales avec de mauvais sites).
+export const NEIGHBORHOODS: Record<string, string[]> = {
+  'Montréal': [
+    'Rosemont', 'Villeray', 'Ahuntsic', 'Saint-Michel', 'Hochelaga', 'Mercier',
+    'Anjou', 'Saint-Léonard', 'Montréal-Nord', 'Rivière-des-Prairies', 'Pointe-aux-Trembles',
+    'Plateau Mont-Royal', 'Centre-ville Montréal', 'Le Sud-Ouest Montréal', 'Verdun',
+    'LaSalle', 'Lachine', 'Côte-des-Neiges', 'Notre-Dame-de-Grâce', 'Saint-Laurent',
+    'Pierrefonds', 'Outremont',
+  ],
+  'Québec': [
+    'Sainte-Foy', 'Sillery', 'Charlesbourg', 'Beauport', 'Limoilou', 'Vanier Québec',
+    'Cap-Rouge', 'Loretteville', 'Val-Bélair', 'Lebourgneuf',
+  ],
+  'Laval': [
+    'Chomedey', 'Laval-des-Rapides', 'Pont-Viau', 'Vimont', 'Auteuil', 'Sainte-Dorothée',
+    'Sainte-Rose', 'Fabreville', 'Saint-François Laval', 'Duvernay',
+  ],
+  'Gatineau': ['Hull', 'Aylmer', 'Gatineau', 'Buckingham', 'Masson-Angers'],
+  'Longueuil': ['Vieux-Longueuil', 'Saint-Hubert', 'Greenfield Park'],
+};

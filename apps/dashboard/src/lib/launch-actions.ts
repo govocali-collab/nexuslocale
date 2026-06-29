@@ -140,7 +140,7 @@ export interface ProspectorResult {
 export async function runProspectorScan(
   niche: string,
   location: string,
-  opts: { limit: number; minReviews: number; simulate: boolean; judge?: boolean },
+  opts: { limit: number; minReviews: number; simulate: boolean; judge?: boolean; storeCity?: string },
 ): Promise<{ out: string; ok: boolean; data: ProspectorResult | null }> {
   if (!niche.trim() || !location.trim()) {
     return { out: 'Niche et ville sont requis.', ok: false, data: null };
@@ -150,6 +150,7 @@ export async function runProspectorScan(
     opts.minReviews > 0 ? `--min-reviews ${opts.minReviews}` : '',
     opts.simulate ? '--simulate' : '', // sans ce flag = vrai appel Google Places (~$1+)
     opts.judge ? '--judge' : '',       // jugement IA des sites (Claude)
+    opts.storeCity ? `--store-city ${shellQuote(opts.storeCity)}` : '', // recherche par quartier → ranger sous la ville
     '--json',
   ].filter(Boolean).join(' ');
   // Le prospector ne demande confirmation que sous --estimate ; on l'omet ⇒ pas de prompt bloquant.

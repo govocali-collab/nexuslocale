@@ -32,6 +32,7 @@ program
   .option('--json',              'Émet aussi les résultats en JSON (pour le dashboard)')
   .option('--judge',             'Jugement IA des sites « a un site » (Claude ouvre et évalue vieux/cassé)')
   .option('--min-pain <n>',      'Ne garder que les prospects avec pain_score ≥ n (défaut 10 = exclut les bons sites)', '10')
+  .option('--store-city <name>', 'Ville à enregistrer (ex. « Montréal ») quand on cherche par quartier')
   .action(async (niche: string, location: string, opts: Record<string, string | boolean>) => {
     const options: ScanOptions = {
       limit:      Number(opts['limit']      ?? 60),
@@ -41,6 +42,7 @@ program
       json:       Boolean(opts['json']),
       judge:      Boolean(opts['judge']),
       minPain:    Number(opts['minPain']    ?? 10),
+      ...(typeof opts['storeCity'] === 'string' ? { storeCity: opts['storeCity'] } : {}),
     };
 
     await runScan(niche, location, options);
@@ -51,7 +53,10 @@ program.parse(process.argv);
 // ─── Scan principal ───────────────────────────────────────────────────────────
 
 async function runScan(niche: string, location: string, options: ScanOptions) {
-  const city = location.replace(/\s*,?\s*(QC|ON|BC|AB|MB|SK|NS|NB|PE|NL|NT|NU|YT)\s*$/i, '').trim();
+  // La ville stockée (DB + dédup) : --store-city si fourni (recherche par quartier),
+  // sinon dérivée de la localisation recherchée.
+  const city = (options.storeCity?.trim())
+    || location.replace(/\s*,?\s*(QC|ON|BC|AB|MB|SK|NS|NB|PE|NL|NT|NU|YT)\s*$/i, '').trim();
 
   // ── Estimation coût ────────────────────────────────────────────────────
   if (options.estimate || !options.simulate) {

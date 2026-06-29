@@ -37,6 +37,7 @@ export interface ScanOptions {
   json:        boolean;
   judge:       boolean;
   minPain:     number; // ne garder que les prospects dont le pain_score ≥ ce seuil (filtre les bons sites)
+  storeCity?:  string; // ville à enregistrer (ex. « Montréal ») quand on cherche par quartier
 }
 
 // Coût approximatif Google Places API (vérifier console.cloud.google.com pour prix actuels)

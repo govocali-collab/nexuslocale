@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { runFinderScan, runProspectorScan, runDemoGen, generateBeautifulSite, publishBeautifulSite, runGscSubmit, runRank, runCron, type RankResult, type SubmitResult, type CronResult } from '@/lib/launch-actions';
 import type { FinderResult, FinderDomain, ProspectorResult, Prospect } from '@/lib/launch-actions';
-import { CITIES_BY_PROVINCE, PROVINCES } from '@/lib/quebec-cities';
+import { CITIES_BY_PROVINCE, PROVINCES, NEIGHBORHOODS } from '@/lib/quebec-cities';
 
 interface Site { id: string; domain: string | null; niche: string; city: string; }
 interface ActionQueue {
@@ -515,6 +515,7 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
   const [minReviews, setMinReviews] = useState('');
   const [simulate,   setSimulate]   = useState(false);
   const [judge,      setJudge]      = useState(false);
+  const [deep,       setDeep]       = useState(false);
   const [result,     setResult]     = useState<{ out: string; ok: boolean; data: ProspectorResult | null } | null>(null);
   const [cityMap,    setCityMap]    = useState<Record<string, string>>({});
   const [progress,   setProgress]   = useState<string | null>(null);
@@ -524,9 +525,17 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
   const limitN      = Number(limit) || 60;
   const minReviewsN = Number(minReviews) || 0;
 
+  // En profondeur : une recherche par quartier (sinon une par ville).
+  const tasksFor = (city: string): { location: string; storeCity?: string; label: string }[] => {
+    const hoods = deep ? NEIGHBORHOODS[city] : undefined;
+    if (hoods && hoods.length) return hoods.map(h => ({ location: `${h}, ${city} ${province}`, storeCity: city, label: `${city} · ${h}` }));
+    return [{ location: `${city} ${province}`, label: city }];
+  };
+  const taskCount   = cities.reduce((n, c) => n + tasksFor(c).length, 0);
+
   const ready       = niche.trim() !== '' && cities.length > 0;
   const allSelected = cityList.length > 0 && cities.length === cityList.length;
-  const estCost     = ((Math.ceil(limitN / 20) * 0.032 + limitN * 0.017) * Math.max(1, cities.length)).toFixed(2);
+  const estCost     = ((Math.ceil(limitN / 20) * 0.032 + limitN * 0.017) * Math.max(1, taskCount)).toFixed(2);
 
   function toggleCity(name: string) {
     setCities(prev => prev.includes(name) ? prev.filter(c => c !== name) : [...prev, name]);
@@ -539,17 +548,18 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
     if (!ready) return;
     setResult(null); setProgress(null);
     start(async () => {
+      const tasks = cities.flatMap(c => tasksFor(c).map(t => ({ ...t, city: c })));
       const allProspects: Prospect[] = [];
       const map: Record<string, string> = {};
       const logs: string[] = [];
       let okAll = true;
-      for (let i = 0; i < cities.length; i++) {
-        const c = cities[i]!;
-        setProgress(`Ville ${i + 1}/${cities.length} : ${c}…`);
-        const r = await runProspectorScan(niche.trim(), `${c} ${province}`, { limit: limitN, minReviews: minReviewsN, simulate, judge });
-        logs.push(`━━━━━━ ${c} ━━━━━━\n${r.out}`);
+      for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i]!;
+        setProgress(`${i + 1}/${tasks.length} : ${t.label}…`);
+        const r = await runProspectorScan(niche.trim(), t.location, { limit: limitN, minReviews: minReviewsN, simulate, judge, ...(t.storeCity ? { storeCity: t.storeCity } : {}) });
+        logs.push(`━━━━━━ ${t.label} ━━━━━━\n${r.out}`);
         if (!r.ok) okAll = false;
-        for (const p of (r.data?.prospects ?? [])) { allProspects.push(p); map[p.business_name] = c; }
+        for (const p of (r.data?.prospects ?? [])) { allProspects.push(p); map[p.business_name] = t.city; }
       }
       setProgress(null);
       setCityMap(map);
@@ -618,6 +628,11 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
             className="rounded border-[#e5e5e5] text-indigo-600" />
           <span className="text-sm text-[#404040]">🤖 Analyse IA des sites</span>
         </label>
+        <label className="flex items-center gap-2 cursor-pointer mt-4" title="Cherche par quartier (Google plafonne à 60/recherche) — bien plus d'entreprises locales">
+          <input type="checkbox" checked={deep} onChange={e => setDeep(e.target.checked)}
+            className="rounded border-[#e5e5e5] text-indigo-600" />
+          <span className="text-sm text-[#404040]">🔬 Scan en profondeur (par quartier)</span>
+        </label>
       </div>
 
       <div className="flex items-center gap-3 flex-wrap">
@@ -629,7 +644,7 @@ function ProspectPanel({ initialNiche, initialCity, onNext }: { initialNiche?: s
         <span className="text-xs text-[#a3a3a3]">
           {simulate
             ? 'Mode fixtures — aucun appel API, aucun coût.'
-            : `${cities.length || 0} ville(s) × Google Places réel — ~$${estCost} en crédits au total. Écrit les prospects dans Supabase.`}
+            : `${cities.length || 0} ville(s)${deep ? ` → ${taskCount} recherche(s) par quartier` : ''} — ~$${estCost} en crédits au total. Écrit les prospects dans Supabase.`}
         </span>
       </div>
 
