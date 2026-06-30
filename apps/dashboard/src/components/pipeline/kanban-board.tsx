@@ -132,10 +132,17 @@ function ProspectCard({
 
 export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[]; initialScript?: string }) {
   const [sortKey, setSortKey]           = useState<SortKey>('pain');
+  const [nicheFilter, setNicheFilter]   = useState('');
   const [board, setBoard]               = useState<Board>(() => sortBoard(buildBoard(prospects), 'pain'));
 
-  // Resynchronise + retrie le board quand les données serveur ou le tri changent.
-  useEffect(() => { setBoard(sortBoard(buildBoard(prospects), sortKey)); }, [prospects, sortKey]);
+  // Catégories distinctes (pour le filtre).
+  const niches = [...new Set(prospects.map(p => p.niche).filter(Boolean))].sort();
+
+  // Resynchronise + filtre (catégorie) + retrie le board quand les données, le tri ou le filtre changent.
+  useEffect(() => {
+    const filtered = nicheFilter ? prospects.filter(p => p.niche === nicheFilter) : prospects;
+    setBoard(sortBoard(buildBoard(filtered), sortKey));
+  }, [prospects, sortKey, nicheFilter]);
   const [drag, setDrag]                 = useState<DragState | null>(null);
   const [overCol, setOverCol]           = useState<string | null>(null);
   const [overIndex, setOverIndex]       = useState<number | null>(null);
@@ -251,15 +258,25 @@ export function KanbanBoard({ prospects, initialScript }: { prospects: Prospect[
             <button onClick={() => setSel(new Set())} className="text-xs text-red-500 hover:text-red-700 underline">Annuler</button>
           </>
         )}
-        <div className="flex items-center gap-1.5 ml-auto">
-          <span className="text-xs text-[#a3a3a3]">Trier :</span>
-          <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
-            className="text-xs rounded-md border-[#e5e5e5] bg-white py-1 pl-2 pr-7 text-[#404040] focus:ring-indigo-500 focus:border-indigo-500">
-            <option value="pain">Besoin d&apos;aide (pire site)</option>
-            <option value="score">Opportunité (valeur)</option>
-            <option value="rating">Note Google</option>
-            <option value="manual">Manuel</option>
-          </select>
+        <div className="flex items-center gap-3 ml-auto flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[#a3a3a3]">Catégorie :</span>
+            <select value={nicheFilter} onChange={e => setNicheFilter(e.target.value)}
+              className="text-xs rounded-md border-[#e5e5e5] bg-white py-1 pl-2 pr-7 text-[#404040] capitalize focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="">Toutes</option>
+              {niches.map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[#a3a3a3]">Trier :</span>
+            <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
+              className="text-xs rounded-md border-[#e5e5e5] bg-white py-1 pl-2 pr-7 text-[#404040] focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="pain">Besoin d&apos;aide (pire site)</option>
+              <option value="score">Opportunité (valeur)</option>
+              <option value="rating">Note Google</option>
+              <option value="manual">Manuel</option>
+            </select>
+          </div>
         </div>
       </div>
       <div
